@@ -2182,13 +2182,11 @@
         document.getElementById('sidebarRole').textContent = teacher.role || 'Teacher';
 
         /* ── Role-based visibility ── */
-        if (teacher.role === 'teacher' || teacher.role === 'admin') {
+        if (teacher.role === 'teacher') {
             document.getElementById('userMgmtSection').style.display = 'block';
             ['addStudentCard', 'bulkImportCard', 'resetPasswordCard'].forEach(id => {
                 document.getElementById(id).style.display = 'flex';
             });
-        }
-        if (teacher.role === 'admin') {
             document.getElementById('addTeacherCard').style.display = 'flex';
             document.getElementById('manageUsersNav').style.display = 'flex';
         }
