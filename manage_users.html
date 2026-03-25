@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .user-tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; margin-bottom: 1.5rem; }
+        .user-tab { padding: 0.75rem 1.5rem; cursor: pointer; font-weight: 600; color: #9ca3af; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .user-tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .password-strength { height: 4px; border-radius: 2px; margin-top: 0.5rem; transition: all 0.3s; }
+        .strength-weak { background: #ef4444; width: 33%; }
+        .strength-medium { background: #f59e0b; width: 66%; }
+        .strength-strong { background: #10b981; width: 100%; }
+        .generated-pw { background: #f0fdf4; border: 1px solid #10b981; padding: 0.75rem; border-radius: 0.5rem; font-family: monospace; color: #065f46; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Management System</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">T</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Teacher</div>
+                    <div class="user-role" id="sidebarRole">Teacher</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="teacher_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">Academic</div>
+                <a href="enter_marks.html" class="nav-item"><span class="nav-icon">📝</span> Enter Marks</a>
+                <a href="take_attendance.html" class="nav-item"><span class="nav-icon">📋</span> Take Attendance</a>
+                <div class="nav-section-title">Management</div>
+                <a href="view_students.html" class="nav-item"><span class="nav-icon">👨‍🎓</span> View Students</a>
+                <a href="manage_users.html" class="nav-item active"><span class="nav-icon">👥</span> Manage Users</a>
+                <div class="nav-section-title">Records</div>
+                <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">User Management</div>
+                    <div class="topbar-breadcrumb">Add teachers and students to the system</div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Permission Check Alert -->
+                <div id="permissionAlert" class="alert alert-error" style="display:none">
+                    ⚠️ You don't have permission to manage users. Please contact an administrator.
+                </div>
+
+                <div class="user-tabs" id="userTabs" style="display:none">
+                    <div class="user-tab active" onclick="switchTab('teacher')">👩‍🏫 Add Teacher</div>
+                    <div class="user-tab" onclick="switchTab('student')">👨‍🎓 Add Student</div>
+                    <div class="user-tab" onclick="switchTab('reset')">🔑 Password Reset</div>
+                </div>
+
+                <!-- Add Teacher Form -->
+                <div class="form-section active" id="teacherSection">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Add New Teacher</span></div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" id="tName" placeholder="Enter teacher's full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Username *</label>
+                                    <input type="text" id="tUsername" placeholder="Unique username" required>
+                                    <small style="color:#9ca3af;font-size:0.75rem">Used for login. Must be unique.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password *</label>
+                                    <input type="password" id="tPassword" placeholder="Min 6 characters" oninput="checkStrength(this.value, 'tStrength')" required>
+                                    <div class="password-strength" id="tStrength"></div>
+                                    <small style="color:#9ca3af;font-size:0.75rem">Or <a href="#" onclick="generatePassword('tPassword', 'tGenerated')" style="color:#667eea">generate secure password</a></small>
+                                    <div class="generated-pw" id="tGenerated" style="display:none"></div>
+                                </div>
+                                <div class="form-group" id="roleGroup" style="display:none">
+                                    <label class="form-label">Role</label>
+                                    <select id="tRole">
+                                        <option value="teacher">Teacher</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.5rem">
+                                <button class="btn btn-primary btn-lg" onclick="addTeacher()">➕ Add Teacher</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teachers List -->
+                    <div class="card" style="margin-top:1.5rem">
+                        <div class="card-header"><span class="card-title">Existing Teachers</span></div>
+                        <div class="card-body">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Username</th>
+                                            <th>Role</th>
+                                            <th>Added By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="teachersList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Student Form -->
+                <div class="form-section" id="studentSection">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Add New Student</span></div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" id="sName" placeholder="Enter student's full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Roll Number *</label>
+                                    <input type="text" id="sRoll" placeholder="Unique roll number" required>
+                                    <small style="color:#9ca3af;font-size:0.75rem">Used for login. Format: CLASS-SECTION-NUMBER (e.g., 10-A-01)</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Class *</label>
+                                    <select id="sClass" required>
+                                        <option value="">Select Class</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section *</label>
+                                    <select id="sSection" required>
+                                        <option value="">Select Section</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password *</label>
+                                    <input type="password" id="sPassword" placeholder="Min 6 characters" oninput="checkStrength(this.value, 'sStrength')" required>
+                                    <div class="password-strength" id="sStrength"></div>
+                                    <small style="color:#9ca3af;font-size:0.75rem">Or <a href="#" onclick="generatePassword('sPassword', 'sGenerated')" style="color:#667eea">generate secure password</a></small>
+                                    <div class="generated-pw" id="sGenerated" style="display:none"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Parent Email (optional)</label>
+                                    <input type="email" id="sEmail" placeholder="For password reset notifications">
+                                </div>
+                            </div>
+                            <div style="margin-top:1.5rem">
+                                <button class="btn btn-primary btn-lg" onclick="addStudent()">➕ Add Student</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Import -->
+                    <div class="card" style="margin-top:1.5rem">
+                        <div class="card-header"><span class="card-title">Bulk Import Students</span></div>
+                        <div class="card-body">
+                            <div class="info-banner" style="margin-bottom:1rem">
+                                Upload CSV with columns: name, roll_number, class, section, password, email (optional)
+                            </div>
+                            <input type="file" id="csvFile" accept=".csv" style="margin-bottom:1rem">
+                            <button class="btn btn-secondary" onclick="downloadTemplate()">📄 Download CSV Template</button>
+                            <button class="btn btn-success" onclick="importCSV()" style="margin-left:0.5rem">📤 Import</button>
+                            <div id="importResult" style="margin-top:1rem"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Reset Section -->
+                <div class="form-section" id="resetSection">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Reset User Password</span></div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">User Type</label>
+                                    <select id="resetType" onchange="loadUsersForReset()">
+                                        <option value="student">Student</option>
+                                        <option value="teacher">Teacher</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Select User</label>
+                                    <select id="resetUser">
+                                        <option value="">Select user to reset</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" id="resetPassword" placeholder="Enter new password" oninput="checkStrength(this.value, 'rStrength')">
+                                    <div class="password-strength" id="rStrength"></div>
+                                    <small style="color:#9ca3af;font-size:0.75rem">Leave blank to auto-generate</small>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.5rem">
+                                <button class="btn btn-warning" onclick="resetPassword()" style="background:#f59e0b;color:white">🔄 Reset Password</button>
+                            </div>
+                            <div id="resetResult" style="margin-top:1rem"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const teacher = getSession('teacher');
+        if (!teacher) throw 'auth';
+        
+        // Check permissions
+        const isAdmin = teacher.role === 'admin';
+        const canManageUsers = isAdmin || true; // Set to `isAdmin only` to restrict to admins
+        
+        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0);
+        document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarRole').textContent = teacher.role || 'Teacher';
+
+        if (!canManageUsers) {
+            document.getElementById('permissionAlert').style.display = 'block';
+        } else {
+            document.getElementById('userTabs').style.display = 'flex';
+            if (isAdmin) {
+                document.getElementById('roleGroup').style.display = 'block';
+            }
+            loadTeachers();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'teacher') {
+                document.querySelectorAll('.user-tab')[0].classList.add('active');
+                document.getElementById('teacherSection').classList.add('active');
+            } else if (tab === 'student') {
+                document.querySelectorAll('.user-tab')[1].classList.add('active');
+                document.getElementById('studentSection').classList.add('active');
+            } else {
+                document.querySelectorAll('.user-tab')[2].classList.add('active');
+                document.getElementById('resetSection').classList.add('active');
+                loadUsersForReset();
+            }
+        }
+
+        function checkStrength(pw, elementId) {
+            const el = document.getElementById(elementId);
+            if (!pw) { el.className = 'password-strength'; return; }
+            if (pw.length < 6) { el.className = 'password-strength strength-weak'; }
+            else if (pw.length < 10 || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw)) { 
+                el.className = 'password-strength strength-medium'; 
+            }
+            else { el.className = 'password-strength strength-strong'; }
+        }
+
+        function generatePassword(inputId, displayId) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let pw = '';
+            for (let i = 0; i < 12; i++) {
+                pw += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById(inputId).value = pw;
+            checkStrength(pw, inputId === 'tPassword' ? 'tStrength' : 'sStrength');
+            
+            const display = document.getElementById(displayId);
+            display.textContent = `Generated: ${pw} (Copy this!)`;
+            display.style.display = 'block';
+            
+            // Auto-copy to clipboard
+            navigator.clipboard.writeText(pw);
+        }
+
+        async function addTeacher() {
+            const name = document.getElementById('tName').value.trim();
+            const username = document.getElementById('tUsername').value.trim();
+            const password = document.getElementById('tPassword').value;
+            const role = isAdmin ? document.getElementById('tRole').value : 'teacher';
+
+            if (!name || !username || !password) {
+                alert('Please fill all required fields'); return;
+            }
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters'); return;
+            }
+
+            // Check if username exists
+            const { data: existing } = await db.from('teachers').select('id').eq('username', username).single();
+            if (existing) { alert('Username already exists!'); return; }
+
+            const { error } = await db.from('teachers').insert({
+                name, username, password, role,
+                created_by: teacher.id,
+                created_at: new Date().toISOString()
+            });
+
+            if (error) { alert('Error: ' + error.message); }
+            else {
+                alert('Teacher added successfully!');
+                document.getElementById('tName').value = '';
+                document.getElementById('tUsername').value = '';
+                document.getElementById('tPassword').value = '';
+                document.getElementById('tGenerated').style.display = 'none';
+                loadTeachers();
+            }
+        }
+
+        async function addStudent() {
+            const name = document.getElementById('sName').value.trim();
+            const roll = document.getElementById('sRoll').value.trim();
+            const cls = document.getElementById('sClass').value;
+            const sec = document.getElementById('sSection').value;
+            const password = document.getElementById('sPassword').value;
+            const email = document.getElementById('sEmail').value.trim();
+
+            if (!name || !roll || !cls || !sec || !password) {
+                alert('Please fill all required fields'); return;
+            }
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters'); return;
+            }
+
+            // Check if roll exists
+            const { data: existing } = await db.from('students').select('id').eq('roll_number', roll).single();
+            if (existing) { alert('Roll number already exists!'); return; }
+
+            const { error } = await db.from('students').insert({
+                name, roll_number: roll, class_name: cls, section: sec, password, email,
+                created_at: new Date().toISOString()
+            });
+
+            if (error) { alert('Error: ' + error.message); }
+            else {
+                alert('Student added successfully!');
+                document.getElementById('sName').value = '';
+                document.getElementById('sRoll').value = '';
+                document.getElementById('sPassword').value = '';
+                document.getElementById('sGenerated').style.display = 'none';
+            }
+        }
+
+        async function loadTeachers() {
+            const { data } = await db.from('teachers').select('*, creator:created_by(name)').order('created_at', { ascending: false });
+            document.getElementById('teachersList').innerHTML = (data || []).map(t => `
+                <tr>
+                    <td><strong>${t.name}</strong></td>
+                    <td>${t.username}</td>
+                    <td><span class="badge ${t.role === 'admin' ? 'badge-purple' : 'badge-blue'}">${t.role || 'teacher'}</span></td>
+                    <td>${t.creator?.name || 'System'}</td>
+                    <td>
+                        ${t.id !== teacher.id ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacher('${t.id}')">Delete</button>` : '<span style="color:#9ca3af;font-size:0.8rem">You</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteTeacher(id) {
+            if (!confirm('Are you sure? This cannot be undone.')) return;
+            const { error } = await db.from('teachers').delete().eq('id', id);
+            if (error) alert('Error: ' + error.message);
+            else loadTeachers();
+        }
+
+        async function loadUsersForReset() {
+            const type = document.getElementById('resetType').value;
+            const { data } = await db.from(type + 's').select('id, name, ' + (type === 'teacher' ? 'username' : 'roll_number'));
+            const sel = document.getElementById('resetUser');
+            sel.innerHTML = '<option value="">Select user to reset</option>' +
+                (data || []).map(u => `<option value="${u.id}">${u.name} (${type === 'teacher' ? u.username : u.roll_number})</option>`).join('');
+        }
+
+        async function resetPassword() {
+            const type = document.getElementById('resetType').value;
+            const userId = document.getElementById('resetUser').value;
+            let newPass = document.getElementById('resetPassword').value;
+
+            if (!userId) { alert('Please select a user'); return; }
+            
+            // Generate if empty
+            if (!newPass) {
+                const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+                newPass = '';
+                for (let i = 0; i < 10; i++) newPass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            const { error } = await db.from(type + 's').update({ password: newPass }).eq('id', userId);
+            
+            const resultDiv = document.getElementById('resetResult');
+            if (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        ✅ Password reset successfully!<br>
+                        <strong>New Password: ${newPass}</strong><br>
+                        <small>Please share this securely with the user.</small>
+                    </div>`;
+                document.getElementById('resetPassword').value = '';
+            }
+        }
+
+        function downloadTemplate() {
+            const csv = 'name,roll_number,class,section,password,email\nJohn Doe,10-A-01,10,A,pass123,parent@email.com\nJane Smith,10-A-02,10,A,pass123,parent2@email.com';
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'students_template.csv';
+            a.click();
+        }
+
+        async function importCSV() {
+            const file = document.getElementById('csvFile').files[0];
+            if (!file) { alert('Please select a CSV file'); return; }
+            
+            const text = await file.text();
+            const lines = text.split('\n').filter(l => l.trim());
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            let success = 0, failed = 0;
+            const errors = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                const row = {};
+                headers.forEach((h, idx) => row[h] = cols[idx]);
+                
+                const { error } = await db.from('students').insert({
+                    name: row.name,
+                    roll_number: row.roll_number,
+                    class_name: row.class,
+                    section: row.section,
+                    password: row.password,
+                    email: row.email
+                });
+                
+                if (error) { failed++; errors.push(`Row ${i}: ${error.message}`); }
+                else { success++; }
+            }
+            
+            document.getElementById('importResult').innerHTML = `
+                <div class="alert ${failed === 0 ? 'alert-success' : 'alert-error'}">
+                    ✅ ${success} imported successfully<br>
+                    ${failed > 0 ? `❌ ${failed} failed<br><small>${errors.slice(0, 3).join('<br>')}</small>` : ''}
+                </div>`;
+        }
+    </script>
+</body>
+</html>

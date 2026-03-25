@@ -36,6 +36,7 @@
             display: block;
             transition: transform 0.2s, box-shadow 0.2s;
             border: 2px solid transparent;
+            position: relative;
         }
         .action-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #e5e7eb; }
         .action-icon { width: 52px; height: 52px; border-radius: 0.875rem; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1rem; }
@@ -56,6 +57,51 @@
         .class-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
         .class-stat-row:last-child { border-bottom: none; }
         .class-name-pill { background: #ede9fe; color: #5b21b6; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
+        
+        /* Admin badge for user management */
+        .admin-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+        
+        /* User management cards styling */
+        .user-card-teacher {
+            border-color: #8b5cf6 !important;
+            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%) !important;
+        }
+        .user-card-teacher .action-icon {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
+            color: white;
+        }
+        
+        .user-card-student {
+            border-color: #10b981 !important;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%) !important;
+        }
+        .user-card-student .action-icon {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            color: white;
+        }
+        
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +116,7 @@
                 <div class="user-avatar" id="sidebarAvatar">T</div>
                 <div class="user-details">
                     <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role">Teacher</div>
+                    <div class="user-role" id="sidebarRole">Teacher</div>
                 </div>
             </div>
             <nav class="sidebar-nav">
@@ -85,10 +131,14 @@
                 <a href="take_attendance.html" class="nav-item">
                     <span class="nav-icon">📋</span> Take Attendance
                 </a>
-                <div class="nav-section-title">Records</div>
+                <div class="nav-section-title">Management</div>
                 <a href="view_students.html" class="nav-item">
                     <span class="nav-icon">👨‍🎓</span> View Students
                 </a>
+                <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                    <span class="nav-icon">👥</span> Manage Users
+                </a>
+                <div class="nav-section-title">Records</div>
                 <a href="reports.html" class="nav-item">
                     <span class="nav-icon">📈</span> Reports
                 </a>
@@ -176,6 +226,42 @@
                     </a>
                 </div>
 
+                <!-- User Management Section -->
+                <div class="section-title" id="userMgmtTitle" style="display:none;">
+                    👥 User Management
+                </div>
+                <div class="quick-actions" id="userMgmtCards" style="display:none;">
+                    
+                    <!-- Add Teacher Card (Admin Only) -->
+                    <a href="manage_users.html#teacher" class="action-card user-card-teacher" id="addTeacherCard" style="display:none;">
+                        <span class="admin-badge">Admin</span>
+                        <div class="action-icon">👩‍🏫</div>
+                        <h3>Add Teacher</h3>
+                        <p>Create new teacher accounts with username and password. Admin privileges required.</p>
+                    </a>
+                    
+                    <!-- Add Student Card (All Teachers) -->
+                    <a href="manage_users.html#student" class="action-card user-card-student" id="addStudentCard" style="display:none;">
+                        <div class="action-icon">👨‍🎓</div>
+                        <h3>Add Student</h3>
+                        <p>Enroll new students with roll number, class, section and login credentials.</p>
+                    </a>
+                    
+                    <!-- Bulk Import Card (All Teachers) -->
+                    <a href="manage_users.html#student" class="action-card user-card-student" id="bulkImportCard" style="display:none;">
+                        <div class="action-icon">📤</div>
+                        <h3>Bulk Import</h3>
+                        <p>Import multiple students at once using CSV file upload.</p>
+                    </a>
+                    
+                    <!-- Password Reset Card (All Teachers) -->
+                    <a href="manage_users.html#reset" class="action-card" id="resetPasswordCard" style="display:none; border-color:#f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);">
+                        <div class="action-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">🔑</div>
+                        <h3>Reset Password</h3>
+                        <p>Reset passwords for students or teachers who forgot their credentials.</p>
+                    </a>
+                </div>
+
                 <!-- Bottom grid -->
                 <div class="bottom-grid">
                     <!-- Recent Marks -->
@@ -227,6 +313,29 @@
         // Set UI
         document.getElementById('sidebarName').textContent = teacher.name;
         document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
+        document.getElementById('sidebarRole').textContent = teacher.role || 'Teacher';
+
+        // Show/hide features based on role
+        const isAdmin = teacher.role === 'admin';
+        
+        // Always show user management section title
+        document.getElementById('userMgmtTitle').style.display = 'flex';
+        document.getElementById('userMgmtCards').style.display = 'grid';
+        
+        // Admin sees: Add Teacher, Add Student, Bulk Import, Reset Password
+        // Teacher sees: Add Student, Bulk Import, Reset Password
+        if (isAdmin) {
+            document.getElementById('addTeacherCard').style.display = 'block';
+            document.getElementById('manageUsersNav').style.display = 'flex';
+        } else {
+            // Hide manage users nav for non-admins, but they can still access direct links
+            document.getElementById('manageUsersNav').style.display = 'none';
+        }
+        
+        // All teachers can see these
+        document.getElementById('addStudentCard').style.display = 'block';
+        document.getElementById('bulkImportCard').style.display = 'block';
+        document.getElementById('resetPasswordCard').style.display = 'block';
 
         const now = new Date();
         const hour = now.getHours();
