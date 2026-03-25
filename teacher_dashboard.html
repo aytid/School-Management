@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .welcome-banner h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .welcome-banner p { opacity: 0.85; font-size: 0.9rem; }
+        .welcome-illustration { font-size: 4rem; }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .action-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .action-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #e5e7eb; }
+        .action-icon { width: 52px; height: 52px; border-radius: 0.875rem; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1rem; }
+        .action-card h3 { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .action-card p { font-size: 0.8rem; color: #9ca3af; line-height: 1.5; }
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
+        .activity-item {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot { width: 10px; height: 10px; border-radius: 50%; background: #667eea; flex-shrink: 0; }
+        .activity-content { flex: 1; }
+        .activity-title { font-size: 0.875rem; font-weight: 500; color: #374151; }
+        .activity-meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.1rem; }
+        .class-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+        .class-stat-row:last-child { border-bottom: none; }
+        .class-name-pill { background: #ede9fe; color: #5b21b6; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Management System</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">T</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Teacher</div>
+                    <div class="user-role">Teacher</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="teacher_dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <div class="nav-section-title">Academic</div>
+                <a href="enter_marks.html" class="nav-item">
+                    <span class="nav-icon">📝</span> Enter Marks
+                </a>
+                <a href="take_attendance.html" class="nav-item">
+                    <span class="nav-icon">📋</span> Take Attendance
+                </a>
+                <div class="nav-section-title">Records</div>
+                <a href="view_students.html" class="nav-item">
+                    <span class="nav-icon">👨‍🎓</span> View Students
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span> Reports
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">↪ Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">Dashboard</div>
+                    <div class="topbar-breadcrumb">Overview of your school activities</div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="currentDate"></div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div>
+                        <h2 id="welcomeText">Good Morning, Teacher!</h2>
+                        <p>Here's what's happening in your school today.</p>
+                    </div>
+                    <div class="welcome-illustration">👩‍🏫</div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon-box bg-blue">👨‍🎓</div>
+                        <div>
+                            <div class="stat-number" id="statStudents">–</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-box bg-green">📊</div>
+                        <div>
+                            <div class="stat-number" id="statMarks">–</div>
+                            <div class="stat-label">Marks Entries</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-box bg-orange">📅</div>
+                        <div>
+                            <div class="stat-number" id="statToday">–</div>
+                            <div class="stat-label">Today's Attendance</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-box bg-purple">📚</div>
+                        <div>
+                            <div class="stat-number">6–10</div>
+                            <div class="stat-label">Classes Managed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="enter_marks.html" class="action-card">
+                        <div class="action-icon bg-blue">📝</div>
+                        <h3>Enter Marks</h3>
+                        <p>Record student marks for FA and SA examinations across all subjects.</p>
+                    </a>
+                    <a href="take_attendance.html" class="action-card">
+                        <div class="action-icon bg-green">📋</div>
+                        <h3>Take Attendance</h3>
+                        <p>Mark daily attendance for students. Mark present or absent class-wise.</p>
+                    </a>
+                    <a href="view_students.html" class="action-card">
+                        <div class="action-icon bg-orange">👨‍🎓</div>
+                        <h3>View Students</h3>
+                        <p>Browse the complete student list, filter by class and section.</p>
+                    </a>
+                    <a href="reports.html" class="action-card">
+                        <div class="action-icon bg-purple">📈</div>
+                        <h3>Reports</h3>
+                        <p>Generate and view performance and attendance reports for any student.</p>
+                    </a>
+                </div>
+
+                <!-- Bottom grid -->
+                <div class="bottom-grid">
+                    <!-- Recent Marks -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Recent Marks Entries</span>
+                            <a href="enter_marks.html" class="btn btn-secondary btn-sm">+ Enter More</a>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Subject</th>
+                                            <th>Exam</th>
+                                            <th>Marks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentMarksBody">
+                                        <tr><td colspan="4" class="loading">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Class Distribution -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Students by Class</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="classStats">
+                                <div class="loading">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const teacher = getSession('teacher');
+        if (!teacher) throw 'auth';
+
+        // Set UI
+        document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
+
+        const now = new Date();
+        const hour = now.getHours();
+        const greet = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+        document.getElementById('welcomeText').textContent = `${greet}, ${teacher.name}!`;
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        async function loadDashboard() {
+            // Total students
+            const { count: sc } = await db.from('students').select('*', { count: 'exact', head: true });
+            document.getElementById('statStudents').textContent = sc || 0;
+
+            // Total marks
+            const { count: mc } = await db.from('marks').select('*', { count: 'exact', head: true });
+            document.getElementById('statMarks').textContent = mc || 0;
+
+            // Today attendance
+            const today = now.toISOString().split('T')[0];
+            const { count: ac } = await db.from('attendance').select('*', { count: 'exact', head: true }).eq('attendance_date', today);
+            document.getElementById('statToday').textContent = ac || 0;
+
+            // Recent marks
+            const { data: marks } = await db.from('marks')
+                .select('*, students(name, class_name, section), subjects(subject_name)')
+                .order('recorded_at', { ascending: false }).limit(8);
+
+            if (marks && marks.length > 0) {
+                document.getElementById('recentMarksBody').innerHTML = marks.map(m => {
+                    const g = calculateGrade(m.marks_obtained, m.max_marks);
+                    return `<tr>
+                        <td><strong>${m.students?.name || '–'}</strong><br><small style="color:#9ca3af">${m.students?.class_name}-${m.students?.section}</small></td>
+                        <td>${m.subjects?.subject_name || '–'}</td>
+                        <td><span class="badge badge-blue">${m.exam_type}</span></td>
+                        <td><strong>${m.marks_obtained}/${m.max_marks}</strong> <span class="grade-tag ${g.cls}">${g.grade}</span></td>
+                    </tr>`;
+                }).join('');
+            } else {
+                document.getElementById('recentMarksBody').innerHTML = '<tr><td colspan="4" class="empty-state">No entries yet</td></tr>';
+            }
+
+            // Students by class
+            const { data: students } = await db.from('students').select('class_name');
+            const classCounts = {};
+            CLASSES.forEach(c => classCounts[c] = 0);
+            if (students) students.forEach(s => { if (classCounts[s.class_name] !== undefined) classCounts[s.class_name]++; });
+            const total = students ? students.length : 1;
+
+            document.getElementById('classStats').innerHTML = CLASSES.map(c => `
+                <div class="class-stat-row">
+                    <div style="display:flex;align-items:center;gap:0.75rem">
+                        <span class="class-name-pill">Class ${c}</span>
+                        <span style="font-size:0.875rem;color:#374151;font-weight:600">${classCounts[c]} students</span>
+                    </div>
+                    <div style="flex:1;max-width:120px;margin:0 1rem">
+                        <div style="height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
+                            <div style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:${Math.round((classCounts[c]/Math.max(total,1))*100)}%"></div>
+                        </div>
+                    </div>
+                    <span style="font-size:0.75rem;color:#9ca3af">${Math.round((classCounts[c]/Math.max(total,1))*100)}%</span>
+                </div>
+            `).join('');
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .report-filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+        .result-header-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-radius: 0.875rem; padding: 1.5rem;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 1rem; margin-bottom: 1.25rem;
+        }
+        .result-header-bar h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .result-header-bar p { font-size: 0.85rem; opacity: 0.85; }
+        .result-summary-pills { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .rsp { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 700; }
+        .subject-block { background: white; border-radius: 0.875rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 1rem; overflow: hidden; }
+        .subject-block-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 1.25rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+        }
+        .sb-name { font-weight: 700; font-size: 0.95rem; color: #1f2937; }
+        .sb-avg { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 0.25rem 0.875rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
+        .class-report-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .crs-card { background: white; border-radius: 0.875rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .crs-name { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.875rem; }
+        .crs-val { font-size: 1.75rem; font-weight: 800; color: #1f2937; }
+        .crs-label { font-size: 0.75rem; color: #9ca3af; }
+        .print-btn { print-color-adjust: exact; }
+        @media print {
+            .sidebar, .topbar, .btn, select, input, .tab-bar { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+            .page-body { padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Management System</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">T</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Teacher</div>
+                    <div class="user-role">Teacher</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="teacher_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">Academic</div>
+                <a href="enter_marks.html" class="nav-item"><span class="nav-icon">📝</span> Enter Marks</a>
+                <a href="take_attendance.html" class="nav-item"><span class="nav-icon">📋</span> Take Attendance</a>
+                <div class="nav-section-title">Records</div>
+                <a href="view_students.html" class="nav-item"><span class="nav-icon">👨‍🎓</span> View Students</a>
+                <a href="reports.html" class="nav-item active"><span class="nav-icon">📈</span> Reports</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">Reports</div>
+                    <div class="topbar-breadcrumb">Generate student and class performance reports</div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-secondary print-btn" onclick="window.print()">🖨 Print</button>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="switchTab('student')">👤 Student Report</div>
+                    <div class="tab-item" onclick="switchTab('class')">📚 Class Report</div>
+                    <div class="tab-item" onclick="switchTab('exam')">📝 Exam Report</div>
+                </div>
+
+                <!-- STUDENT REPORT -->
+                <div class="tab-panel active" id="panelStudent">
+                    <div class="card" style="margin-bottom:1.5rem">
+                        <div class="card-header"><span class="card-title">Student Report Generator</span></div>
+                        <div class="card-body">
+                            <div class="report-filter-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <select id="srClass" onchange="loadStudentsForReport()">
+                                        <option value="">Select Class</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select id="srSection" onchange="loadStudentsForReport()">
+                                        <option value="">Select Section</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Student</label>
+                                    <select id="srStudent"><option value="">Select Student</option></select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="generateStudentReport()">Generate Report</button>
+                        </div>
+                    </div>
+                    <div id="studentReportOutput"></div>
+                </div>
+
+                <!-- CLASS REPORT -->
+                <div class="tab-panel" id="panelClass">
+                    <div class="card" style="margin-bottom:1.5rem">
+                        <div class="card-header"><span class="card-title">Class Performance Report</span></div>
+                        <div class="card-body">
+                            <div class="report-filter-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <select id="crClass">
+                                        <option value="">Select Class</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select id="crSection">
+                                        <option value="">All Sections</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Exam Type</label>
+                                    <select id="crExam">
+                                        <option value="">All Exams</option>
+                                        ${EXAMS.map(e => `<option value="${e.value}">${e.label}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="generateClassReport()">Generate Report</button>
+                        </div>
+                    </div>
+                    <div id="classReportOutput"></div>
+                </div>
+
+                <!-- EXAM REPORT -->
+                <div class="tab-panel" id="panelExam">
+                    <div class="card" style="margin-bottom:1.5rem">
+                        <div class="card-header"><span class="card-title">Exam-wise Performance Analysis</span></div>
+                        <div class="card-body">
+                            <div class="report-filter-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <select id="erClass" onchange="updateErSubjects()">
+                                        <option value="">Select Class</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select id="erSection">
+                                        <option value="">All Sections</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Subject</label>
+                                    <select id="erSubject">
+                                        <option value="">All Subjects</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Exam</label>
+                                    <select id="erExam">
+                                        <option value="">All Exams</option>
+                                        ${EXAMS.map(e => `<option value="${e.value}">${e.value}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="generateExamReport()">Generate Report</button>
+                        </div>
+                    </div>
+                    <div id="examReportOutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const teacher = getSession('teacher');
+        if (!teacher) throw 'auth';
+        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0);
+        document.getElementById('sidebarName').textContent = teacher.name;
+
+        let reportStudents = [];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach((t, i) => {
+                t.classList.toggle('active', (i === 0 && tab === 'student') || (i === 1 && tab === 'class') || (i === 2 && tab === 'exam'));
+            });
+            document.getElementById('panelStudent').classList.toggle('active', tab === 'student');
+            document.getElementById('panelClass').classList.toggle('active', tab === 'class');
+            document.getElementById('panelExam').classList.toggle('active', tab === 'exam');
+        }
+
+        async function loadStudentsForReport() {
+            const cls = document.getElementById('srClass').value;
+            const sec = document.getElementById('srSection').value;
+            if (!cls) return;
+
+            let query = db.from('students').select('*').eq('class_name', cls);
+            if (sec) query = query.eq('section', sec);
+            const { data } = await query.order('roll_number');
+            reportStudents = data || [];
+
+            const sel = document.getElementById('srStudent');
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                reportStudents.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
+        }
+
+        async function generateStudentReport() {
+            const studentId = document.getElementById('srStudent').value;
+            if (!studentId) { alert('Please select a student'); return; }
+            const student = reportStudents.find(s => s.id == studentId);
+
+            const [marksRes, attRes] = await Promise.all([
+                db.from('marks').select('*, subjects(subject_name)').eq('student_id', studentId).order('exam_type'),
+                db.from('attendance').select('status').eq('student_id', studentId)
+            ]);
+
+            const marks = marksRes.data || [];
+            const att = attRes.data || [];
+            const attPct = att.length > 0 ? ((att.filter(a => a.status === 'Present').length / att.length) * 100).toFixed(1) : 0;
+
+            const subjectGroups = {};
+            marks.forEach(m => {
+                const n = m.subjects?.subject_name || 'Unknown';
+                if (!subjectGroups[n]) subjectGroups[n] = [];
+                subjectGroups[n].push(m);
+            });
+
+            let avgPct = 0;
+            if (marks.length > 0) {
+                avgPct = (marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / marks.length).toFixed(1);
+            }
+
+            const og = calculateGrade(parseFloat(avgPct), 100);
+
+            document.getElementById('studentReportOutput').innerHTML = `
+                <div class="result-header-bar">
+                    <div>
+                        <h3>${student.name}</h3>
+                        <p>Class ${student.class_name}-${student.section} | Roll: ${student.roll_number}</p>
+                    </div>
+                    <div class="result-summary-pills">
+                        <span class="rsp">Avg: ${avgPct}%</span>
+                        <span class="rsp">Grade: ${og.grade}</span>
+                        <span class="rsp">Attendance: ${attPct}%</span>
+                        <span class="rsp">Exams: ${marks.length}</span>
+                    </div>
+                </div>
+                ${Object.entries(subjectGroups).map(([subj, exams]) => {
+                    const tot = exams.reduce((a, e) => a + e.marks_obtained, 0);
+                    const max = exams.reduce((a, e) => a + e.max_marks, 0);
+                    const avg = ((tot / max) * 100).toFixed(1);
+                    return `
+                        <div class="subject-block">
+                            <div class="subject-block-header">
+                                <span class="sb-name">📚 ${subj}</span>
+                                <span class="sb-avg">Average: ${avg}%</span>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead><tr><th>Exam</th><th>Marks</th><th>Max</th><th>Percentage</th><th>Grade</th></tr></thead>
+                                    <tbody>
+                                        ${exams.map(e => {
+                                            const pct = ((e.marks_obtained / e.max_marks) * 100).toFixed(1);
+                                            const g = calculateGrade(e.marks_obtained, e.max_marks);
+                                            return `<tr>
+                                                <td><strong>${e.exam_type}</strong></td>
+                                                <td>${e.marks_obtained}</td>
+                                                <td>${e.max_marks}</td>
+                                                <td>${pct}%</td>
+                                                <td><span class="grade-tag ${g.cls}">${g.grade}</span></td>
+                                            </tr>`;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                }).join('') || '<div class="empty-state"><p>No marks recorded yet</p></div>'}
+            `;
+        }
+
+        async function generateClassReport() {
+            const cls = document.getElementById('crClass').value;
+            const sec = document.getElementById('crSection').value;
+            const exam = document.getElementById('crExam').value;
+
+            if (!cls) { alert('Please select a class'); return; }
+
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery.order('roll_number');
+            if (!students || students.length === 0) { document.getElementById('classReportOutput').innerHTML = '<div class="empty-state"><p>No students found</p></div>'; return; }
+
+            let marksQuery = db.from('marks').select('*, subjects(subject_name)')
+                .in('student_id', students.map(s => s.id));
+            if (exam) marksQuery = marksQuery.eq('exam_type', exam);
+            const { data: marks } = await marksQuery;
+
+            const { data: att } = await db.from('attendance').select('student_id, status')
+                .in('student_id', students.map(s => s.id));
+
+            const studentStats = students.map(s => {
+                const sm = marks ? marks.filter(m => m.student_id === s.id) : [];
+                const sa = att ? att.filter(a => a.student_id === s.id) : [];
+                const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
+                const attPct = sa.length > 0 ? ((sa.filter(a => a.status === 'Present').length / sa.length) * 100).toFixed(1) : '–';
+                const g = avg !== '–' ? calculateGrade(parseFloat(avg), 100) : null;
+                return { ...s, avg, attPct, exams: sm.length, grade: g };
+            });
+
+            const withAvg = studentStats.filter(s => s.avg !== '–');
+            const classAvg = withAvg.length > 0 ? (withAvg.reduce((a, s) => a + parseFloat(s.avg), 0) / withAvg.length).toFixed(1) : '–';
+
+            document.getElementById('classReportOutput').innerHTML = `
+                <div class="result-header-bar">
+                    <div>
+                        <h3>Class ${cls}${sec ? '-' + sec : ''} Report${exam ? ' — ' + exam : ''}</h3>
+                        <p>${students.length} students | Generated on ${new Date().toLocaleDateString('en-IN')}</p>
+                    </div>
+                    <div class="result-summary-pills">
+                        <span class="rsp">Students: ${students.length}</span>
+                        <span class="rsp">Class Avg: ${classAvg}%</span>
+                        <span class="rsp">Passed: ${withAvg.filter(s => parseFloat(s.avg) >= 40).length}</span>
+                        <span class="rsp">Top Scorers: ${withAvg.filter(s => parseFloat(s.avg) >= 80).length}</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Section</th>
+                                    <th>Exams</th>
+                                    <th>Average</th>
+                                    <th>Grade</th>
+                                    <th>Attendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${studentStats.sort((a, b) => (parseFloat(b.avg) || 0) - (parseFloat(a.avg) || 0)).map((s, i) => `
+                                    <tr>
+                                        <td style="color:#9ca3af">${i + 1}</td>
+                                        <td><span class="badge badge-gray">${s.roll_number}</span></td>
+                                        <td><strong>${s.name}</strong></td>
+                                        <td>${s.section}</td>
+                                        <td>${s.exams}</td>
+                                        <td><strong>${s.avg}${s.avg !== '–' ? '%' : ''}</strong></td>
+                                        <td>${s.grade ? `<span class="grade-tag ${s.grade.cls}">${s.grade.grade}</span>` : '–'}</td>
+                                        <td><span style="color:${parseFloat(s.attPct) >= 75 ? '#10b981' : '#ef4444'};font-weight:600">${s.attPct}${s.attPct !== '–' ? '%' : ''}</span></td>
+                                    </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+
+        function updateErSubjects() {
+            const cls = document.getElementById('erClass').value;
+            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : ALL_SUBJECTS;
+            document.getElementById('erSubject').innerHTML = '<option value="">All Subjects</option>' +
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        async function generateExamReport() {
+            const cls = document.getElementById('erClass').value;
+            const sec = document.getElementById('erSection').value;
+            const subj = document.getElementById('erSubject').value;
+            const exam = document.getElementById('erExam').value;
+
+            if (!cls) { alert('Please select a class'); return; }
+
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery.order('roll_number');
+            if (!students || students.length === 0) { document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><p>No students found</p></div>'; return; }
+
+            let subjMap = {};
+            const { data: subjData } = await db.from('subjects').select('*');
+            if (subjData) subjData.forEach(s => { subjMap[s.subject_name] = s.id; });
+
+            let marksQuery = db.from('marks').select('*, subjects(subject_name)')
+                .in('student_id', students.map(s => s.id));
+            if (subj && subjMap[subj]) marksQuery = marksQuery.eq('subject_id', subjMap[subj]);
+            if (exam) marksQuery = marksQuery.eq('exam_type', exam);
+            const { data: marks } = await marksQuery;
+
+            if (!marks || marks.length === 0) {
+                document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No marks found for selected criteria</p></div>';
+                return;
+            }
+
+            // Group by student
+            const studentMarkMap = {};
+            marks.forEach(m => {
+                if (!studentMarkMap[m.student_id]) studentMarkMap[m.student_id] = [];
+                studentMarkMap[m.student_id].push(m);
+            });
+
+            const rows = students.map(s => {
+                const sm = studentMarkMap[s.id] || [];
+                const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
+                return { ...s, marks: sm, avg };
+            }).filter(s => s.marks.length > 0)
+              .sort((a, b) => (parseFloat(b.avg) || 0) - (parseFloat(a.avg) || 0));
+
+            const allPcts = rows.filter(r => r.avg !== '–').map(r => parseFloat(r.avg));
+            const classAvg = allPcts.length > 0 ? (allPcts.reduce((a, b) => a + b, 0) / allPcts.length).toFixed(1) : '–';
+            const highest = allPcts.length > 0 ? Math.max(...allPcts).toFixed(1) : '–';
+
+            document.getElementById('examReportOutput').innerHTML = `
+                <div class="result-header-bar">
+                    <div>
+                        <h3>Class ${cls}${sec ? '-' + sec : ''} | ${subj || 'All Subjects'} | ${exam || 'All Exams'}</h3>
+                        <p>${rows.length} students with marks | Generated on ${new Date().toLocaleDateString('en-IN')}</p>
+                    </div>
+                    <div class="result-summary-pills">
+                        <span class="rsp">Avg: ${classAvg}%</span>
+                        <span class="rsp">Highest: ${highest}%</span>
+                        <span class="rsp">Passed (≥40%): ${allPcts.filter(p => p >= 40).length}</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    ${!exam ? EXAMS.map(e => `<th>${e.value}</th>`).join('') : '<th>Marks</th>'}
+                                    <th>Average</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map((s, i) => {
+                                    const g = s.avg !== '–' ? calculateGrade(parseFloat(s.avg), 100) : null;
+                                    let marksCells;
+                                    if (!exam) {
+                                        marksCells = EXAMS.map(e => {
+                                            const m = s.marks.find(mk => mk.exam_type === e.value);
+                                            return `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
+                                        }).join('');
+                                    } else {
+                                        const m = s.marks[0];
+                                        marksCells = `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
+                                    }
+                                    return `<tr>
+                                        <td style="color:#9ca3af;font-weight:700">${i + 1}</td>
+                                        <td><span class="badge badge-gray">${s.roll_number}</span></td>
+                                        <td><strong>${s.name}</strong></td>
+                                        ${marksCells}
+                                        <td><strong>${s.avg}${s.avg !== '–' ? '%' : ''}</strong></td>
+                                        <td>${g ? `<span class="grade-tag ${g.cls}">${g.grade}</span>` : '–'}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+    </script>
+</body>
+</html>

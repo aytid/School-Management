@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Attendance - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .att-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .att-stat-box {
+            background: white; border-radius: 0.75rem;
+            padding: 1rem 1.5rem; text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06); min-width: 100px;
+        }
+        .att-stat-box .asb-val { font-size: 1.6rem; font-weight: 800; }
+        .att-stat-box .asb-label { font-size: 0.75rem; color: #9ca3af; }
+        .asb-total .asb-val { color: #1f2937; }
+        .asb-present .asb-val { color: #10b981; }
+        .asb-absent .asb-val { color: #ef4444; }
+        .bulk-actions { display: flex; gap: 0.5rem; }
+        .notify-toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: #1f2937; color: white;
+            padding: 1rem 1.5rem; border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-weight: 500; font-size: 0.9rem;
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s; z-index: 999;
+        }
+        .notify-toast.show { transform: translateY(0); opacity: 1; }
+        .notify-toast.success { background: #065f46; }
+        .notify-toast.error { background: #991b1b; }
+        /* Custom radio toggle */
+        .att-toggle { display: flex; gap: 0; border-radius: 0.5rem; overflow: hidden; border: 1.5px solid #e5e7eb; }
+        .att-toggle-btn {
+            padding: 0.375rem 0.875rem;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+            border: none; background: white; color: #6b7280;
+        }
+        .att-toggle-btn.p-btn.selected { background: #d1fae5; color: #065f46; }
+        .att-toggle-btn.a-btn.selected { background: #fee2e2; color: #991b1b; }
+        /* Report tab */
+        .report-card {
+            background: white; border-radius: 0.875rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 1rem; overflow: hidden;
+        }
+        .report-row { display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1.25rem; border-bottom: 1px solid #f3f4f6; }
+        .report-row:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Management System</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">T</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Teacher</div>
+                    <div class="user-role">Teacher</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="teacher_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">Academic</div>
+                <a href="enter_marks.html" class="nav-item"><span class="nav-icon">📝</span> Enter Marks</a>
+                <a href="take_attendance.html" class="nav-item active"><span class="nav-icon">📋</span> Take Attendance</a>
+                <div class="nav-section-title">Records</div>
+                <a href="view_students.html" class="nav-item"><span class="nav-icon">👨‍🎓</span> View Students</a>
+                <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">Attendance Management</div>
+                    <div class="topbar-breadcrumb">Mark and view student attendance</div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="switchTab('take')">📋 Take Attendance</div>
+                    <div class="tab-item" onclick="switchTab('report')">📊 View Reports</div>
+                </div>
+
+                <!-- TAKE ATTENDANCE TAB -->
+                <div class="tab-panel active" id="panelTake">
+                    <div class="card" style="margin-bottom:1.5rem">
+                        <div class="card-header"><span class="card-title">Select Class & Date</span></div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" id="dateSelect">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <select id="classSelect">
+                                        <option value="">Select Class</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select id="sectionSelect">
+                                        <option value="">Select Section</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.25rem">
+                                <button class="btn btn-primary btn-lg" onclick="loadAttendance()">📋 Load Students</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="attSection" style="display:none">
+                        <div class="att-stats" id="attStats"></div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title" id="attTableTitle">Attendance</span>
+                                <div class="bulk-actions">
+                                    <button class="btn btn-secondary btn-sm" onclick="markAll('Present')">✓ All Present</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="markAll('Absent')">✗ All Absent</button>
+                                    <button class="btn btn-success" onclick="saveAll()">💾 Save All</button>
+                                </div>
+                            </div>
+                            <div class="card-body" style="padding:0">
+                                <div class="table-wrapper">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th style="width:50px">#</th>
+                                                <th>Roll No</th>
+                                                <th>Student Name</th>
+                                                <th>Attendance</th>
+                                                <th style="width:80px">Save</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="attTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REPORT TAB -->
+                <div class="tab-panel" id="panelReport">
+                    <div class="card" style="margin-bottom:1.5rem">
+                        <div class="card-header"><span class="card-title">Attendance Report</span></div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Class</label>
+                                    <select id="rptClass" onchange="filterStudents()">
+                                        <option value="">All Classes</option>
+                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Section</label>
+                                    <select id="rptSection" onchange="filterStudents()">
+                                        <option value="">All Sections</option>
+                                        <option>A</option><option>B</option><option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Student</label>
+                                    <select id="rptStudent">
+                                        <option value="">Select Student</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" id="rptFrom">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" id="rptTo">
+                                </div>
+                            </div>
+                            <div style="margin-top:1.25rem">
+                                <button class="btn btn-primary" onclick="loadReport()">Generate Report</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reportOutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notify-toast" id="toast"></div>
+
+    <script src="config.js"></script>
+    <script>
+        const teacher = getSession('teacher');
+        if (!teacher) throw 'auth';
+        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0);
+        document.getElementById('sidebarName').textContent = teacher.name;
+
+        // Set today
+        document.getElementById('dateSelect').value = new Date().toISOString().split('T')[0];
+
+        let studentsList = [];
+        let allStudentsForReport = [];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach((t, i) => t.classList.toggle('active', (i === 0 && tab === 'take') || (i === 1 && tab === 'report')));
+            document.getElementById('panelTake').classList.toggle('active', tab === 'take');
+            document.getElementById('panelReport').classList.toggle('active', tab === 'report');
+        }
+
+        async function loadAllStudentsForReport() {
+            const { data } = await db.from('students').select('*').order('class_name').order('section').order('roll_number');
+            allStudentsForReport = data || [];
+            filterStudents();
+        }
+
+        function filterStudents() {
+            const cls = document.getElementById('rptClass').value;
+            const sec = document.getElementById('rptSection').value;
+            const filtered = allStudentsForReport.filter(s =>
+                (!cls || s.class_name === cls) && (!sec || s.section === sec)
+            );
+            const sel = document.getElementById('rptStudent');
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                filtered.map(s => `<option value="${s.id}">${s.name} (${s.roll_number}) - Class ${s.class_name}-${s.section}</option>`).join('');
+        }
+
+        async function loadAttendance() {
+            const date = document.getElementById('dateSelect').value;
+            const cls = document.getElementById('classSelect').value;
+            const sec = document.getElementById('sectionSelect').value;
+
+            if (!date || !cls || !sec) { showToast('Please select Date, Class and Section', 'error'); return; }
+
+            const { data: students, error } = await db.from('students')
+                .select('*').eq('class_name', cls).eq('section', sec).order('roll_number');
+
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            studentsList = students || [];
+
+            // Get existing attendance for this date
+            const { data: existing } = await db.from('attendance')
+                .select('*').eq('attendance_date', date)
+                .in('student_id', studentsList.map(s => s.id));
+
+            const attMap = {};
+            if (existing) existing.forEach(a => { attMap[a.student_id] = a.status; });
+
+            document.getElementById('attTableTitle').textContent = `Class ${cls}-${sec} | ${formatDate(date)}`;
+            renderAttTable(attMap);
+            document.getElementById('attSection').style.display = 'block';
+        }
+
+        function renderAttTable(attMap) {
+            if (studentsList.length === 0) {
+                document.getElementById('attTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👨‍🎓</div><p>No students found</p></td></tr>';
+                updateAttStats();
+                return;
+            }
+
+            document.getElementById('attTableBody').innerHTML = studentsList.map((s, i) => {
+                const status = attMap[s.id] || 'Present';
+                return `<tr id="attRow_${s.id}">
+                    <td style="color:#9ca3af;font-weight:600">${i + 1}</td>
+                    <td><span class="badge badge-gray">${s.roll_number}</span></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>
+                        <div class="att-toggle">
+                            <button class="att-toggle-btn p-btn ${status === 'Present' ? 'selected' : ''}"
+                                    id="p_${s.id}" onclick="setStatus(${s.id},'Present')">✓ Present</button>
+                            <button class="att-toggle-btn a-btn ${status === 'Absent' ? 'selected' : ''}"
+                                    id="a_${s.id}" onclick="setStatus(${s.id},'Absent')">✗ Absent</button>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="saveSingle(${s.id})">Save</button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            updateAttStats();
+        }
+
+        function setStatus(studentId, status) {
+            document.getElementById('p_' + studentId).classList.toggle('selected', status === 'Present');
+            document.getElementById('a_' + studentId).classList.toggle('selected', status === 'Absent');
+            updateAttStats();
+        }
+
+        function getStatus(studentId) {
+            return document.getElementById('p_' + studentId)?.classList.contains('selected') ? 'Present' : 'Absent';
+        }
+
+        function markAll(status) {
+            studentsList.forEach(s => setStatus(s.id, status));
+        }
+
+        function updateAttStats() {
+            let present = 0, absent = 0;
+            studentsList.forEach(s => {
+                if (getStatus(s.id) === 'Present') present++; else absent++;
+            });
+            document.getElementById('attStats').innerHTML = `
+                <div class="att-stat-box asb-total"><div class="asb-val">${studentsList.length}</div><div class="asb-label">Total</div></div>
+                <div class="att-stat-box asb-present"><div class="asb-val">${present}</div><div class="asb-label">Present</div></div>
+                <div class="att-stat-box asb-absent"><div class="asb-val">${absent}</div><div class="asb-label">Absent</div></div>
+                <div class="att-stat-box"><div class="asb-val">${studentsList.length > 0 ? Math.round((present / studentsList.length) * 100) : 0}%</div><div class="asb-label">Rate</div></div>
+            `;
+        }
+
+        async function saveSingle(studentId) {
+            const date = document.getElementById('dateSelect').value;
+            const status = getStatus(studentId);
+
+            const { data: existing } = await db.from('attendance').select('id')
+                .eq('student_id', studentId).eq('attendance_date', date).single();
+
+            let result;
+            if (existing) {
+                result = await db.from('attendance').update({ status, recorded_by: teacher.id }).eq('id', existing.id);
+            } else {
+                result = await db.from('attendance').insert({ student_id: studentId, attendance_date: date, status, recorded_by: teacher.id });
+            }
+
+            if (result.error) showToast('Error: ' + result.error.message, 'error');
+            else showToast('Attendance saved!', 'success');
+        }
+
+        async function saveAll() {
+            const date = document.getElementById('dateSelect').value;
+            if (studentsList.length === 0) { showToast('No students loaded', 'error'); return; }
+
+            const records = studentsList.map(s => ({
+                student_id: s.id, attendance_date: date,
+                status: getStatus(s.id), recorded_by: teacher.id
+            }));
+
+            // Delete existing then insert
+            await db.from('attendance').delete().eq('attendance_date', date)
+                .in('student_id', studentsList.map(s => s.id));
+
+            const { error } = await db.from('attendance').insert(records);
+            if (error) showToast('Error: ' + error.message, 'error');
+            else showToast(`✓ ${records.length} attendance records saved!`, 'success');
+        }
+
+        async function loadReport() {
+            const studentId = document.getElementById('rptStudent').value;
+            if (!studentId) { showToast('Please select a student', 'error'); return; }
+
+            const fromDate = document.getElementById('rptFrom').value;
+            const toDate = document.getElementById('rptTo').value;
+
+            let query = db.from('attendance').select('*')
+                .eq('student_id', studentId).order('attendance_date', { ascending: false });
+            if (fromDate) query = query.gte('attendance_date', fromDate);
+            if (toDate) query = query.lte('attendance_date', toDate);
+
+            const { data: records } = await query;
+            const student = allStudentsForReport.find(s => s.id == studentId);
+
+            const total = records ? records.length : 0;
+            const present = records ? records.filter(r => r.status === 'Present').length : 0;
+            const absent = total - present;
+            const pct = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+            const pctColor = pct >= 75 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
+
+            document.getElementById('reportOutput').innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">${student?.name} — Attendance Report</span>
+                        <span class="badge badge-gray">Class ${student?.class_name}-${student?.section}</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem">
+                            <div class="att-stat-box asb-total"><div class="asb-val">${total}</div><div class="asb-label">Total Days</div></div>
+                            <div class="att-stat-box asb-present"><div class="asb-val">${present}</div><div class="asb-label">Present</div></div>
+                            <div class="att-stat-box asb-absent"><div class="asb-val">${absent}</div><div class="asb-label">Absent</div></div>
+                            <div class="att-stat-box"><div class="asb-val" style="color:${pctColor}">${pct}%</div><div class="asb-label">Attendance %</div></div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Date</th><th>Day</th><th>Status</th></tr></thead>
+                                <tbody>
+                                    ${records && records.length > 0 ? records.map(r => {
+                                        const d = new Date(r.attendance_date);
+                                        return `<tr>
+                                            <td>${d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                            <td>${d.toLocaleDateString('en-IN', { weekday: 'long' })}</td>
+                                            <td><span class="badge ${r.status === 'Present' ? 'badge-green' : 'badge-red'}">${r.status}</span></td>
+                                        </tr>`;
+                                    }).join('') : '<tr><td colspan="3" class="empty-state">No records in selected range</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'notify-toast ' + type + ' show';
+            setTimeout(() => { t.className = 'notify-toast'; }, 3500);
+        }
+
+        loadAllStudentsForReport();
+    </script>
+</body>
+</html>

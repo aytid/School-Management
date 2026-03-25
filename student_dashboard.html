@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .profile-avatar-lg {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .profile-details h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .profile-details p { opacity: 0.85; font-size: 0.9rem; margin-bottom: 0.15rem; }
+        .profile-pill {
+            display: inline-flex; align-items: center;
+            background: rgba(255,255,255,0.25);
+            padding: 0.3rem 0.875rem; border-radius: 9999px;
+            font-size: 0.8rem; font-weight: 700; margin-top: 0.5rem;
+        }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .summary-card {
+            background: white; border-radius: 1rem;
+            padding: 1.5rem; text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .summary-card .s-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .summary-card .s-value { font-size: 2rem; font-weight: 800; color: #1f2937; }
+        .summary-card .s-label { font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem; }
+        .attendance-ring-card {
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ring-container { position: relative; width: 120px; height: 120px; margin: 0 auto 0.75rem; }
+        .ring-container svg { transform: rotate(-90deg); }
+        .ring-overlay {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .ring-pct { font-size: 1.4rem; font-weight: 800; color: #1f2937; }
+        .ring-label { font-size: 0.65rem; color: #9ca3af; }
+        .quick-access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem; }
+        .quick-access-card {
+            background: white; border-radius: 1rem; padding: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            text-decoration: none; color: inherit;
+            display: flex; flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .quick-access-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #e5e7eb; }
+        .quick-access-card .qa-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .quick-access-card h3 { font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .quick-access-card p { font-size: 0.85rem; color: #9ca3af; line-height: 1.5; }
+        .qa-arrow { margin-top: auto; padding-top: 1rem; font-size: 1.2rem; color: #667eea; }
+        .recent-marks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; }
+        .mark-chip {
+            background: #f9fafb; border-radius: 0.75rem; padding: 1rem;
+            text-align: center; border: 1px solid #e5e7eb;
+        }
+        .mark-chip .mc-subject { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+        .mark-chip .mc-exam { font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.4rem; }
+        .mark-chip .mc-score { font-size: 1.2rem; font-weight: 800; color: #1f2937; }
+        .mark-chip .mc-max { font-size: 0.7rem; color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Student Portal</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">S</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Student</div>
+                    <div class="user-role">Student</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="student_dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <div class="nav-section-title">My Records</div>
+                <a href="view_marks.html" class="nav-item">
+                    <span class="nav-icon">📝</span> My Marks
+                </a>
+                <a href="view_attendance.html" class="nav-item">
+                    <span class="nav-icon">📅</span> My Attendance
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">↪ Logout</button>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">Student Dashboard</div>
+                    <div class="topbar-breadcrumb" id="classBreadcrumb">Loading...</div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="currentDate"></div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Profile Banner -->
+                <div class="profile-banner">
+                    <div class="profile-avatar-lg" id="bigAvatar">?</div>
+                    <div class="profile-details">
+                        <h2 id="profileName">Loading...</h2>
+                        <p id="profileClass">–</p>
+                        <p id="profileRoll">–</p>
+                        <span class="profile-pill">Student</span>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="s-icon">📊</div>
+                        <div class="s-value" id="avgScore">–</div>
+                        <div class="s-label">Overall Average</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="s-icon">📝</div>
+                        <div class="s-value" id="totalExams">–</div>
+                        <div class="s-label">Exams Taken</div>
+                    </div>
+                    <div class="summary-card attendance-ring-card">
+                        <div class="ring-container">
+                            <svg width="120" height="120" viewBox="0 0 120 120">
+                                <circle fill="none" stroke="#e5e7eb" stroke-width="10" cx="60" cy="60" r="50"/>
+                                <circle id="attRing" fill="none" stroke="#10b981" stroke-width="10" stroke-linecap="round"
+                                    cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+                            </svg>
+                            <div class="ring-overlay">
+                                <div class="ring-pct" id="attPct">0%</div>
+                                <div class="ring-label">Attendance</div>
+                            </div>
+                        </div>
+                        <div class="s-label">Attendance Rate</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="s-icon">📚</div>
+                        <div class="s-value" id="totalSubjects">–</div>
+                        <div class="s-label">Subjects</div>
+                    </div>
+                </div>
+
+                <!-- Quick Access -->
+                <div class="quick-access-grid">
+                    <a href="view_marks.html" class="quick-access-card">
+                        <div class="qa-icon">📝</div>
+                        <h3>My Marks</h3>
+                        <p>View your academic performance across all subjects and exam types.</p>
+                        <div class="qa-arrow">→</div>
+                    </a>
+                    <a href="view_attendance.html" class="quick-access-card">
+                        <div class="qa-icon">📅</div>
+                        <h3>My Attendance</h3>
+                        <p>View your attendance history and percentage with monthly breakdown.</p>
+                        <div class="qa-arrow">→</div>
+                    </a>
+                </div>
+
+                <!-- Recent Marks -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Exam Results</span>
+                        <a href="view_marks.html" class="btn btn-secondary btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="recent-marks-grid" id="recentMarks">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const session = getSession('student');
+        if (!session) throw 'auth';
+
+        document.getElementById('sidebarAvatar').textContent = session.name.charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent = session.name;
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        async function loadDashboard() {
+            const { data: student } = await db.from('students').select('*').eq('id', session.id).single();
+            if (!student) return;
+
+            document.getElementById('bigAvatar').textContent = student.name.charAt(0).toUpperCase();
+            document.getElementById('profileName').textContent = student.name;
+            document.getElementById('profileClass').textContent = `Class ${student.class_name} – Section ${student.section}`;
+            document.getElementById('profileRoll').textContent = `Roll Number: ${student.roll_number}`;
+            document.getElementById('classBreadcrumb').textContent = `Class ${student.class_name} | Section ${student.section}`;
+
+            // Marks
+            const { data: marks } = await db.from('marks').select('*, subjects(subject_name)').eq('student_id', session.id).order('recorded_at', { ascending: false });
+            if (marks && marks.length > 0) {
+                const totalPct = marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0);
+                const avg = (totalPct / marks.length).toFixed(1);
+                document.getElementById('avgScore').textContent = avg + '%';
+                document.getElementById('totalExams').textContent = marks.length;
+                const subjects = new Set(marks.map(m => m.subjects?.subject_name).filter(Boolean));
+                document.getElementById('totalSubjects').textContent = subjects.size;
+
+                // Recent chips
+                document.getElementById('recentMarks').innerHTML = marks.slice(0, 12).map(m => {
+                    const g = calculateGrade(m.marks_obtained, m.max_marks);
+                    const pct = ((m.marks_obtained / m.max_marks) * 100).toFixed(0);
+                    return `<div class="mark-chip">
+                        <div class="mc-subject">${m.subjects?.subject_name || '–'}</div>
+                        <div class="mc-exam"><span class="badge badge-blue">${m.exam_type}</span></div>
+                        <div class="mc-score">${m.marks_obtained}</div>
+                        <div class="mc-max">/${m.max_marks} (${pct}%)</div>
+                        <div style="margin-top:0.5rem"><span class="grade-tag ${g.cls}">${g.grade}</span></div>
+                    </div>`;
+                }).join('');
+            } else {
+                document.getElementById('avgScore').textContent = '0%';
+                document.getElementById('totalExams').textContent = '0';
+                document.getElementById('totalSubjects').textContent = '0';
+                document.getElementById('recentMarks').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No marks recorded yet</p></div>';
+            }
+
+            // Attendance
+            const { data: att } = await db.from('attendance').select('status').eq('student_id', session.id);
+            if (att && att.length > 0) {
+                const present = att.filter(a => a.status === 'Present').length;
+                const pct = ((present / att.length) * 100).toFixed(1);
+                document.getElementById('attPct').textContent = pct + '%';
+                const offset = 314.16 - (314.16 * pct / 100);
+                document.getElementById('attRing').style.strokeDashoffset = offset;
+                const color = pct >= 75 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
+                document.getElementById('attRing').style.stroke = color;
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

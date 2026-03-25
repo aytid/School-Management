@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Students - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .search-bar {
+            position: relative;
+        }
+        .search-bar input {
+            padding-left: 2.5rem;
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .student-card {
+            background: white;
+            border-radius: 0.875rem;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .student-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-color: #e5e7eb; }
+        .student-card-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 800; color: white;
+            flex-shrink: 0;
+        }
+        .sc-name { font-size: 0.95rem; font-weight: 700; color: #1f2937; margin-bottom: 0.2rem; }
+        .sc-roll { font-size: 0.8rem; color: #9ca3af; }
+        .sc-class { margin-top: 0.4rem; }
+        .filter-row { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .filter-count { font-size: 0.9rem; color: #6b7280; margin-left: auto; align-self: center; }
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center;
+            z-index: 200; padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white; border-radius: 1rem;
+            width: 100%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: white; z-index: 1;
+        }
+        .modal-close { font-size: 1.5rem; cursor: pointer; color: #9ca3af; line-height: 1; }
+        .modal-close:hover { color: #1f2937; }
+        .modal-body { padding: 1.5rem; }
+        .detail-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { font-size: 0.85rem; color: #9ca3af; font-weight: 500; }
+        .detail-value { font-size: 0.9rem; font-weight: 600; color: #1f2937; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Management System</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">T</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Teacher</div>
+                    <div class="user-role">Teacher</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="teacher_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">Academic</div>
+                <a href="enter_marks.html" class="nav-item"><span class="nav-icon">📝</span> Enter Marks</a>
+                <a href="take_attendance.html" class="nav-item"><span class="nav-icon">📋</span> Take Attendance</a>
+                <div class="nav-section-title">Records</div>
+                <a href="view_students.html" class="nav-item active"><span class="nav-icon">👨‍🎓</span> View Students</a>
+                <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">Students</div>
+                    <div class="topbar-breadcrumb">Browse and search all enrolled students</div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Stats -->
+                <div class="stats-grid" id="classStatCards"></div>
+
+                <!-- Filters -->
+                <div class="filter-row">
+                    <div class="form-group" style="min-width:180px">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" onchange="applyFilters()">
+                            <option value="">All Classes</option>
+                            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="min-width:160px">
+                        <label class="form-label">Section</label>
+                        <select id="filterSection" onchange="applyFilters()">
+                            <option value="">All Sections</option>
+                            <option>A</option><option>B</option><option>C</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1;min-width:200px">
+                        <label class="form-label">Search</label>
+                        <div class="search-bar">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Search by name or roll number..." oninput="applyFilters()">
+                        </div>
+                    </div>
+                    <div class="filter-count" id="filterCount"></div>
+                </div>
+
+                <!-- Student Grid -->
+                <div class="student-grid" id="studentGrid">
+                    <div class="loading">Loading students...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#1f2937" id="modalName">Student</div>
+                    <div style="font-size:0.8rem;color:#9ca3af" id="modalSubtitle">Details</div>
+                </div>
+                <span class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">×</span>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const teacher = getSession('teacher');
+        if (!teacher) throw 'auth';
+        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0);
+        document.getElementById('sidebarName').textContent = teacher.name;
+
+        let allStudents = [];
+
+        async function loadStudents() {
+            const { data } = await db.from('students').select('*').order('class_name').order('section').order('roll_number');
+            allStudents = data || [];
+
+            // Build class stat cards
+            const classCounts = {};
+            CLASSES.forEach(c => classCounts[c] = 0);
+            allStudents.forEach(s => { if (classCounts[s.class_name] !== undefined) classCounts[s.class_name]++; });
+            const colors = ['bg-blue', 'bg-green', 'bg-orange', 'bg-purple', 'bg-teal'];
+            document.getElementById('classStatCards').innerHTML = CLASSES.map((c, i) => `
+                <div class="stat-card" style="cursor:pointer" onclick="filterByClass('${c}')">
+                    <div class="stat-icon-box ${colors[i]}">📚</div>
+                    <div>
+                        <div class="stat-number">${classCounts[c]}</div>
+                        <div class="stat-label">Class ${c} Students</div>
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="stat-card">
+                    <div class="stat-icon-box bg-red">👨‍🎓</div>
+                    <div>
+                        <div class="stat-number">${allStudents.length}</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                </div>`;
+
+            applyFilters();
+        }
+
+        function filterByClass(cls) {
+            document.getElementById('filterClass').value = cls;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const cls = document.getElementById('filterClass').value;
+            const sec = document.getElementById('filterSection').value;
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = allStudents.filter(s =>
+                (!cls || s.class_name === cls) &&
+                (!sec || s.section === sec) &&
+                (!q || s.name.toLowerCase().includes(q) || s.roll_number.toLowerCase().includes(q))
+            );
+
+            document.getElementById('filterCount').textContent = `Showing ${filtered.length} of ${allStudents.length} students`;
+
+            if (filtered.length === 0) {
+                document.getElementById('studentGrid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👨‍🎓</div><p>No students match your filters</p></div>';
+                return;
+            }
+
+            document.getElementById('studentGrid').innerHTML = filtered.map(s => `
+                <div class="student-card" onclick="openModal(${s.id})">
+                    <div class="student-card-avatar">${s.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                        <div class="sc-name">${s.name}</div>
+                        <div class="sc-roll">Roll: ${s.roll_number}</div>
+                        <div class="sc-class">
+                            <span class="badge badge-purple">Class ${s.class_name}</span>
+                            <span class="badge badge-blue" style="margin-left:0.25rem">Section ${s.section}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openModal(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('modalName').textContent = student.name;
+            document.getElementById('modalSubtitle').textContent = `Class ${student.class_name} – Section ${student.section} | Roll: ${student.roll_number}`;
+
+            document.getElementById('modalBody').innerHTML = '<div class="loading">Loading details...</div>';
+            document.getElementById('modal').classList.add('open');
+
+            // Load marks & attendance
+            const [marksRes, attRes] = await Promise.all([
+                db.from('marks').select('*, subjects(subject_name)').eq('student_id', studentId),
+                db.from('attendance').select('status').eq('student_id', studentId)
+            ]);
+
+            const marks = marksRes.data || [];
+            const att = attRes.data || [];
+
+            const attTotal = att.length;
+            const attPresent = att.filter(a => a.status === 'Present').length;
+            const attPct = attTotal > 0 ? ((attPresent / attTotal) * 100).toFixed(1) : 0;
+
+            let avgPct = '–';
+            if (marks.length > 0) {
+                const total = marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0);
+                avgPct = (total / marks.length).toFixed(1) + '%';
+            }
+
+            // Group marks by exam
+            const byExam = {};
+            marks.forEach(m => {
+                if (!byExam[m.exam_type]) byExam[m.exam_type] = [];
+                byExam[m.exam_type].push(m);
+            });
+
+            document.getElementById('modalBody').innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+                    <div style="background:#f9fafb;padding:1rem;border-radius:0.75rem;text-align:center">
+                        <div style="font-size:1.5rem;font-weight:800;color:#1f2937">${avgPct}</div>
+                        <div style="font-size:0.8rem;color:#9ca3af">Average Marks</div>
+                    </div>
+                    <div style="background:#f9fafb;padding:1rem;border-radius:0.75rem;text-align:center">
+                        <div style="font-size:1.5rem;font-weight:800;color:${attPct >= 75 ? '#10b981' : '#ef4444'}">${attPct}%</div>
+                        <div style="font-size:0.8rem;color:#9ca3af">Attendance</div>
+                    </div>
+                </div>
+                <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${student.name}</span></div>
+                <div class="detail-row"><span class="detail-label">Roll Number</span><span class="detail-value">${student.roll_number}</span></div>
+                <div class="detail-row"><span class="detail-label">Class</span><span class="detail-value">${student.class_name}</span></div>
+                <div class="detail-row"><span class="detail-label">Section</span><span class="detail-value">${student.section}</span></div>
+                <div class="detail-row"><span class="detail-label">Total Exams</span><span class="detail-value">${marks.length}</span></div>
+                <div class="detail-row"><span class="detail-label">Days Present</span><span class="detail-value">${attPresent}/${attTotal}</span></div>
+                ${marks.length > 0 ? `
+                <div style="margin-top:1.25rem">
+                    <div style="font-weight:700;color:#1f2937;margin-bottom:0.75rem;font-size:0.9rem">Exam Results</div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Subject</th><th>Exam</th><th>Marks</th><th>Grade</th></tr></thead>
+                            <tbody>
+                                ${marks.map(m => {
+                                    const g = calculateGrade(m.marks_obtained, m.max_marks);
+                                    return `<tr>
+                                        <td>${m.subjects?.subject_name}</td>
+                                        <td><span class="badge badge-blue">${m.exam_type}</span></td>
+                                        <td>${m.marks_obtained}/${m.max_marks}</td>
+                                        <td><span class="grade-tag ${g.cls}">${g.grade}</span></td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>` : '<div style="margin-top:1rem;color:#9ca3af;font-size:0.875rem;text-align:center">No marks recorded yet</div>'}
+            `;
+        }
+
+        function closeModal(e) {
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.remove('open');
+            }
+        }
+
+        loadStudents();
+    </script>
+</body>
+</html>

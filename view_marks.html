@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Marks - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .overall-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem; padding: 2rem; color: white; margin-bottom: 1.5rem;
+        }
+        .overall-card h2 { font-size: 1.25rem; margin-bottom: 1.25rem; opacity: 0.9; }
+        .overall-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .os-item { text-align: center; }
+        .os-val { font-size: 2.5rem; font-weight: 800; }
+        .os-label { font-size: 0.8rem; opacity: 0.8; margin-top: 0.1rem; }
+        .exam-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .ef-btn {
+            padding: 0.4rem 1rem; border: 2px solid #e5e7eb;
+            border-radius: 9999px; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; color: #6b7280; background: white;
+        }
+        .ef-btn:hover { border-color: #667eea; color: #667eea; }
+        .ef-btn.active { background: #667eea; border-color: #667eea; color: white; }
+        .progress-bar-row { display: flex; align-items: center; gap: 1rem; }
+        .progress-bar-track { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Student Portal</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">S</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Student</div>
+                    <div class="user-role">Student</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="student_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">My Records</div>
+                <a href="view_marks.html" class="nav-item active"><span class="nav-icon">📝</span> My Marks</a>
+                <a href="view_attendance.html" class="nav-item"><span class="nav-icon">📅</span> My Attendance</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">My Academic Performance</div>
+                    <div class="topbar-breadcrumb">View marks across all subjects and exams</div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Overall card -->
+                <div class="overall-card" id="overallCard">
+                    <h2>📊 Overall Performance</h2>
+                    <div class="overall-stats">
+                        <div class="os-item"><div class="os-val" id="overallAvg">–</div><div class="os-label">Overall Average</div></div>
+                        <div class="os-item"><div class="os-val" id="overallExams">–</div><div class="os-label">Exams Taken</div></div>
+                        <div class="os-item"><div class="os-val" id="overallSubjects">–</div><div class="os-label">Subjects</div></div>
+                        <div class="os-item"><div class="os-val" id="overallGrade">–</div><div class="os-label">Overall Grade</div></div>
+                    </div>
+                </div>
+
+                <!-- Subject-wise progress -->
+                <div class="card" style="margin-bottom:1.5rem" id="subjectProgressCard">
+                    <div class="card-header"><span class="card-title">Subject-wise Average</span></div>
+                    <div class="card-body" id="subjectProgressBody">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Exam filter -->
+                <div style="margin-bottom:1rem">
+                    <div class="exam-filter" id="examFilter">
+                        <div class="ef-btn active" onclick="filterByExam('all', this)">All Exams</div>
+                    </div>
+                </div>
+
+                <!-- Detailed marks by subject -->
+                <div id="subjectCards">
+                    <div class="loading">Loading marks...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const session = getSession('student');
+        if (!session) throw 'auth';
+        document.getElementById('sidebarAvatar').textContent = session.name.charAt(0);
+        document.getElementById('sidebarName').textContent = session.name;
+
+        let allMarks = [];
+        let subjectGroups = {};
+
+        async function loadMarks() {
+            const { data: marks } = await db.from('marks')
+                .select('*, subjects(subject_name)')
+                .eq('student_id', session.id)
+                .order('exam_type');
+
+            if (!marks || marks.length === 0) {
+                document.getElementById('subjectCards').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No marks recorded yet. Please check back later.</p></div>';
+                document.getElementById('subjectProgressBody').innerHTML = '<div class="empty-state">No data yet</div>';
+                return;
+            }
+
+            allMarks = marks;
+
+            // Group by subject
+            subjectGroups = {};
+            marks.forEach(m => {
+                const name = m.subjects?.subject_name || 'Unknown';
+                if (!subjectGroups[name]) subjectGroups[name] = [];
+                subjectGroups[name].push(m);
+            });
+
+            // Overall stats
+            const totalPct = marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0);
+            const avg = (totalPct / marks.length).toFixed(1);
+            const g = calculateGrade(parseFloat(avg), 100);
+            document.getElementById('overallAvg').textContent = avg + '%';
+            document.getElementById('overallExams').textContent = marks.length;
+            document.getElementById('overallSubjects').textContent = Object.keys(subjectGroups).length;
+            document.getElementById('overallGrade').textContent = g.grade;
+
+            // Subject progress bars
+            const colors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
+            document.getElementById('subjectProgressBody').innerHTML = Object.entries(subjectGroups).map(([subj, exams], i) => {
+                const tot = exams.reduce((a, e) => a + e.marks_obtained, 0);
+                const max = exams.reduce((a, e) => a + e.max_marks, 0);
+                const pct = ((tot / max) * 100).toFixed(1);
+                const color = colors[i % colors.length];
+                return `
+                    <div style="margin-bottom:1.25rem">
+                        <div class="progress-bar-row">
+                            <span style="min-width:100px;font-size:0.875rem;font-weight:600;color:#374151">${subj}</span>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width:${pct}%;background:${color}"></div>
+                            </div>
+                            <span style="min-width:50px;text-align:right;font-size:0.875rem;font-weight:700;color:${color}">${pct}%</span>
+                            <span class="grade-tag ${calculateGrade(parseFloat(pct), 100).cls}" style="margin-left:0.5rem">${calculateGrade(parseFloat(pct), 100).grade}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            // Build exam type filter
+            const examTypes = [...new Set(marks.map(m => m.exam_type))].sort();
+            const filterEl = document.getElementById('examFilter');
+            filterEl.innerHTML = '<div class="ef-btn active" onclick="filterByExam(\'all\', this)">All Exams</div>' +
+                examTypes.map(e => `<div class="ef-btn" onclick="filterByExam('${e}', this)">${e}</div>`).join('');
+
+            renderSubjectCards('all');
+        }
+
+        function filterByExam(examType, el) {
+            document.querySelectorAll('.ef-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            renderSubjectCards(examType);
+        }
+
+        function renderSubjectCards(filter) {
+            const container = document.getElementById('subjectCards');
+            let html = '';
+
+            Object.entries(subjectGroups).forEach(([subj, exams]) => {
+                const filtered = filter === 'all' ? exams : exams.filter(e => e.exam_type === filter);
+                if (filtered.length === 0) return;
+
+                const tot = filtered.reduce((a, e) => a + e.marks_obtained, 0);
+                const max = filtered.reduce((a, e) => a + e.max_marks, 0);
+                const avg = ((tot / max) * 100).toFixed(1);
+
+                html += `
+                    <div class="subject-result-card">
+                        <div class="subject-result-header">
+                            <span class="subject-result-name">📚 ${subj}</span>
+                            <span class="subject-avg-pill">Average: ${avg}%</span>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Exam</th>
+                                        <th>Marks Obtained</th>
+                                        <th>Max Marks</th>
+                                        <th>Percentage</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filtered.map(e => {
+                                        const pct = ((e.marks_obtained / e.max_marks) * 100).toFixed(1);
+                                        const g = calculateGrade(e.marks_obtained, e.max_marks);
+                                        const barColor = parseFloat(pct) >= 75 ? '#10b981' : parseFloat(pct) >= 60 ? '#f59e0b' : '#ef4444';
+                                        return `<tr>
+                                            <td><strong>${e.exam_type}</strong></td>
+                                            <td><strong>${e.marks_obtained}</strong></td>
+                                            <td>${e.max_marks}</td>
+                                            <td>
+                                                <div style="display:flex;align-items:center;gap:0.5rem">
+                                                    <div style="width:80px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
+                                                        <div style="width:${pct}%;height:100%;background:${barColor};border-radius:3px"></div>
+                                                    </div>
+                                                    <span style="font-weight:600">${pct}%</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="grade-tag ${g.cls}">${g.grade}</span></td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+            });
+
+            container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📊</div><p>No marks for selected exam type</p></div>';
+        }
+
+        loadMarks();
+    </script>
+</body>
+</html>

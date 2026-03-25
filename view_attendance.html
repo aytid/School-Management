@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .att-overview {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+            align-items: center;
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .att-ring-box { text-align: center; }
+        .att-ring-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+        .att-mini-stat {
+            padding: 1.25rem; border-radius: 0.875rem; text-align: center;
+        }
+        .att-mini-stat .ams-val { font-size: 2rem; font-weight: 800; }
+        .att-mini-stat .ams-label { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
+        .warning-bar {
+            background: #fef3c7; border: 1px solid #fbbf24;
+            padding: 0.875rem 1.25rem; border-radius: 0.75rem;
+            font-size: 0.875rem; color: #92400e;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .good-bar {
+            background: #d1fae5; border: 1px solid #6ee7b7;
+            padding: 0.875rem 1.25rem; border-radius: 0.75rem;
+            font-size: 0.875rem; color: #065f46;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .month-block { margin-bottom: 1.5rem; }
+        .month-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; background: #f9fafb;
+            border-radius: 0.625rem; margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        .month-header h4 { font-size: 0.95rem; font-weight: 700; color: #374151; }
+        .month-mini-stats { display: flex; gap: 0.75rem; }
+        .mms-item { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600; }
+        .mms-present { background: #d1fae5; color: #065f46; }
+        .mms-absent { background: #fee2e2; color: #991b1b; }
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 4px; padding: 0.75rem;
+            background: white; border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .cal-day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #9ca3af; padding: 0.25rem; }
+        .cal-cell {
+            aspect-ratio: 1;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 0.375rem; font-size: 0.75rem; font-weight: 700;
+        }
+        .cal-cell.present { background: #d1fae5; color: #065f46; }
+        .cal-cell.absent { background: #fee2e2; color: #991b1b; }
+        .cal-cell.empty { background: transparent; }
+        @media (max-width: 600px) {
+            .att-overview { grid-template-columns: 1fr; }
+            .att-ring-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏫</span>
+                <div><h2>School Manager</h2><small>Student Portal</small></div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebarAvatar">S</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarName">Student</div>
+                    <div class="user-role">Student</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="student_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="nav-section-title">My Records</div>
+                <a href="view_marks.html" class="nav-item"><span class="nav-icon">📝</span> My Marks</a>
+                <a href="view_attendance.html" class="nav-item active"><span class="nav-icon">📅</span> My Attendance</a>
+            </nav>
+            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title">My Attendance</div>
+                    <div class="topbar-breadcrumb">View your attendance history and statistics</div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <!-- Overview -->
+                <div class="att-overview">
+                    <div class="att-ring-box">
+                        <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg)">
+                            <circle fill="none" stroke="#e5e7eb" stroke-width="14" cx="80" cy="80" r="66"/>
+                            <circle id="attRing" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"
+                                cx="80" cy="80" r="66" stroke-dasharray="414.69" stroke-dashoffset="414.69"/>
+                        </svg>
+                        <div style="margin-top:-170px;position:relative;z-index:1;text-align:center;padding-top:55px">
+                            <div style="font-size:2.5rem;font-weight:800;color:#1f2937" id="pctDisplay">0%</div>
+                            <div style="font-size:0.75rem;color:#9ca3af">Attendance</div>
+                        </div>
+                        <div style="height:80px"></div>
+                    </div>
+                    <div>
+                        <div class="att-ring-stats">
+                            <div class="att-mini-stat" style="background:#d1fae5">
+                                <div class="ams-val" style="color:#065f46" id="presentCount">0</div>
+                                <div class="ams-label">Present</div>
+                            </div>
+                            <div class="att-mini-stat" style="background:#fee2e2">
+                                <div class="ams-val" style="color:#991b1b" id="absentCount">0</div>
+                                <div class="ams-label">Absent</div>
+                            </div>
+                            <div class="att-mini-stat" style="background:#dbeafe">
+                                <div class="ams-val" style="color:#1e40af" id="totalCount">0</div>
+                                <div class="ams-label">Total Days</div>
+                            </div>
+                        </div>
+                        <div id="attMessage"></div>
+                    </div>
+                </div>
+
+                <!-- Month-wise history -->
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Monthly Attendance History</span></div>
+                    <div class="card-body" id="monthHistory">
+                        <div class="loading">Loading attendance records...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const session = getSession('student');
+        if (!session) throw 'auth';
+        document.getElementById('sidebarAvatar').textContent = session.name.charAt(0);
+        document.getElementById('sidebarName').textContent = session.name;
+
+        async function loadAttendance() {
+            const { data: records } = await db.from('attendance')
+                .select('*').eq('student_id', session.id)
+                .order('attendance_date', { ascending: false });
+
+            if (!records || records.length === 0) {
+                document.getElementById('monthHistory').innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>No attendance records found yet.</p></div>';
+                return;
+            }
+
+            const total = records.length;
+            const present = records.filter(r => r.status === 'Present').length;
+            const absent = total - present;
+            const pct = ((present / total) * 100).toFixed(1);
+
+            document.getElementById('pctDisplay').textContent = pct + '%';
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('totalCount').textContent = total;
+
+            const offset = 414.69 - (414.69 * parseFloat(pct) / 100);
+            const ring = document.getElementById('attRing');
+            ring.style.strokeDashoffset = offset;
+            if (parseFloat(pct) >= 75) ring.style.stroke = '#10b981';
+            else if (parseFloat(pct) >= 60) ring.style.stroke = '#f59e0b';
+            else ring.style.stroke = '#ef4444';
+
+            const msgEl = document.getElementById('attMessage');
+            if (parseFloat(pct) >= 75) {
+                msgEl.innerHTML = `<div class="good-bar">✅ Great attendance! Keep it up. You are attending ${pct}% of classes.</div>`;
+            } else if (parseFloat(pct) >= 60) {
+                msgEl.innerHTML = `<div class="warning-bar">⚠️ Your attendance is ${pct}%. Try to attend more classes. 75% is the minimum required.</div>`;
+            } else {
+                msgEl.innerHTML = `<div class="warning-bar" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b">🚨 Low attendance: ${pct}%. Attendance below 75% may affect your exams!</div>`;
+            }
+
+            // Group by month
+            const monthGroups = {};
+            records.forEach(r => {
+                const d = new Date(r.attendance_date);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const label = d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+                if (!monthGroups[key]) monthGroups[key] = { label, records: [], year: d.getFullYear(), month: d.getMonth() };
+                monthGroups[key].records.push(r);
+            });
+
+            document.getElementById('monthHistory').innerHTML = Object.entries(monthGroups)
+                .sort((a, b) => b[0].localeCompare(a[0]))
+                .map(([key, data]) => {
+                    const mp = data.records.filter(r => r.status === 'Present').length;
+                    const ma = data.records.length - mp;
+                    const mpct = ((mp / data.records.length) * 100).toFixed(0);
+
+                    // Build calendar
+                    const firstDay = new Date(data.year, data.month, 1).getDay();
+                    const daysInMonth = new Date(data.year, data.month + 1, 0).getDate();
+                    const attByDate = {};
+                    data.records.forEach(r => {
+                        const d = new Date(r.attendance_date).getDate();
+                        attByDate[d] = r.status;
+                    });
+
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    let calHtml = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+                    for (let i = 0; i < firstDay; i++) calHtml += '<div class="cal-cell empty"></div>';
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const status = attByDate[d];
+                        const cls = status === 'Present' ? 'present' : status === 'Absent' ? 'absent' : 'empty';
+                        calHtml += `<div class="cal-cell ${cls}">${d}</div>`;
+                    }
+
+                    return `
+                        <div class="month-block">
+                            <div class="month-header">
+                                <h4>📅 ${data.label}</h4>
+                                <div class="month-mini-stats">
+                                    <span class="mms-item mms-present">✓ ${mp} Present</span>
+                                    <span class="mms-item mms-absent">✗ ${ma} Absent</span>
+                                    <span class="badge ${parseFloat(mpct) >= 75 ? 'badge-green' : 'badge-orange'}">${mpct}%</span>
+                                </div>
+                            </div>
+                            <div class="calendar-grid">${calHtml}</div>
+                        </div>`;
+                }).join('');
+        }
+
+        loadAttendance();
+    </script>
+</body>
+</html>
