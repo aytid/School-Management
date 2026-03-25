@@ -10,10 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ═══════════════════════════════════════════════════════
-   SCHOOL MANAGER — Design System
-   Mobile-first, professional UI
-═══════════════════════════════════════════════════════ */
 
         /* ── TOKENS ──────────────────────────────────────────── */
         :root {
@@ -712,6 +708,7 @@
             text-transform: uppercase;
             letter-spacing: .1em;
             color: var(--gray-400);
+            margin-bottom: 20px;
         }
 
         /* ── QUICK ACTIONS ───────────────────────────────────── */
@@ -1835,14 +1832,6 @@
                     <h1>Dashboard</h1>
                     <p id="currentDate">Today</p>
                 </div>
-                <div class="topbar-actions">
-                    <button class="icon-btn" title="Notifications">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                            <path d="M13.73 21a2 2 0 01-3.46 0" />
-                        </svg>
-                    </button>
-                </div>
             </div>
 
             <!-- Page body -->
@@ -1996,7 +1985,7 @@
                     </a>
                 </div>
 
-                <!-- User Management (admin/teacher only) -->
+                <!-- User Management teacher only -->
                 <div id="userMgmtSection" style="display:none;">
                     <div class="section-header">
                         <span class="section-title">User Management</span>
@@ -2030,6 +2019,19 @@
                                 <p>Enroll new students</p>
                             </div>
                         </a>
+                        <a href="manage_users.html#reset" class="mgmt-tile reset" id="resetPasswordCard"
+                            style="display:none;">
+                            <div class="mgmt-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4>Reset Password</h4>
+                                <p>Reset user passwords</p>
+                            </div>
+                        </a>
                         <a href="manage_users.html#student" class="mgmt-tile import" id="bulkImportCard"
                             style="display:none;">
                             <div class="mgmt-icon">
@@ -2044,53 +2046,20 @@
                                 <p>Import via CSV</p>
                             </div>
                         </a>
-                        <a href="manage_users.html#reset" class="mgmt-tile reset" id="resetPasswordCard"
-                            style="display:none;">
-                            <div class="mgmt-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h4>Reset Password</h4>
-                                <p>Reset user passwords</p>
-                            </div>
-                        </a>
                     </div>
                 </div>
-
-                <!-- Two-column bottom section -->
-                <div class="bottom-grid">
-
-                    <!-- Today's Attendance by Class -->
-                    <div class="card">
-                        <div class="card-head">
-                            <h2 class="card-title">Today's Attendance</h2>
-                            <a href="take_attendance.html" class="card-link">View all</a>
-                        </div>
-                        <div class="card-body" id="classStats">
-                            <div class="loading-state">
-                                <div class="spinner"></div>
-                                <span>Loading…</span>
-                            </div>
+                <!-- Today's Attendance by Class -->
+                <div class="card">
+                    <div class="card-head">
+                        <h2 class="card-title">Today's Attendance</h2>
+                        <a href="take_attendance.html" class="card-link">View all</a>
+                    </div>
+                    <div class="card-body" id="classStats">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <span>Loading…</span>
                         </div>
                     </div>
-
-                    <!-- Recent Marks Entries -->
-                    <div class="card marks-card">
-                        <div class="card-head">
-                            <h2 class="card-title">Recent Marks</h2>
-                            <a href="enter_marks.html" class="card-link">+ Enter more</a>
-                        </div>
-                        <div class="marks-list" id="recentMarksList">
-                            <div class="loading-state">
-                                <div class="spinner"></div>
-                                <span>Loading…</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
             </div><!-- /page-content -->
@@ -2231,28 +2200,6 @@
                     .order('recorded_at', { ascending: false })
                     .limit(6);
 
-                const marksList = document.getElementById('recentMarksList');
-                if (marks && marks.length > 0) {
-                    marksList.innerHTML = marks.map(m => {
-                        const g = calcGrade(m.marks_obtained, m.max_marks);
-                        const av = m.students?.name ? m.students.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'ST';
-                        return `
-                        <div class="mark-row">
-                            <div class="mark-avatar">${av}</div>
-                            <div class="mark-info">
-                                <strong>${m.students?.name || 'Unknown'}</strong>
-                                <span>Class ${m.students?.class_name || '–'}${m.students?.section ? '-' + m.students.section : ''} · ${m.subjects?.subject_name || '–'}</span>
-                            </div>
-                            <div class="mark-score">
-                                <span class="score-val">${m.marks_obtained}<small>/${m.max_marks}</small></span>
-                                <span class="grade-pill ${g.cls}">${g.g}</span>
-                            </div>
-                        </div>`;
-                    }).join('');
-                } else {
-                    marksList.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><p>No marks yet</p></div>`;
-                }
-
                 /* Class-wise attendance */
                 const CLASSES = ['6', '7', '8', '9', '10'];
                 const classTotal = {}, classPresent = {};
@@ -2274,7 +2221,7 @@
                     return `
                     <div class="class-row">
                         <div class="class-label">
-                            <span class="class-badge">Cls ${c}</span>
+                            <span class="class-badge">Class ${c}</span>
                             <span class="class-count">${present} / ${total}</span>
                         </div>
                         <div class="class-progress">
