@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,555 +8,1090 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* ===== FIXES FOR WELCOME BANNER ===== */
+
+        /* Fix 1: Reduce welcome banner text size and improve spacing */
         .welcome-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 1rem;
-            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            /* Reduced from 2rem */
             color: white;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            /* Added minimum height */
         }
-        .welcome-banner h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .welcome-banner p { opacity: 0.85; font-size: 0.9rem; }
-        .welcome-illustration { font-size: 4rem; }
-        .quick-actions {
+
+        /* Fix 2: Reduce heading size */
+        .welcome-content h2 {
+            font-size: 1.25rem;
+            /* Reduced from 1.5rem */
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.3;
+            /* Added line height */
+        }
+
+        /* Fix 3: Adjust paragraph spacing */
+        .welcome-content p {
+            opacity: 0.9;
+            font-size: 0.875rem;
+            /* Reduced from 0.9375rem */
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            /* Remove default margins */
+        }
+
+        /* Fix 4: Smaller welcome icon */
+        .welcome-icon {
+            width: 64px;
+            /* Reduced from 80px */
+            height: 64px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            /* Prevent icon from shrinking */
+        }
+
+        .welcome-icon svg {
+            width: 32px;
+            /* Reduced from 40px */
+            height: 32px;
+            color: white;
+        }
+
+        /* Fix 5: Adjust decorative circle */
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 250px;
+            /* Reduced from 300px */
+            height: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        /* Fix 6: Better page header spacing */
+        .page-title h1 {
+            font-size: 1.25rem;
+            /* Consistent size */
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+            /* Add spacing */
+        }
+
+        /* Fix 7: Mobile adjustments */
+        @media (max-width: 768px) {
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+                padding: 1.25rem;
+                min-height: auto;
+            }
+
+            .welcome-content h2 {
+                font-size: 1.1rem;
+                /* Smaller on mobile */
+            }
+
+            .welcome-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .welcome-icon svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            /* Hide decorative circle on mobile */
+            .welcome-banner::before {
+                display: none;
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-icon.blue {
+            background: #e0e7ff;
+            color: var(--primary);
+        }
+
+        .stat-icon.green {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .stat-icon.orange {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .stat-icon.purple {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .action-card {
-            background: white;
-            border-radius: 1rem;
+            background: var(--white);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid var(--gray-200);
             text-decoration: none;
             color: inherit;
-            display: block;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 2px solid transparent;
-            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.2s;
         }
-        .action-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #e5e7eb; }
-        .action-icon { width: 52px; height: 52px; border-radius: 0.875rem; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1rem; }
-        .action-card h3 { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
-        .action-card p { font-size: 0.8rem; color: #9ca3af; line-height: 1.5; }
-        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
-        .activity-item {
-            display: flex; align-items: center; gap: 1rem;
-            padding: 0.875rem 0;
-            border-bottom: 1px solid #f3f4f6;
+
+        .action-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-dot { width: 10px; height: 10px; border-radius: 50%; background: #667eea; flex-shrink: 0; }
-        .activity-content { flex: 1; }
-        .activity-title { font-size: 0.875rem; font-weight: 500; color: #374151; }
-        .activity-meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.1rem; }
-        .class-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
-        .class-stat-row:last-child { border-bottom: none; }
-        .class-name-pill { background: #ede9fe; color: #5b21b6; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
-        
-        /* Admin badge for user management */
-        .admin-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ef4444;
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            text-transform: uppercase;
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-        
-        /* User management cards styling */
-        .user-card-teacher {
-            border-color: #8b5cf6 !important;
-            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%) !important;
+
+        .action-icon svg {
+            width: 24px;
+            height: 24px;
         }
-        .user-card-teacher .action-icon {
-            background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
-            color: white;
+
+        .action-icon.blue {
+            background: #e0e7ff;
+            color: var(--primary);
         }
-        
-        .user-card-student {
-            border-color: #10b981 !important;
-            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%) !important;
+
+        .action-icon.green {
+            background: #d1fae5;
+            color: var(--success);
         }
-        .user-card-student .action-icon {
-            background: linear-gradient(135deg, #10b981, #059669) !important;
-            color: white;
+
+        .action-icon.orange {
+            background: #fef3c7;
+            color: var(--warning);
         }
-        
-        .section-title {
+
+        .action-icon.purple {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .action-icon.red {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .action-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.375rem;
+        }
+
+        .action-content p {
             font-size: 0.875rem;
-            font-weight: 700;
-            color: #6b7280;
+            color: var(--gray-500);
+            line-height: 1.5;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        /* ===== MOBILE NAVIGATION ===== */
-        
-        /* Mobile Header (Hamburger + Logo) */
-        .mobile-header {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            z-index: 1000;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        .section-title svg {
+            width: 16px;
+            height: 16px;
         }
-        
-        .mobile-menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 0.5rem;
-            transition: background 0.2s;
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
         }
-        
-        .mobile-menu-btn:hover {
-            background: rgba(255,255,255,0.1);
+
+        @media (max-width: 1024px) {
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .mobile-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
         }
-        
-        .mobile-logo .brand-icon {
-            font-size: 1.5rem;
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
         }
-        
-        /* Mobile Sidebar Overlay */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        /* Mobile Bottom Navigation */
-        .mobile-bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 0.5rem 0;
-        }
-        
-        .mobile-nav-items {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 100%;
-        }
-        
-        .mobile-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            text-decoration: none;
-            color: #9ca3af;
-            font-size: 0.7rem;
+
+        .data-table th {
+            padding: 0.875rem 1rem;
+            text-align: left;
             font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.75rem;
-            transition: all 0.2s;
-            min-width: 60px;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
         }
-        
-        .mobile-nav-item.active {
-            color: #667eea;
-            background: #eff6ff;
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
         }
-        
-        .mobile-nav-item .nav-icon {
-            font-size: 1.4rem;
+
+        .data-table tr:hover td {
+            background: var(--gray-50);
         }
-        
-        .mobile-more-menu {
-            position: fixed;
-            bottom: 80px;
-            right: 1rem;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 0.5rem;
-            min-width: 200px;
-            display: none;
-            z-index: 1001;
-        }
-        
-        .mobile-more-menu.active {
-            display: block;
-        }
-        
-        .mobile-more-item {
+
+        .student-info {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.875rem 1rem;
-            text-decoration: none;
-            color: #374151;
-            font-size: 0.9rem;
+        }
+
+        .student-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .student-details strong {
+            display: block;
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+
+        .student-details small {
+            color: var(--gray-400);
+            font-size: 0.75rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
             font-weight: 500;
-            border-radius: 0.5rem;
-            transition: background 0.2s;
         }
-        
-        .mobile-more-item:hover {
-            background: #f3f4f6;
+
+        .badge-blue {
+            background: #e0e7ff;
+            color: var(--primary);
         }
-        
-        .mobile-more-item .nav-icon {
-            font-size: 1.2rem;
-            width: 24px;
+
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-orange {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .grade-a {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .grade-b {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .grade-c {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .grade-d {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Class Stats */
+        .class-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .class-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .class-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .class-badge {
+            background: #ede9fe;
+            color: #5b21b6;
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 70px;
             text-align: center;
         }
-        
-        /* Responsive Styles */
+
+        .class-info {
+            flex: 1;
+        }
+
+        .class-info span {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .class-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.375rem;
+        }
+
+        .class-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .class-percent {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            font-weight: 500;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-400);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+
+        /* Loading State */
+        .loading-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-400);
+        }
+
+        /* User Management Cards */
+        .user-mgmt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-card.teacher {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+        }
+
+        .user-card.teacher .user-card-icon {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+        }
+
+        .user-card.student {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        }
+
+        .user-card.student .user-card-icon {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .user-card.reset {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+        }
+
+        .user-card.reset .user-card-icon {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+        }
+
+        .user-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-card-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .user-card-content h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-card-content p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* Card Header Link */
+        .card-header-link {
+            font-size: 0.875rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .card-header-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .card-header-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Mobile Optimizations */
         @media (max-width: 768px) {
-            .mobile-header {
-                display: flex;
-            }
-            
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-                width: 280px;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding-top: 60px;
-                padding-bottom: 80px;
-            }
-            
-            .topbar {
-                display: none;
-            }
-            
-            .mobile-bottom-nav {
-                display: block;
-            }
-            
-            .page-body {
-                padding: 1rem;
-            }
-            
             .welcome-banner {
                 flex-direction: column;
                 text-align: center;
                 gap: 1rem;
+                padding: 1.5rem;
             }
-            
-            .welcome-illustration {
-                font-size: 3rem;
+
+            .welcome-icon {
+                width: 60px;
+                height: 60px;
             }
-            
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
+
+            .welcome-icon svg {
+                width: 30px;
+                height: 30px;
             }
-            
-            .action-card {
-                padding: 1rem;
-            }
-            
-            .action-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1.3rem;
-            }
-            
-            .action-card h3 {
-                font-size: 0.9rem;
-            }
-            
-            .action-card p {
-                display: none;
-            }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
             }
-            
+
             .stat-card {
                 padding: 1rem;
             }
-            
-            .stat-icon-box {
+
+            .stat-icon {
                 width: 40px;
                 height: 40px;
-                font-size: 1.3rem;
             }
-            
-            .stat-number {
-                font-size: 1.5rem;
+
+            .stat-icon svg {
+                width: 20px;
+                height: 20px;
             }
-        }
-        
-        @media (max-width: 480px) {
+
+            .stat-info h3 {
+                font-size: 1.25rem;
+            }
+
             .quick-actions {
                 grid-template-columns: 1fr;
+            }
+
+            .action-card {
+                padding: 1.25rem;
+            }
+
+            .action-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .action-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .user-mgmt-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .user-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .user-card-content p {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .user-mgmt-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
 </head>
+
 <body>
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-        <div class="mobile-logo">
-            <span class="brand-icon">🏫</span>
-            <span>School Manager</span>
-        </div>
-        <div style="width: 40px;"></div>
-    </div>
-
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
     <div class="app-layout">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <span class="brand-icon">🏫</span>
-                <div><h2>School Manager</h2><small>Management System</small></div>
-            </div>
-            <div class="sidebar-user">
-                <div class="user-avatar" id="sidebarAvatar">T</div>
-                <div class="user-details">
-                    <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role" id="sidebarRole">Teacher</div>
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+                        <path d="M5 13v6l7 4 7-4v-6" />
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>School Manager</h1>
+                    <span>Management System</span>
                 </div>
             </div>
+
             <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="teacher_dashboard.html" class="nav-item active">
-                    <span class="nav-icon">📊</span> Dashboard
-                </a>
-                <div class="nav-section-title">Academic</div>
-                <a href="enter_marks.html" class="nav-item">
-                    <span class="nav-icon">📝</span> Enter Marks
-                </a>
-                <a href="take_attendance.html" class="nav-item">
-                    <span class="nav-icon">📋</span> Take Attendance
-                </a>
-                <div class="nav-section-title">Management</div>
-                <a href="view_students.html" class="nav-item">
-                    <span class="nav-icon">👨‍🎓</span> View Students
-                </a>
-                <a href="manage_users.html" class="nav-item" id="manageUsersNav">
-                    <span class="nav-icon">👥</span> Manage Users
-                </a>
-                <div class="nav-section-title">Records</div>
-                <a href="reports.html" class="nav-item">
-                    <span class="nav-icon">📈</span> Reports
-                </a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="teacher_dashboard.html" class="nav-item active">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Dashboard
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Academic</div>
+                    <a href="enter_marks.html" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4" />
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                        </svg>
+                        Enter Marks
+                    </a>
+                    <a href="take_attendance.html" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            <path d="M9 14l2 2 4-4" />
+                        </svg>
+                        Take Attendance
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="view_students.html" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                            <path d="M16 3.13a4 4 0 010 7.75" />
+                        </svg>
+                        View Students
+                    </a>
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <path d="M20 8v6" />
+                            <path d="M23 11h-6" />
+                        </svg>
+                        Manage Users
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18" />
+                            <path d="M18 17V9" />
+                            <path d="M13 17V5" />
+                            <path d="M8 17v-3" />
+                        </svg>
+                        Reports
+                    </a>
+                </div>
+
+                <div class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">T</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName">Teacher</div>
+                        <div class="user-role" id="sidebarRole">Teacher</div>
+                    </div>
+                </div>
             </nav>
+
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="logout()">↪ Logout</button>
+                <button class="btn-logout" onclick="logout()">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    Logout
+                </button>
             </div>
         </aside>
 
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+            <div class="brand-text">
+                <h1>School Manager</h1>
+            </div>
+            <div style="width: 40px;"></div>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
-            <div class="topbar">
-                <div>
-                    <div class="topbar-title">Dashboard</div>
-                    <div class="topbar-breadcrumb">Overview of your school activities</div>
+            <!-- Top Header -->
+            <!-- <div class="top-header">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Overview of your school activities</p>
+                    <p id="currentDate"></p>
                 </div>
-                <div class="topbar-right">
-                    <div class="topbar-date" id="currentDate"></div>
-                </div>
-            </div>
+            </div> -->
 
-            <div class="page-body">
+            <!-- Page Content -->
+            <div class="page-content">
                 <!-- Welcome Banner -->
                 <div class="welcome-banner">
-                    <div>
+                    <div class="welcome-content">
                         <h2 id="welcomeText">Good Morning, Teacher!</h2>
                         <p>Here's what's happening in your school today.</p>
                     </div>
-                    <div class="welcome-illustration">👩‍🏫</div>
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
                 </div>
 
-                <!-- Stats -->
+                <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon-box bg-blue">👨‍🎓</div>
-                        <div>
-                            <div class="stat-number" id="statStudents">–</div>
-                            <div class="stat-label">Total Students</div>
+                        <div class="stat-icon blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="statStudents">–</h3>
+                            <p>Total Students</p>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon-box bg-green">📊</div>
-                        <div>
-                            <div class="stat-number" id="statMarks">–</div>
-                            <div class="stat-label">Marks Entries</div>
+                        <div class="stat-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                                <path d="M9 16l2 2 4-4" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="statToday">–</h3>
+                            <p>Today's Attendance</p>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon-box bg-orange">📅</div>
-                        <div>
-                            <div class="stat-number" id="statToday">–</div>
-                            <div class="stat-label">Today's Attendance</div>
+                        <div class="stat-icon orange">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon-box bg-purple">📚</div>
-                        <div>
-                            <div class="stat-number">6–10</div>
-                            <div class="stat-label">Classes Managed</div>
+                        <div class="stat-info">
+                            <h3 id="statMarks">–</h3>
+                            <p>Total Marks Entries</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Quick Actions -->
+                <div class="section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                    Quick Actions
+                </div>
                 <div class="quick-actions">
                     <a href="enter_marks.html" class="action-card">
-                        <div class="action-icon bg-blue">📝</div>
-                        <h3>Enter Marks</h3>
-                        <p>Record student marks for FA and SA examinations across all subjects.</p>
+                        <div class="action-icon blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h3>Enter Marks</h3>
+                            <p>Record student marks for FA and SA examinations across all subjects.</p>
+                        </div>
                     </a>
                     <a href="take_attendance.html" class="action-card">
-                        <div class="action-icon bg-green">📋</div>
-                        <h3>Take Attendance</h3>
-                        <p>Mark daily attendance for students. Mark present or absent class-wise.</p>
+                        <div class="action-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h3>Take Attendance</h3>
+                            <p>Mark daily attendance for students. Mark present or absent class-wise.</p>
+                        </div>
                     </a>
                     <a href="view_students.html" class="action-card">
-                        <div class="action-icon bg-orange">👨‍🎓</div>
-                        <h3>View Students</h3>
-                        <p>Browse the complete student list, filter by class and section.</p>
+                        <div class="action-icon orange">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </div>
+                        <div class="action-content">
+                            <h3>View Students</h3>
+                            <p>Browse the complete student list, filter by class and section.</p>
+                        </div>
                     </a>
                     <a href="reports.html" class="action-card">
-                        <div class="action-icon bg-purple">📈</div>
-                        <h3>Reports</h3>
-                        <p>Generate and view performance and attendance reports for any student.</p>
-                    </a>
-                </div>
-
-                <!-- User Management Section -->
-                <div class="section-title" id="userMgmtTitle" style="display:none;">
-                    👥 User Management
-                </div>
-                <div class="quick-actions" id="userMgmtCards" style="display:none;">
-                    
-                    <!-- Add Teacher Card (Admin Only) -->
-                    <a href="manage_users.html#teacher" class="action-card user-card-teacher" id="addTeacherCard" style="display:none;">
-                        <span class="admin-badge">Admin</span>
-                        <div class="action-icon">👩‍🏫</div>
-                        <h3>Add Teacher</h3>
-                        <p>Create new teacher accounts with username and password. Admin privileges required.</p>
-                    </a>
-                    
-                    <!-- Add Student Card (All Teachers) -->
-                    <a href="manage_users.html#student" class="action-card user-card-student" id="addStudentCard" style="display:none;">
-                        <div class="action-icon">👨‍🎓</div>
-                        <h3>Add Student</h3>
-                        <p>Enroll new students with roll number, class, section and login credentials.</p>
-                    </a>
-                    
-                    <!-- Bulk Import Card (All Teachers) -->
-                    <a href="manage_users.html#student" class="action-card user-card-student" id="bulkImportCard" style="display:none;">
-                        <div class="action-icon">📤</div>
-                        <h3>Bulk Import</h3>
-                        <p>Import multiple students at once using CSV file upload.</p>
-                    </a>
-                    
-                    <!-- Password Reset Card (All Teachers) -->
-                    <a href="manage_users.html#reset" class="action-card" id="resetPasswordCard" style="display:none; border-color:#f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);">
-                        <div class="action-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">🔑</div>
-                        <h3>Reset Password</h3>
-                        <p>Reset passwords for students or teachers who forgot their credentials.</p>
-                    </a>
-                </div>
-
-                <!-- Bottom grid -->
-                <div class="bottom-grid">
-                    <!-- Recent Marks -->
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Recent Marks Entries</span>
-                            <a href="enter_marks.html" class="btn btn-secondary btn-sm">+ Enter More</a>
+                        <div class="action-icon purple">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
                         </div>
-                        <div class="card-body" style="padding: 0;">
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Student</th>
-                                            <th>Subject</th>
-                                            <th>Exam</th>
-                                            <th>Marks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recentMarksBody">
-                                        <tr><td colspan="4" class="loading">Loading...</td></tr>
-                                    </tbody>
-                                </table>
+                        <div class="action-content">
+                            <h3>Reports</h3>
+                            <p>Generate and view performance and attendance reports for any student.</p>
+                        </div>
+                    </a>
+                </div>
+                <!-- Class Distribution -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Today's Attendance by Class</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="class-stats" id="classStats">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    style="width:28px;height:28px;animation:spin 1s linear infinite;">
+                                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83
+                 M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                                </svg>
+                                <div style="margin-top:8px;">Loading attendance...</div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Class Distribution -->
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Students by Class</span>
-                        </div>
-                        <div class="card-body">
-                            <div id="classStats">
-                                <div class="loading">Loading...</div>
+                </div>
+                <!-- User Management Section -->
+                <div id="userMgmtSection" style="display: block;">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <path d="M20 8v6" />
+                            <path d="M23 11h-6" />
+                        </svg>
+                        User Management
+                    </div>
+                    <div class="user-mgmt-grid" id="userMgmtCards">
+                        <a href="manage_users.html#teacher" class="user-card teacher" id="addTeacherCard"
+                            style="display: none; position: relative;">
+                            <div class="user-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
                             </div>
+                            <div class="user-card-content">
+                                <h4>Add Teacher</h4>
+                                <p>Create new teacher accounts</p>
+                            </div>
+                        </a>
+                        <a href="manage_users.html#student" class="user-card student" id="addStudentCard"
+                            style="display: none;">
+                            <div class="user-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 010 7.75" />
+                                </svg>
+                            </div>
+                            <div class="user-card-content">
+                                <h4>Add Student</h4>
+                                <p>Enroll new students</p>
+                            </div>
+                        </a>
+                        <a href="manage_users.html#student" class="user-card student" id="bulkImportCard"
+                            style="display: none;">
+                            <div class="user-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </div>
+                            <div class="user-card-content">
+                                <h4>Bulk Import</h4>
+                                <p>Import via CSV</p>
+                            </div>
+                        </a>
+                        <a href="manage_users.html#reset" class="user-card reset" id="resetPasswordCard"
+                            style="display: none;">
+                            <div class="user-card-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                                </svg>
+                            </div>
+                            <div class="user-card-content">
+                                <h4>Reset Password</h4>
+                                <p>Reset user passwords</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <!-- Recent Marks -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Marks Entries</span>
+                        <a href="enter_marks.html" class="card-header-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Enter More
+                        </a>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Subject</th>
+                                        <th>Exam</th>
+                                        <th>Marks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentMarksBody">
+                                    <tr class="loading-row">
+                                        <td colspan="4">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                style="width: 24px; height: 24px; animation: spin 1s linear infinite;">
+                                                <path
+                                                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                                            </svg>
+                                            <div style="margin-top: 0.5rem;">Loading...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -563,166 +1099,272 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-bottom-nav">
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
         <div class="mobile-nav-items">
             <a href="teacher_dashboard.html" class="mobile-nav-item active">
-                <span class="nav-icon">📊</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
                 <span>Home</span>
             </a>
             <a href="enter_marks.html" class="mobile-nav-item">
-                <span class="nav-icon">📝</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
                 <span>Marks</span>
             </a>
             <a href="take_attendance.html" class="mobile-nav-item">
-                <span class="nav-icon">📋</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
                 <span>Attendance</span>
             </a>
             <a href="view_students.html" class="mobile-nav-item">
-                <span class="nav-icon">👨‍🎓</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
                 <span>Students</span>
             </a>
-            <button class="mobile-nav-item" onclick="toggleMoreMenu()" style="background:none;border:none;">
-                <span class="nav-icon">☰</span>
+            <a href="#" class="mobile-nav-item" onclick="toggleMoreMenu(); return false;">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1" />
+                    <circle cx="19" cy="12" r="1" />
+                    <circle cx="5" cy="12" r="1" />
+                </svg>
                 <span>More</span>
-            </button>
+            </a>
         </div>
     </nav>
 
     <!-- Mobile More Menu -->
     <div class="mobile-more-menu" id="mobileMoreMenu">
         <a href="reports.html" class="mobile-more-item">
-            <span class="nav-icon">📈</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18" />
+                <path d="M18 17V9" />
+                <path d="M13 17V5" />
+                <path d="M8 17v-3" />
+            </svg>
             <span>Reports</span>
         </a>
         <a href="manage_users.html" class="mobile-more-item" id="mobileManageUsers">
-            <span class="nav-icon">👥</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <path d="M20 8v6" />
+                <path d="M23 11h-6" />
+            </svg>
             <span>Manage Users</span>
         </a>
         <a href="#" class="mobile-more-item" onclick="logout(); return false;">
-            <span class="nav-icon">↪</span>
-            <span>Logout</span>
+            Logout
         </a>
     </div>
 
     <script src="config.js"></script>
     <script>
-        const teacher = getSession('teacher');
-        if (!teacher) throw 'auth';
+        // Toggle sidebar for mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
 
-        // Set UI
+        // Toggle more menu
+        function toggleMoreMenu() {
+            document.getElementById('mobileMoreMenu').classList.toggle('active');
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function (e) {
+            const moreMenu = document.getElementById('mobileMoreMenu');
+            const moreBtn = e.target.closest('.mobile-nav-item:last-child');
+            if (!moreBtn && moreMenu.classList.contains('active')) {
+                moreMenu.classList.remove('active');
+            }
+        });
+
+        // Initialize dashboard
+        const teacher = getSession('teacher');
+        if (!teacher) {
+            window.location.href = 'login.html';
+        }
+
+        // Set user info
         document.getElementById('sidebarName').textContent = teacher.name;
-        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
+        document.getElementById('sidebarAvatar').textContent = teacher?.name?.charAt(0)?.toUpperCase() || 'T';
         document.getElementById('sidebarRole').textContent = teacher.role || 'Teacher';
 
-        // Show/hide features based on role
-        const isAdmin = teacher.role === 'admin';
-        
-        // Always show user management section title
-        document.getElementById('userMgmtTitle').style.display = 'flex';
-        document.getElementById('userMgmtCards').style.display = 'grid';
-        
-        // Admin sees: Add Teacher, Add Student, Bulk Import, Reset Password
-        // Teacher sees: Add Student, Bulk Import, Reset Password
-        if (isAdmin) {
-            document.getElementById('addTeacherCard').style.display = 'block';
-            document.getElementById('manageUsersNav').style.display = 'flex';
-        } else {
-            // Hide manage users nav for non-admins, but they can still access direct links
-            document.getElementById('manageUsersNav').style.display = 'none';
-            document.getElementById('mobileManageUsers').style.display = 'none';
+        // Show/hide user management based on role
+        if (teacher.role === 'teacher') {
+            document.getElementById('userMgmtSection').style.display = 'block';
+            document.getElementById('addStudentCard').style.display = 'flex';
+            document.getElementById('bulkImportCard').style.display = 'flex';
+            document.getElementById('resetPasswordCard').style.display = 'flex';
+            document.getElementById('addTeacherCard').style.display = 'flex';
+            document.getElementById('manageUsersNav').style.display = 'flex'
         }
-        
-        // All teachers can see these
-        document.getElementById('addStudentCard').style.display = 'block';
-        document.getElementById('bulkImportCard').style.display = 'block';
-        document.getElementById('resetPasswordCard').style.display = 'block';
-
+        // Set welcome message
         const now = new Date();
         const hour = now.getHours();
         const greet = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
         document.getElementById('welcomeText').textContent = `${greet}, ${teacher.name}!`;
-        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-        // Mobile Navigation Functions
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-
-        function toggleMoreMenu() {
-            const menu = document.getElementById('mobileMoreMenu');
-            menu.classList.toggle('active');
-        }
-
-        // Close more menu when clicking outside
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('mobileMoreMenu');
-            const moreBtn = e.target.closest('.mobile-nav-item');
-            if (!moreBtn && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short'
         });
 
-        async function loadDashboard() {
-            // Total students
-            const { count: sc } = await db.from('students').select('*', { count: 'exact', head: true });
-            document.getElementById('statStudents').textContent = sc || 0;
-
-            // Total marks
-            const { count: mc } = await db.from('marks').select('*', { count: 'exact', head: true });
-            document.getElementById('statMarks').textContent = mc || 0;
-
-            // Today attendance
-            const today = now.toISOString().split('T')[0];
-            const { count: ac } = await db.from('attendance').select('*', { count: 'exact', head: true }).eq('attendance_date', today);
-            document.getElementById('statToday').textContent = ac || 0;
-
-            // Recent marks
-            const { data: marks } = await db.from('marks')
-                .select('*, students(name, class_name, section), subjects(subject_name)')
-                .order('recorded_at', { ascending: false }).limit(8);
-
-            if (marks && marks.length > 0) {
-                document.getElementById('recentMarksBody').innerHTML = marks.map(m => {
-                    const g = calculateGrade(m.marks_obtained, m.max_marks);
-                    return `<tr>
-                        <td><strong>${m.students?.name || '–'}</strong><br><small style="color:#9ca3af">${m.students?.class_name}-${m.students?.section}</small></td>
-                        <td>${m.subjects?.subject_name || '–'}</td>
-                        <td><span class="badge badge-blue">${m.exam_type}</span></td>
-                        <td><strong>${m.marks_obtained}/${m.max_marks}</strong> <span class="grade-tag ${g.cls}">${g.grade}</span></td>
-                    </tr>`;
-                }).join('');
-            } else {
-                document.getElementById('recentMarksBody').innerHTML = '<tr><td colspan="4" class="empty-state">No entries yet</td></tr>';
-            }
-
-            // Students by class
-            const { data: students } = await db.from('students').select('class_name');
-            const classCounts = {};
-            CLASSES.forEach(c => classCounts[c] = 0);
-            if (students) students.forEach(s => { if (classCounts[s.class_name] !== undefined) classCounts[s.class_name]++; });
-            const total = students ? students.length : 1;
-
-            document.getElementById('classStats').innerHTML = CLASSES.map(c => `
-                <div class="class-stat-row">
-                    <div style="display:flex;align-items:center;gap:0.75rem">
-                        <span class="class-name-pill">Class ${c}</span>
-                        <span style="font-size:0.875rem;color:#374151;font-weight:600">${classCounts[c]} students</span>
-                    </div>
-                    <div style="flex:1;max-width:120px;margin:0 1rem">
-                        <div style="height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
-                            <div style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:${Math.round((classCounts[c]/Math.max(total,1))*100)}%"></div>
-                        </div>
-                    </div>
-                    <span style="font-size:0.75rem;color:#9ca3af">${Math.round((classCounts[c]/Math.max(total,1))*100)}%</span>
-                </div>
-            `).join('');
+        // Calculate grade
+        function calculateGrade(obtained, max) {
+            const percentage = (obtained / max) * 100;
+            if (percentage >= 90) return { grade: 'A', cls: 'grade-a' };
+            if (percentage >= 80) return { grade: 'B', cls: 'grade-b' };
+            if (percentage >= 60) return { grade: 'C', cls: 'grade-c' };
+            return { grade: 'D', cls: 'grade-d' };
         }
 
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                // Total students
+                const { count: sc } = await db.from('students').select('*', { count: 'exact', head: true });
+                document.getElementById('statStudents').textContent = sc || 0;
+
+                // Total marks
+                const { count: mc } = await db.from('marks').select('*', { count: 'exact', head: true });
+                document.getElementById('statMarks').textContent = mc || 0;
+
+                // Today's attendance
+                const { count: ac } = await db.from('attendance')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('attendance_date', today)
+                    .eq('status', 'Present');
+                document.getElementById('statToday').textContent = ac || 0;
+
+                // Recent marks
+                const { data: marks } = await db.from('marks')
+                    .select('*, students(name, class_name, section), subjects(subject_name)')
+                    .order('recorded_at', { ascending: false })
+                    .limit(8);
+
+                if (marks && marks.length > 0) {
+                    document.getElementById('recentMarksBody').innerHTML = marks.map(m => {
+                        const g = calculateGrade(m.marks_obtained, m.max_marks);
+                        const initials = m.students?.name ? m.students.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'ST';
+                        return `<tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">${initials}</div>
+                                    <div class="student-details">
+                                        <strong>${m.students?.name || 'Unknown'}</strong>
+                                        <small>Class ${m.students?.class_name || '–'}${m.students?.section ? '-' + m.students.section : ''}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${m.subjects?.subject_name || '–'}</td>
+                            <td><span class="badge badge-blue">${m.exam_type}</span></td>
+                            <td>
+                                <strong>${m.marks_obtained}/${m.max_marks}</strong>
+                                <span class="grade-badge ${g.cls}">${g.grade}</span>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                } else {
+                    document.getElementById('recentMarksBody').innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11l3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                                </svg>
+                                <div>No marks entries yet</div>
+                            </td>
+                        </tr>`;
+                }
+
+                // Class-wise attendance (Present students today)
+
+                const CLASSES = ['6', '7', '8', '9', '10'];
+
+                const classTotal = {};
+                const classPresent = {};
+
+                CLASSES.forEach(c => {
+                    classTotal[c] = 0;
+                    classPresent[c] = 0;
+                });
+
+                // Get all students
+                const { data: students } = await db
+                    .from('students')
+                    .select('id, class_name');
+
+                if (students) {
+                    students.forEach(s => {
+                        if (classTotal[s.class_name] !== undefined) {
+                            classTotal[s.class_name]++;
+                        }
+                    });
+                }
+
+                // Get today's present students
+                const { data: attendance } = await db
+                    .from('attendance')
+                    .select(`
+      student_id,
+      students(class_name)
+  `)
+                    .eq('attendance_date', today)
+                    .eq('status', 'Present');
+
+                if (attendance) {
+                    attendance.forEach(a => {
+                        const cls = a.students?.class_name;
+                        if (classPresent[cls] !== undefined) {
+                            classPresent[cls]++;
+                        }
+                    });
+                }
+
+                document.getElementById('classStats').innerHTML = CLASSES.map(c => {
+
+                    const present = classPresent[c];
+                    const total = classTotal[c];
+                    const percent = total ? Math.round((present / total) * 100) : 0;
+
+                    return `
+        <div class="class-stat-item">
+            <span class="class-badge">Class ${c}</span>
+            <div class="class-info">
+                <span>${present} / ${total} present</span>
+                <div class="class-bar">
+                    <div class="class-bar-fill" style="width:${percent}%"></div>
+                </div>
+            </div>
+            <span class="class-percent">${percent}%</span>
+        </div>
+    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+                alert("Failed to load dashboard data");
+            }
+        }
+
+        // Load dashboard on page load
         loadDashboard();
     </script>
 </body>
+
 </html>

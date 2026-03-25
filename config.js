@@ -27,7 +27,7 @@ const EXAMS = [
 function getSession(role) {
     const s = JSON.parse(localStorage.getItem('school_session'));
     if (!s || (role && s.role !== role)) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return null;
     }
     return s;
@@ -35,7 +35,7 @@ function getSession(role) {
 
 function logout() {
     localStorage.removeItem('school_session');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 }
 
 function calculateGrade(marks, maxMarks) {
@@ -56,20 +56,4 @@ function getExamMaxMarks(examType) {
 function formatDate(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-// Add to config.js
-function isAdmin() {
-    const s = getSession();
-    return s && s.role === 'admin';
-}
-
-function checkPermission(requiredRole) {
-    const s = getSession();
-    if (!s) { window.location.href = 'login.html'; return false; }
-    if (requiredRole === 'admin' && s.role !== 'admin') {
-        alert('Admin access required');
-        return false;
-    }
-    return true;
 }
