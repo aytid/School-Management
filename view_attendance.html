@@ -1,246 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Attendance - School Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Attendance - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        .att-overview {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 2rem;
-            align-items: center;
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            margin-bottom: 1.5rem;
+        /* Attendance Banner & Ring */
+        .attendance-banner {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border-radius: 1rem; padding: 2rem; color: white; margin-bottom: 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1.5rem; position: relative; overflow: hidden;
         }
-        .att-ring-box { text-align: center; }
-        .att-ring-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
-        .att-mini-stat {
-            padding: 1.25rem; border-radius: 0.875rem; text-align: center;
+
+        .ring-container { position: relative; width: 120px; height: 120px; flex-shrink: 0; z-index: 1; }
+        .ring-container svg { transform: rotate(-90deg); width: 120px; height: 120px; }
+        .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .ring-pct-lg { font-size: 1.75rem; font-weight: 800; }
+        .ring-label { font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .att-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .att-stat-card { background: white; padding: 1.25rem; border-radius: 1rem; text-align: center; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
+        .att-stat-val { font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem; }
+        .att-stat-label { font-size: 0.75rem; color: #9ca3af; font-weight: 600; }
+
+        .month-card { background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); margin-bottom: 1.5rem; }
+        .month-card-header { padding: 1.25rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 1.25rem; }
+        .cal-day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: #9ca3af; padding-bottom: 0.5rem; }
+        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; font-weight: 600; background: #f9fafb; color: #6b7280; }
+        .cal-date.present { background: #d1fae5; color: #059669; }
+        .cal-date.absent { background: #fee2e2; color: #dc2626; }
+
+        .user-avatar img, .profile-avatar-mobile img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;
         }
-        .att-mini-stat .ams-val { font-size: 2rem; font-weight: 800; }
-        .att-mini-stat .ams-label { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
-        .warning-bar {
-            background: #fef3c7; border: 1px solid #fbbf24;
-            padding: 0.875rem 1.25rem; border-radius: 0.75rem;
-            font-size: 0.875rem; color: #92400e;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .good-bar {
-            background: #d1fae5; border: 1px solid #6ee7b7;
-            padding: 0.875rem 1.25rem; border-radius: 0.75rem;
-            font-size: 0.875rem; color: #065f46;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .month-block { margin-bottom: 1.5rem; }
-        .month-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0.75rem 1rem; background: #f9fafb;
-            border-radius: 0.625rem; margin-bottom: 0.5rem;
-            cursor: pointer;
-        }
-        .month-header h4 { font-size: 0.95rem; font-weight: 700; color: #374151; }
-        .month-mini-stats { display: flex; gap: 0.75rem; }
-        .mms-item { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600; }
-        .mms-present { background: #d1fae5; color: #065f46; }
-        .mms-absent { background: #fee2e2; color: #991b1b; }
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            gap: 4px; padding: 0.75rem;
-            background: white; border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-        .cal-day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #9ca3af; padding: 0.25rem; }
-        .cal-cell {
-            aspect-ratio: 1;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 0.375rem; font-size: 0.75rem; font-weight: 700;
-        }
-        .cal-cell.present { background: #d1fae5; color: #065f46; }
-        .cal-cell.absent { background: #fee2e2; color: #991b1b; }
-        .cal-cell.empty { background: transparent; }
-        @media (max-width: 600px) {
-            .att-overview { grid-template-columns: 1fr; }
-            .att-ring-stats { grid-template-columns: repeat(3, 1fr); }
+
+        @media (max-width: 640px) {
+            .attendance-banner { flex-direction: column-reverse; text-align: center; padding: 1.5rem; }
+            .att-stats-grid { gap: 0.5rem; }
         }
     </style>
 </head>
+
 <body>
     <div class="app-layout">
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <span class="brand-icon">🏫</span>
-                <div><h2>School Manager</h2><small>Student Portal</small></div>
-            </div>
-            <div class="sidebar-user">
-                <div class="user-avatar" id="sidebarAvatar">S</div>
-                <div class="user-details">
-                    <div class="user-name" id="sidebarName">Student</div>
-                    <div class="user-role">Student</div>
+        <aside class="sidebar" id="sidebar">
+            <a href="student_profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">S</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Student</div>
+                    <div class="profile-role-mobile">View Profile →</div>
                 </div>
-            </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
+
             <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="student_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-                <div class="nav-section-title">My Records</div>
-                <a href="view_marks.html" class="nav-item"><span class="nav-icon">📝</span> My Marks</a>
-                <a href="view_attendance.html" class="nav-item active"><span class="nav-icon">📅</span> My Attendance</a>
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <a href="student_dashboard.html" class="nav-item">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg></span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">My Records</div>
+                    <a href="view_marks.html" class="nav-item">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></span>
+                        <span>My Marks</span>
+                    </a>
+                    <a href="view_attendance.html" class="nav-item active">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /><path d="M9 14l2 2 4-4" /></svg></span>
+                        <span>My Attendance</span>
+                    </a>
+                </div>
+
+                <a href="student_profile.html" class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">S</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName">Student Name</div>
+                        <div class="user-role" id="sidebarClass">Class</div>
+                    </div>
+                </a>
             </nav>
-            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg> Sign Out
+                </button>
+            </div>
         </aside>
 
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
         <div class="main-content">
-            <div class="topbar">
-                <div>
-                    <div class="topbar-title">My Attendance</div>
-                    <div class="topbar-breadcrumb">View your attendance history and statistics</div>
-                </div>
-            </div>
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+                <div class="mobile-brand"><span>ZPHS Nagulapet</span></div>
+                <div style="width: 36px;"></div>
+            </header>
 
-            <div class="page-body">
-                <!-- Overview -->
-                <div class="att-overview">
-                    <div class="att-ring-box">
-                        <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg)">
-                            <circle fill="none" stroke="#e5e7eb" stroke-width="14" cx="80" cy="80" r="66"/>
-                            <circle id="attRing" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"
-                                cx="80" cy="80" r="66" stroke-dasharray="414.69" stroke-dashoffset="414.69"/>
+            <div class="desktop-topbar"><div class="page-title"><h1>Attendance Records</h1></div></div>
+
+            <div class="page-content">
+                <div class="attendance-banner" id="bannerTheme">
+                    <div class="banner-info">
+                        <h2 id="greetingMsg">Track your attendance</h2>
+                        <div class="status-pill" id="statusMsg">Analyzing records...</div>
+                    </div>
+                    <div class="ring-container">
+                        <svg viewBox="0 0 120 120">
+                            <circle fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="10" cx="60" cy="60" r="52"/>
+                            <circle id="attRing" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
                         </svg>
-                        <div style="margin-top:-170px;position:relative;z-index:1;text-align:center;padding-top:55px">
-                            <div style="font-size:2.5rem;font-weight:800;color:#1f2937" id="pctDisplay">0%</div>
-                            <div style="font-size:0.75rem;color:#9ca3af">Attendance</div>
-                        </div>
-                        <div style="height:80px"></div>
-                    </div>
-                    <div>
-                        <div class="att-ring-stats">
-                            <div class="att-mini-stat" style="background:#d1fae5">
-                                <div class="ams-val" style="color:#065f46" id="presentCount">0</div>
-                                <div class="ams-label">Present</div>
-                            </div>
-                            <div class="att-mini-stat" style="background:#fee2e2">
-                                <div class="ams-val" style="color:#991b1b" id="absentCount">0</div>
-                                <div class="ams-label">Absent</div>
-                            </div>
-                            <div class="att-mini-stat" style="background:#dbeafe">
-                                <div class="ams-val" style="color:#1e40af" id="totalCount">0</div>
-                                <div class="ams-label">Total Days</div>
-                            </div>
-                        </div>
-                        <div id="attMessage"></div>
+                        <div class="ring-text"><div class="ring-pct-lg" id="pctDisplay">0%</div><div class="ring-label">Present</div></div>
                     </div>
                 </div>
 
-                <!-- Month-wise history -->
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Monthly Attendance History</span></div>
-                    <div class="card-body" id="monthHistory">
-                        <div class="loading">Loading attendance records...</div>
-                    </div>
+                <div class="att-stats-grid">
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#059669" id="presentCount">0</span><span class="att-stat-label">Days Present</span></div>
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#dc2626" id="absentCount">0</span><span class="att-stat-label">Days Absent</span></div>
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#4f46e5" id="totalCount">0</span><span class="att-stat-label">Working Days</span></div>
                 </div>
+
+                <div id="monthHistory"><div class="loading-state">Loading calendar...</div></div>
             </div>
         </div>
     </div>
 
+    <nav class="bottom-nav">
+        <a href="student_dashboard.html" class="bnav-item">
+            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg></span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="view_marks.html" class="bnav-item">
+            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="view_attendance.html" class="bnav-item active">
+            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /><path d="M9 14l2 2 4-4" /></svg></span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="student_profile.html" class="bnav-item">
+            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span>
+            <span class="bnav-label">Profile</span>
+        </a>
+    </nav>
+
     <script src="config.js"></script>
     <script>
-        const session = getSession('student');
-        if (!session) throw 'auth';
-        document.getElementById('sidebarAvatar').textContent = session.name.charAt(0);
-        document.getElementById('sidebarName').textContent = session.name;
+        const student = getSession('student');
+        if (!student) window.location.href = 'index.html';
 
-        async function loadAttendance() {
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+            document.getElementById('hamburgerBtn').classList.toggle('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        function displayAvatar(elementId, initials) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (student?.image_url) {
+                el.innerHTML = `<img src="${student.image_url}" alt="${student.name}">`;
+            } else { el.textContent = initials; }
+        }
+
+        async function init() {
+            const initials = student.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('sidebarName').textContent = student.name;
+            document.getElementById('sidebarClass').textContent = `Class ${student.class_name || ''}`;
+            document.getElementById('sidebarProfileName').textContent = student.name.split(' ')[0];
+            displayAvatar('sidebarAvatar', initials);
+            displayAvatar('sidebarProfileAvatar', initials);
+
             const { data: records } = await db.from('attendance')
-                .select('*').eq('student_id', session.id)
-                .order('attendance_date', { ascending: false });
+                .select('*').eq('student_id', student.id).order('attendance_date', { ascending: false });
 
             if (!records || records.length === 0) {
-                document.getElementById('monthHistory').innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>No attendance records found yet.</p></div>';
+                document.getElementById('monthHistory').innerHTML = '<div class="empty-state">No attendance logs found.</div>';
                 return;
             }
 
             const total = records.length;
             const present = records.filter(r => r.status === 'Present').length;
-            const absent = total - present;
             const pct = ((present / total) * 100).toFixed(1);
 
-            document.getElementById('pctDisplay').textContent = pct + '%';
+            document.getElementById('pctDisplay').textContent = Math.round(pct) + '%';
             document.getElementById('presentCount').textContent = present;
-            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('absentCount').textContent = total - present;
             document.getElementById('totalCount').textContent = total;
 
-            const offset = 414.69 - (414.69 * parseFloat(pct) / 100);
-            const ring = document.getElementById('attRing');
-            ring.style.strokeDashoffset = offset;
-            if (parseFloat(pct) >= 75) ring.style.stroke = '#10b981';
-            else if (parseFloat(pct) >= 60) ring.style.stroke = '#f59e0b';
-            else ring.style.stroke = '#ef4444';
+            const dashoffset = 326.7 - (326.7 * pct / 100);
+            document.getElementById('attRing').style.strokeDashoffset = dashoffset;
 
-            const msgEl = document.getElementById('attMessage');
-            if (parseFloat(pct) >= 75) {
-                msgEl.innerHTML = `<div class="good-bar">✅ Great attendance! Keep it up. You are attending ${pct}% of classes.</div>`;
-            } else if (parseFloat(pct) >= 60) {
-                msgEl.innerHTML = `<div class="warning-bar">⚠️ Your attendance is ${pct}%. Try to attend more classes. 75% is the minimum required.</div>`;
+            const banner = document.getElementById('bannerTheme');
+            if (pct >= 85) {
+                document.getElementById('statusMsg').textContent = '✅ Excellent attendance!';
+                banner.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+            } else if (pct >= 75) {
+                document.getElementById('statusMsg').textContent = '👍 Good standing';
+                banner.style.background = 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)';
             } else {
-                msgEl.innerHTML = `<div class="warning-bar" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b">🚨 Low attendance: ${pct}%. Attendance below 75% may affect your exams!</div>`;
+                document.getElementById('statusMsg').textContent = '⚠️ Attention required';
+                banner.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
             }
 
-            // Group by month
-            const monthGroups = {};
+            const months = {};
             records.forEach(r => {
-                const d = new Date(r.attendance_date);
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                const label = d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-                if (!monthGroups[key]) monthGroups[key] = { label, records: [], year: d.getFullYear(), month: d.getMonth() };
-                monthGroups[key].records.push(r);
+                const date = new Date(r.attendance_date);
+                const key = `${date.getFullYear()}-${date.getMonth()}`;
+                if (!months[key]) {
+                    months[key] = {
+                        name: date.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
+                        year: date.getFullYear(), month: date.getMonth(), records: {}
+                    };
+                }
+                months[key].records[date.getDate()] = r.status;
             });
 
-            document.getElementById('monthHistory').innerHTML = Object.entries(monthGroups)
-                .sort((a, b) => b[0].localeCompare(a[0]))
-                .map(([key, data]) => {
-                    const mp = data.records.filter(r => r.status === 'Present').length;
-                    const ma = data.records.length - mp;
-                    const mpct = ((mp / data.records.length) * 100).toFixed(0);
+            document.getElementById('monthHistory').innerHTML = Object.values(months).map(m => {
+                const firstDay = new Date(m.year, m.month, 1).getDay();
+                const daysInMonth = new Date(m.year, m.month + 1, 0).getDate();
+                const monthPres = Object.values(m.records).filter(s => s === 'Present').length;
+                const monthTotal = Object.keys(m.records).length;
 
-                    // Build calendar
-                    const firstDay = new Date(data.year, data.month, 1).getDay();
-                    const daysInMonth = new Date(data.year, data.month + 1, 0).getDate();
-                    const attByDate = {};
-                    data.records.forEach(r => {
-                        const d = new Date(r.attendance_date).getDate();
-                        attByDate[d] = r.status;
-                    });
-
-                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    let calHtml = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
-                    for (let i = 0; i < firstDay; i++) calHtml += '<div class="cal-cell empty"></div>';
-                    for (let d = 1; d <= daysInMonth; d++) {
-                        const status = attByDate[d];
-                        const cls = status === 'Present' ? 'present' : status === 'Absent' ? 'absent' : 'empty';
-                        calHtml += `<div class="cal-cell ${cls}">${d}</div>`;
-                    }
-
-                    return `
-                        <div class="month-block">
-                            <div class="month-header">
-                                <h4>📅 ${data.label}</h4>
-                                <div class="month-mini-stats">
-                                    <span class="mms-item mms-present">✓ ${mp} Present</span>
-                                    <span class="mms-item mms-absent">✗ ${ma} Absent</span>
-                                    <span class="badge ${parseFloat(mpct) >= 75 ? 'badge-green' : 'badge-orange'}">${mpct}%</span>
-                                </div>
-                            </div>
-                            <div class="calendar-grid">${calHtml}</div>
-                        </div>`;
-                }).join('');
+                const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                let grid = dayLabels.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+                for (let i = 0; i < firstDay; i++) grid += '<div class="cal-date empty"></div>';
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const status = m.records[d];
+                    const cls = status === 'Present' ? 'present' : status === 'Absent' ? 'absent' : '';
+                    grid += `<div class="cal-date ${cls}">${d}</div>`;
+                }
+                return `<div class="month-card">
+                    <div class="month-card-header"><span class="month-title">${m.name}</span>
+                        <div class="month-summary">
+                            <span class="badge" style="background:#d1fae5; color:#065f46">${monthPres} Present</span>
+                            <span class="badge" style="background:#fee2e2; color:#991b1b">${monthTotal - monthPres} Absent</span>
+                        </div>
+                    </div><div class="cal-grid">${grid}</div></div>`;
+            }).join('');
         }
-
-        loadAttendance();
+        init();
     </script>
 </body>
+
 </html>

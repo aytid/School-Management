@@ -63,33 +63,6 @@
             object-fit: cover;
         }
 
-        .profile-avatar-edit {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 40px;
-            height: 40px;
-            background: var(--emerald-500);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 3px solid white;
-            transition: transform 0.2s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .profile-avatar-edit:hover {
-            transform: scale(1.1);
-        }
-
-        .profile-avatar-edit svg {
-            width: 20px;
-            height: 20px;
-            color: white;
-        }
-
         .profile-name-large {
             font-size: 1.5rem;
             font-weight: 700;
@@ -229,7 +202,33 @@
                         </span>
                         <span>View Students</span>
                     </a>
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:none;">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
+                    </a>
                 </div>
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
                 <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
@@ -281,17 +280,7 @@
                             <div class="profile-header">
                                 <div class="profile-avatar-large" id="profileAvatar">
                                     <span id="profileInitials">T</span>
-                                    <div class="profile-avatar-edit"
-                                        onclick="document.getElementById('imageInput').click()">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path
-                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
                                 </div>
-                                <input type="file" id="imageInput" class="upload-input" accept="image/*"
-                                    onchange="handleImageUpload(this)">
                                 <div class="profile-name-large" id="profileName">Teacher</div>
                                 <div class="profile-role-large" id="profileRole">Teacher</div>
                             </div>
@@ -356,224 +345,161 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
-    <script>
-        /* ── Sidebar toggle ── */
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('sidebarOverlay');
-            const btn = document.getElementById('hamburgerBtn');
-            sb.classList.toggle('open');
-            ov.classList.toggle('active');
-            btn.classList.toggle('active');
+<script src="config.js"></script>
+<script>
+
+/* ── Sidebar toggle ── */
+function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebarOverlay');
+    const btn = document.getElementById('hamburgerBtn');
+    sb.classList.toggle('open');
+    ov.classList.toggle('active');
+    btn.classList.toggle('active');
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+    document.getElementById('hamburgerBtn').classList.remove('active');
+}
+
+/* ── Session guard ── */
+const teacher = getSession('teacher');
+if (!teacher) window.location.href = 'index.html';
+
+/* ── Initials ── */
+const initials =
+    teacher?.name
+        ?.split(' ')
+        .map(n => n[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase() || 'T';
+
+/* ── Populate Profile Info ── */
+document.getElementById('profileName').textContent = teacher.name;
+document.getElementById('profileRole').textContent = 'Designation: '+teacher.designation || 'Teacher';
+
+document.getElementById('infoName').textContent = teacher.name;
+document.getElementById('infoUsername').textContent = teacher.username;
+document.getElementById('infoRole').textContent = teacher.designation || 'Teacher';
+
+document.getElementById('sidebarName').textContent = teacher.name;
+document.getElementById('sidebarDesignation').textContent = teacher.designation || 'Teacher';
+document.getElementById('sidebarProfileName').textContent = teacher.name;
+
+/* ── Avatar Helper ── */
+function setAvatar(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    if (teacher?.image_url) {
+        el.innerHTML =
+            `<img src="${teacher.image_url}" 
+                  alt="${teacher.name}" 
+                  style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+        el.textContent = initials;
+    }
+}
+
+/* ── Set avatars everywhere ── */
+setAvatar("profileAvatar");
+setAvatar("sidebarAvatar");
+setAvatar("sidebarProfileAvatar");
+
+/* ── Role-based visibility ── */
+const role = teacher?.designation?.toLowerCase();
+
+if (role === 'admin' || role === 'ghm') {
+    const manageNav = document.getElementById('manageUsersNav');
+    if (manageNav) manageNav.style.display = 'flex';
+}
+
+/* ── Password Change ── */
+function showChangePassword() {
+    document.getElementById('passwordModal').style.display = 'block';
+}
+
+function closePasswordModal() {
+    document.getElementById('passwordModal').style.display = 'none';
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+}
+
+async function updatePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('confirmPassword').value;
+
+    if (!current || !newPass || !confirm) {
+        showToast('Please fill all fields');
+        return;
+    }
+
+    if (newPass !== confirm) {
+        showToast('New passwords do not match');
+        return;
+    }
+
+    if (newPass.length < 6) {
+        showToast('Password must be at least 6 characters');
+        return;
+    }
+
+    try {
+
+        const { data: verifyData, error: verifyError } = await db
+            .from('teachers')
+            .select('id')
+            .eq('id', teacher.id)
+            .eq('password', current)
+            .single();
+
+        if (verifyError || !verifyData) {
+            showToast('Current password is incorrect');
+            return;
         }
 
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-            document.getElementById('hamburgerBtn').classList.remove('active');
-        }
+        const { error: updateError } = await db
+            .from('teachers')
+            .update({ password: newPass })
+            .eq('id', teacher.id);
 
-        /* ── Session guard ── */
-        const teacher = getSession('teacher');
-        if (!teacher) window.location.href = 'index.html';
+        if (updateError) throw updateError;
 
-        /* ── Populate Profile ── */
-        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+        showToast('Password updated successfully!');
+        closePasswordModal();
 
-        // Large profile avatar
-        const profileAvatar = document.getElementById('profileAvatar');
-        const profileInitials = document.getElementById('profileInitials');
-        if (teacher?.image_url) {
-            profileAvatar.innerHTML = `
-                <img src="${teacher.image_url}" alt="${teacher.name}">
-                <div class="profile-avatar-edit" onclick="document.getElementById('imageInput').click()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-            `;
-        } else {
-            profileInitials.textContent = initials;
-        }
+    } catch (err) {
+        console.error('Password update error:', err);
+        showToast('Failed to update password');
+    }
+}
 
-        // Text info
-        document.getElementById('profileName').textContent = teacher.name;
-        document.getElementById('profileRole').textContent = teacher.designation || 'Teacher';
-        document.getElementById('infoName').textContent = teacher.name;
-        document.getElementById('infoUsername').textContent = teacher.username;
-        document.getElementById('infoRole').textContent = teacher.designation || 'Teacher';
-        document.getElementById('infoDate').textContent = new Date(teacher.created_at).toLocaleDateString('en-IN');
+/* ── Toast Notification ── */
+function showToast(message, type = 'success') {
 
-        // Sidebar avatars
-        const sidebarAvatar = document.getElementById('sidebarAvatar');
-        if (sidebarAvatar) {
-            if (teacher?.image_url) {
-                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            } else {
-                sidebarAvatar.textContent = initials;
-            }
-        }
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
 
-        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
-        if (sidebarProfileAvatar) {
-            if (teacher?.image_url) {
-                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            } else {
-                sidebarProfileAvatar.textContent = initials;
-            }
-        }
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
 
-        document.getElementById('sidebarName').textContent = teacher.name;
-        document.getElementById('sidebarDesignation').textContent = teacher.designation || 'Teacher';
-        document.getElementById('sidebarProfileName').textContent = teacher.name;
+    document.body.appendChild(toast);
 
-        /* ── Image Upload ── */
-        async function handleImageUpload(input) {
-            if (!input.files || !input.files[0]) return;
+    setTimeout(() => toast.classList.add('show'), 10);
 
-            const file = input.files[0];
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
-            // Validate file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showToast('Image size must be less than 2MB');
-                return;
-            }
-
-            try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `teacher_${teacher.id}_${Date.now()}.${fileExt}`;
-                const filePath = `teacher-profiles/${fileName}`;
-
-                // Show loading
-                const editBtn = document.querySelector('.profile-avatar-edit');
-                editBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div>';
-
-                // Upload to Supabase Storage
-                const { error: uploadError } = await db.storage
-                    .from('teacher-images')
-                    .upload(filePath, file);
-
-                if (uploadError) throw uploadError;
-
-                // Get public URL
-                const { data: { publicUrl } } = db.storage
-                    .from('teacher-images')
-                    .getPublicUrl(filePath);
-
-                // Update database
-                const { error: updateError } = await db
-                    .from('teachers')
-                    .update({ image_url: publicUrl })
-                    .eq('id', teacher.id);
-
-                if (updateError) throw updateError;
-
-                // Update session
-                teacher.image_url = publicUrl;
-                setSession('teacher', teacher);
-
-                // Refresh page to show new image
-                location.reload();
-
-            } catch (err) {
-                console.error('Upload error:', err);
-                showToast('Failed to upload image. Please try again.');
-                location.reload();
-            }
-        }
-
-        /* ── Password Change ── */
-        function showChangePassword() {
-            document.getElementById('passwordModal').style.display = 'block';
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').style.display = 'none';
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        }
-
-        async function updatePassword() {
-            const current = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
-
-            if (!current || !newPass || !confirm) {
-                showToast('Please fill all fields');
-                return;
-            }
-
-            if (newPass !== confirm) {
-                showToast('New passwords do not match');
-                return;
-            }
-
-            if (newPass.length < 6) {
-                showToast('Password must be at least 6 characters');
-                return;
-            }
-
-            try {
-                // Verify current password
-                const { data: verifyData, error: verifyError } = await db
-                    .from('teachers')
-                    .select('id')
-                    .eq('id', teacher.id)
-                    .eq('password', current)
-                    .single();
-
-                if (verifyError || !verifyData) {
-                    showToast('Current password is incorrect');
-                    return;
-                }
-
-                // Update password
-                const { error: updateError } = await db
-                    .from('teachers')
-                    .update({ password: newPass })
-                    .eq('id', teacher.id);
-
-                if (updateError) throw updateError;
-
-                showToast('Password updated successfully!');
-                closePasswordModal();
-
-            } catch (err) {
-                console.error('Password update error:', err);
-                showToast('Failed to update password');
-            }
-        }
-
-        /* ── Logout ── */
-        function logout() {
-            clearSession();
-            window.location.href = 'index.html';
-        }
-        /* ── Toast Notification ── */
-        function showToast(message, type = 'success') {
-            // Remove existing toast
-            const existing = document.querySelector('.toast');
-            if (existing) existing.remove();
-
-            // Create toast
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            // Show
-            setTimeout(() => toast.classList.add('show'), 10);
-
-            // Hide after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    </script>
+</script>
 </body>
 
 </html>

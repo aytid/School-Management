@@ -122,12 +122,35 @@
             font-weight: 700;
         }
 
-        .grade-ap { background: var(--emerald-100); color: #065f46; }
-        .grade-a { background: #dbeafe; color: #1e40af; }
-        .grade-b { background: var(--amber-100); color: #92400e; }
-        .grade-c { background: #fed7aa; color: #9a3412; }
-        .grade-d { background: var(--rose-100); color: #991b1b; }
-        .grade-f { background: #fecaca; color: #7f1d1d; }
+        .grade-ap {
+            background: var(--emerald-100);
+            color: #065f46;
+        }
+
+        .grade-a {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .grade-b {
+            background: var(--amber-100);
+            color: #92400e;
+        }
+
+        .grade-c {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .grade-d {
+            background: var(--rose-100);
+            color: #991b1b;
+        }
+
+        .grade-f {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
 
         .empty-state {
             text-align: center;
@@ -152,42 +175,43 @@
                 align-items: flex-start;
             }
         }
+
         /* Sidebar open state for mobile */
-.sidebar.open {
-    transform: translateX(0);
-    box-shadow: var(--shadow-lg);
-}
+        .sidebar.open {
+            transform: translateX(0);
+            box-shadow: var(--shadow-lg);
+        }
 
-.sidebar-overlay.active {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
-}
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-/* Mobile profile section */
-.sidebar-profile-mobile {
-    display: none;
-}
+        /* Mobile profile section */
+        .sidebar-profile-mobile {
+            display: none;
+        }
 
-@media (max-width: 1024px) {
-    .sidebar-profile-mobile {
-        display: flex;
-    }
-    
-    .sidebar-user {
-        display: none !important;
-    }
-}
+        @media (max-width: 1024px) {
+            .sidebar-profile-mobile {
+                display: flex;
+            }
 
-@media (min-width: 1025px) {
-    .sidebar-profile-mobile {
-        display: none !important;
-    }
-    
-    .sidebar-user {
-        display: flex !important;
-    }
-}
+            .sidebar-user {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .sidebar-profile-mobile {
+                display: none !important;
+            }
+
+            .sidebar-user {
+                display: flex !important;
+            }
+        }
     </style>
 </head>
 
@@ -260,7 +284,7 @@
                     </a>
                 </div>
                 <div class="nav-section">
-                                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:flex;">
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:flex;">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -271,7 +295,7 @@
                         </span>
                         <span>Manage Users</span>
                     </a>
-</div>
+                </div>
                 <div class="nav-section">
                     <div class="nav-label">Records</div>
                     <a href="reports.html" class="nav-item">
@@ -321,12 +345,6 @@
                     <span></span><span></span><span></span>
                 </button>
                 <div class="mobile-brand">
-                    <div class="brand-logo-sm">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
-                            <path d="M5 13v6l7 4 7-4v-6" />
-                        </svg>
-                    </div>
                     <span>Enter Marks</span>
                 </div>
                 <div style="width: 36px; height: 36px;"></div>
@@ -389,8 +407,10 @@
                     </div>
 
                     <button class="btn btn-primary btn-lg" onclick="loadStudents()" style="width: 100%;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 0.5rem;">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                            <path
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                         Load Students
                     </button>
@@ -420,7 +440,8 @@
                                         <th style="width:60px">#</th>
                                         <th>Roll No</th>
                                         <th>Student Name</th>
-                                        <th>Marks <span style="font-weight:400">(Max: <span id="maxMarksDisplay">20</span>)</span></th>
+                                        <th>Marks <span style="font-weight:400">(Max: <span
+                                                    id="maxMarksDisplay">20</span>)</span></th>
                                         <th>Grade</th>
                                         <th style="width:80px">Action</th>
                                     </tr>
@@ -515,38 +536,38 @@
         const teacher = getSession('teacher');
         if (!teacher) window.location.href = 'index.html';
 
-/* ── Populate user info ── */
-const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
 
-// Desktop sidebar avatar
-const sidebarAvatar = document.getElementById('sidebarAvatar');
-if (sidebarAvatar) {
-    if (teacher?.image_url) {
-        sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    } else {
-        sidebarAvatar.textContent = initials;
-    }
-}
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
 
-// Mobile profile avatar
-const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
-if (sidebarProfileAvatar) {
-    if (teacher?.image_url) {
-        sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    } else {
-        sidebarProfileAvatar.textContent = initials;
-    }
-}
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
 
-// Names
-const sidebarName = document.getElementById('sidebarName');
-if (sidebarName) sidebarName.textContent = teacher.name || 'Teacher';
+        // Names
+        const sidebarName = document.getElementById('sidebarName');
+        if (sidebarName) sidebarName.textContent = teacher.name || 'Teacher';
 
-const sidebarRole = document.getElementById('sidebarRole');
-if (sidebarRole) sidebarRole.textContent = teacher.designation || 'Teacher';
+        const sidebarRole = document.getElementById('sidebarRole');
+        if (sidebarRole) sidebarRole.textContent = teacher.designation || 'Teacher';
 
-const sidebarProfileName = document.getElementById('sidebarProfileName');
-if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
+        const sidebarProfileName = document.getElementById('sidebarProfileName');
+        if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
 
         /* ── Marks functionality ── */
         let studentsList = [];
@@ -775,12 +796,6 @@ if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' 
             toast.textContent = message;
             toast.className = `toast ${type} show`;
             setTimeout(() => toast.className = 'toast', 3000);
-        }
-
-        /* ── Logout ── */
-        function logout() {
-            clearSession();
-            window.location.href = 'index.html';
         }
 
         loadSubjectIds();

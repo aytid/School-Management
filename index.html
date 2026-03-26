@@ -3,193 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Management System - Login</title>
+    <title>Login - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #7c3aed;
+            --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-500: #6b7280;
+            --gray-900: #111827;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 1.5rem;
         }
+
         .login-wrapper {
             display: flex;
             width: 100%;
-            max-width: 900px;
-            background: white;
-            border-radius: 1.5rem;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            max-width: 1000px;
+            background: var(--white);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            min-height: 560px;
+            min-height: 600px;
         }
+
+        /* Left Side: Branding */
         .branding {
-            flex: 1;
-            background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
-            padding: 3rem;
+            flex: 1.2;
+            background: linear-gradient(160deg, #6366f1 0%, #a855f7 100%);
+            padding: 4rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
             color: white;
+            position: relative;
         }
-        .branding .school-icon { font-size: 5rem; margin-bottom: 1.5rem; }
-        .branding h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .branding p { font-size: 1rem; opacity: 0.85; line-height: 1.6; margin-bottom: 2rem; }
+
+        .branding::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .school-logo-svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .branding h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+        .branding p { font-size: 1.1rem; opacity: 0.9; line-height: 1.6; margin-bottom: 2.5rem; }
+
         .feature-list { list-style: none; }
         .feature-list li {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-            opacity: 0.9;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
-        .feature-list li::before { content: '✓'; font-weight: 700; }
+
+        .check-icon { width: 20px; height: 20px; flex-shrink: 0; color: #a5f3fc; }
+
+        /* Right Side: Form */
         .form-side {
             flex: 1;
-            padding: 3rem;
+            padding: 4rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            background: var(--white);
         }
-        .form-side h2 { color: #1f2937; font-size: 1.75rem; margin-bottom: 0.5rem; }
-        .form-side .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 2rem; }
-        .form-group { margin-bottom: 1.25rem; }
-        label { display: block; color: #374151; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; }
-        select, input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            color: #1f2937;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: white;
-        }
-        select:focus, input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-        }
+
+        .form-side h2 { color: var(--gray-900); font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .subtitle { color: var(--gray-500); font-size: 1rem; margin-bottom: 2.5rem; }
+
+        /* Custom Tabs */
         .role-tabs {
             display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            background: var(--gray-100);
+            padding: 0.4rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            gap: 0.4rem;
         }
+
         .role-tab {
             flex: 1;
-            padding: 0.875rem;
-            border: 2px solid #e5e7eb;
+            padding: 0.75rem;
             border-radius: 0.75rem;
             text-align: center;
             cursor: pointer;
             font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            color: #6b7280;
-            background: white;
-        }
-        .role-tab:hover { border-color: #667eea; color: #667eea; }
-        .role-tab.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-        .role-tab .tab-icon { font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
-        .btn-login {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
             font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.2s;
-            margin-top: 0.5rem;
-            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--gray-500);
+            border: none;
         }
-        .btn-login:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-login:active { transform: translateY(0); }
-        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .error-msg {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #dc2626;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            margin-top: 1rem;
-            display: none;
-            text-align: center;
+
+        .role-tab svg { width: 20px; height: 20px; }
+
+        .role-tab.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; color: var(--gray-900); font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.8rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
         .password-wrapper { position: relative; }
-        .password-wrapper input { padding-right: 3rem; }
         .toggle-pass {
             position: absolute;
             right: 1rem;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 1.1rem;
-            color: #9ca3af;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
         }
-        @media (max-width: 640px) {
-            .login-wrapper { flex-direction: column; }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-login:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .error-msg {
+            background: #fff1f2;
+            border: 1px solid #fda4af;
+            color: #e11d48;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            font-size: 0.875rem;
+            margin-top: 1.5rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        @media (max-width: 850px) {
             .branding { display: none; }
-            .form-side { padding: 2rem; }
+            .login-wrapper { max-width: 500px; border-radius: 2rem; }
+            .form-side { padding: 3rem 2rem; }
         }
+        .mobile-only-brand {
+    display: none; /* Hidden on desktop */
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 1.25rem;
+}
+
+@media (max-width: 850px) {
+    .mobile-only-brand {
+        display: flex; /* Shown only on mobile */
+    }
+    .form-side h2 {
+        font-size: 1.75rem;
+    }
+}
     </style>
 </head>
 <body>
     <div class="login-wrapper">
         <div class="branding">
-            <div class="school-icon">🏫</div>
-            <h1>School Manager</h1>
-            <p>A comprehensive school management system for tracking student performance and attendance.</p>
+            <svg class="school-logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            <h1>ZPHS <br>Nagulapet</h1>
+            <p>Empowering students with a digital academic portal to track progress, marks, and daily attendance.</p>
             <ul class="feature-list">
-                <li>Classes 6 to 10 management</li>
-                <li>FA1, FA2, SA1, FA3, FA4, SA2 exams</li>
-                <li>Subject-wise marks entry</li>
-                <li>Daily attendance tracking</li>
-                <li>Performance analytics</li>
+                <li>
+                    <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Comprehensive performance tracking
+                </li>
+                <li>
+                    <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Instant exam result updates
+                </li>
+                <li>
+                    <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Secure user authentication
+                </li>
             </ul>
         </div>
+
         <div class="form-side">
-            <h2>Welcome Back</h2>
-            <p class="subtitle">Sign in to your account to continue</p>
+            <div class="mobile-only-brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+    </svg>
+    <span>ZPHS Nagulapet</span>
+</div>
+            <h2>Welcome</h2>
+            <p class="subtitle">Please sign in to your account</p>
 
             <div class="role-tabs">
-                <div class="role-tab active" id="tabTeacher" onclick="setRole('teacher')">
-                    <span class="tab-icon">👩‍🏫</span>
-                    Teacher
-                </div>
-                <div class="role-tab" id="tabStudent" onclick="setRole('student')">
-                    <span class="tab-icon">👨‍🎓</span>
+                <button class="role-tab active" id="tabStudent" onclick="setRole('student')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Student
-                </div>
+                </button>
+                <button class="role-tab" id="tabTeacher" onclick="setRole('teacher')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Teacher
+                </button>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label id="identifierLabel">Username</label>
-                    <input type="text" id="identifier" placeholder="Enter username" required autocomplete="username">
+                    <label id="identifierLabel">Roll Number</label>
+                    <input type="text" id="identifier" placeholder="Enter roll number" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
-                        <span class="toggle-pass" onclick="togglePass()">👁</span>
+                        <input type="password" id="password" placeholder="Enter password" required>
+                        <span class="toggle-pass" onclick="togglePass()">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
                     </div>
                 </div>
-                <button type="submit" class="btn-login" id="loginBtn">Login</button>
+                
+                <button type="submit" class="btn-login" id="loginBtn">Login to Portal</button>
+                
                 <div class="error-msg" id="errorMsg">Invalid credentials. Please try again.</div>
-                <div style="text-align:center;margin-top:1rem">
-                    <a href="forgot_password.html" style="color:#667eea;font-size:0.875rem;text-decoration:none">Forgot password?</a>
+                
+                <div style="text-align:center;margin-top:1.5rem">
+                    <a href="forgot_password.html" style="color:var(--primary);font-size:0.875rem;text-decoration:none;font-weight:600">Forgot password?</a>
                 </div>
             </form>
         </div>
@@ -200,13 +310,8 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhY2NtemRnb294b3Roa2Vqd2lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NTE2OTksImV4cCI6MjA5MDAyNzY5OX0.0cWa-UxKv1-DHGNIwT3SGYM_LVnc9HuMLCAGDbV039U';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentRole = 'teacher';
-
-        // Redirect if already logged in
-        const existing = JSON.parse(localStorage.getItem('school_session'));
-        if (existing) {
-            window.location.href = existing.role === 'teacher' ? 'teacher_dashboard.html' : 'student_dashboard.html';
-        }
+        // Default role changed to student
+        let currentRole = 'student';
 
         function setRole(role) {
             currentRole = role;
@@ -230,7 +335,7 @@
 
             errEl.style.display = 'none';
             btn.disabled = true;
-            btn.textContent = 'Signing in...';
+            btn.textContent = 'Authenticating...';
 
             try {
                 let query;
@@ -243,7 +348,7 @@
                 const { data, error } = await query;
 
                 if (error || !data) {
-                    errEl.textContent = 'Invalid credentials. Please check your username/roll number and password.';
+                    errEl.textContent = 'Access Denied. Please check your credentials.';
                     errEl.style.display = 'block';
                 } else {
                     const session = { ...data, role: currentRole };
@@ -251,12 +356,12 @@
                     window.location.href = currentRole === 'teacher' ? 'teacher_dashboard.html' : 'student_dashboard.html';
                 }
             } catch (err) {
-                errEl.textContent = 'Connection error. Please try again.';
+                errEl.textContent = 'Connection failed. Please check your internet.';
                 errEl.style.display = 'block';
             }
 
             btn.disabled = false;
-            btn.textContent = 'Login';
+            btn.textContent = 'Login to Portal';
         }
     </script>
 </body>
