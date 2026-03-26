@@ -480,45 +480,77 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Password Reset Section -->
-                <div class="form-section" id="resetSection">
-                    <div class="card">
+                    <div class="card" style="margin-top:1.5rem">
                         <div class="card-head">
-                            <h2 class="card-title">Reset User Password</h2>
+                            <h2 class="card-title">Existing Students</h2>
+                            <div class="search-box">
+                                <input type="text" id="studentSearch" placeholder="Search by name or roll..."
+                                    oninput="loadStudents()"
+                                    style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--gray-200); font-size: 0.8rem;">
+                            </div>
                         </div>
                         <div class="card-body">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">User Type</label>
-                                    <select id="resetType" onchange="loadUsersForReset()">
-                                        <option value="student">Student</option>
-                                        <option value="teacher">Teacher</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Select User</label>
-                                    <select id="resetUser">
-                                        <option value="">Select user to reset</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">New Password</label>
-                                    <input type="password" id="resetPassword" placeholder="Enter new password"
-                                        oninput="checkStrength(this.value, 'rStrength')">
-                                    <div class="password-strength" id="rStrength"></div>
-                                    <small style="color:var(--gray-500);font-size:0.75rem">Leave blank to
-                                        auto-generate</small>
-                                </div>
+                            <div class="table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Roll Number</th>
+                                            <th>Class</th>
+                                            <th>Section</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsList">
+                                        <tr>
+                                            <td colspan="5" style="text-align:center">Loading students...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div style="margin-top:1.5rem">
-                                <button class="btn btn-primary" onclick="resetPassword()">Reset Password</button>
-                            </div>
-                            <div id="resetResult" style="margin-top:1rem"></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Password Reset Section -->
+<div class="form-section" id="resetSection">
+    <div class="card">
+        <div class="card-head">
+            <h2 class="card-title">Reset User Password</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">User Type</label>
+                    <select id="resetType" onchange="loadUsersForReset()">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select User</label>
+                    <select id="resetUser">
+                        <option value="">Select user to reset</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="resetPassword" placeholder="Enter new password"
+                        oninput="checkStrength(this.value, 'rStrength')">
+                    <div class="password-strength" id="rStrength"></div>
+                    <small style="color:var(--gray-500);font-size:0.75rem">Or <a href="#"
+                            onclick="generatePassword('resetPassword', 'rGenerated')"
+                            style="color:var(--indigo-600)">generate secure password</a></small>
+                    <div class="generated-pw" id="rGenerated" style="display:none"></div>
+                </div>
+            </div>
+            <div style="margin-top:1.5rem">
+                <button class="btn btn-primary" onclick="resetPassword()">Reset Password</button>
+            </div>
+            <div id="resetResult" style="margin-top:1rem"></div>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -639,7 +671,7 @@
 
         // Check permissions
         const isAdmin = teacher.role === 'admin';
-        const isGHM = teacher.designation === 'GHM';
+        const isGHM = teacher.designation === 'GHM' || teacher.designation === 'Admin';
         const canManageUsers = isAdmin || true;
 
         const canResetPassword = isGHM;
@@ -932,6 +964,69 @@
                 toast.classList.add('hiding');
                 setTimeout(() => toast.remove(), 300);
             }, duration);
+        }
+        /* ── Student Management Logic ── */
+
+        // Update switchTab to load students when the tab is clicked
+        const originalSwitchTab = switchTab;
+        switchTab = function (tab) {
+            originalSwitchTab(tab);
+            if (tab === 'student') {
+                loadStudents();
+            }
+        }
+
+        async function loadStudents() {
+            const listEl = document.getElementById('studentsList');
+            const searchTerm = document.getElementById('studentSearch')?.value.toLowerCase() || '';
+
+            let query = db.from('students').select('*').order('class_name', { ascending: true });
+
+            const { data, error } = await query;
+
+            if (error) {
+                listEl.innerHTML = `<tr><td colspan="5" style="color:var(--rose-500)">Error loading data</td></tr>`;
+                return;
+            }
+
+            const filteredData = data.filter(s =>
+                s.name.toLowerCase().includes(searchTerm) ||
+                s.roll_number.toLowerCase().includes(searchTerm)
+            );
+
+            listEl.innerHTML = filteredData.map(s => `
+        <tr>
+            <td><strong>${s.name}</strong></td>
+            <td><code>${s.roll_number}</code></td>
+            <td>Class ${s.class_name}</td>
+            <td>${s.section}</td>
+            <td>
+                ${isGHM || isAdmin ?
+                    `<button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}', '${s.name}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; vertical-align:middle">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg> Delete
+                    </button>` :
+                    '<span style="color:var(--gray-400);font-size:0.8rem">No Access</span>'
+                }
+            </td>
+        </tr>
+    `).join('');
+        }
+
+        async function deleteStudent(id, name) {
+            if (!confirm(`Are you sure you want to delete student "${name}"? This will also remove their marks and attendance records.`)) return;
+
+            // Optional: If your DB doesn't have CASCADE delete, you'd need to delete marks/attendance first.
+            // Assuming Standard RLS/Constraints:
+            const { error } = await db.from('students').delete().eq('id', id);
+
+            if (error) {
+                showToast('error', 'Delete Failed', error.message);
+            } else {
+                showToast('success', 'Deleted', `Student ${name} removed successfully.`);
+                loadStudents();
+            }
         }
     </script>
 </body>
