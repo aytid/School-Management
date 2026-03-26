@@ -304,6 +304,83 @@
             color: #92400e;
         }
 
+        .badge-purple {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        /* Date filter styles */
+        .date-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .date-filter-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+        }
+
+        .date-filter-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .date-input-wrapper {
+            position: relative;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            padding: 0.5rem 2.5rem 0.5rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .date-input-wrapper input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .clear-date-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0.25rem;
+            display: none;
+        }
+
+        .clear-date-btn:hover {
+            color: var(--gray-600);
+        }
+
+        .clear-date-btn.visible {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .tabs-header {
                 flex-direction: row;
@@ -323,6 +400,15 @@
             .homework-actions {
                 width: 100%;
                 justify-content: flex-end;
+            }
+
+            .date-filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-filter-btn {
+                text-align: center;
             }
         }
     </style>
@@ -543,7 +629,7 @@
                     <!-- All Homeworks Tab -->
                     <div class="tab-content" id="tab-list">
                         <div class="filter-card" style="margin-bottom: 1.5rem;">
-                            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
                                 <div class="form-group">
                                     <label class="form-label">Filter by Class</label>
                                     <select id="filterClass" onchange="onFilterClassChange(); loadAllHomeworks()">
@@ -569,6 +655,19 @@
                                     <select id="filterSubject" onchange="loadAllHomeworks()">
                                         <option value="">All Subjects</option>
                                     </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Date</label>
+                                    <div class="date-filter-container">
+                                        <button class="date-filter-btn active" id="btnToday" onclick="setDateFilter('today')">Today</button>
+                                        <button class="date-filter-btn" id="btnWeek" onclick="setDateFilter('week')">This Week</button>
+                                        <button class="date-filter-btn" id="btnMonth" onclick="setDateFilter('month')">This Month</button>
+                                        <button class="date-filter-btn" id="btnAll" onclick="setDateFilter('all')">All Time</button>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="filterDate" onchange="onCustomDateChange()">
+                                            <button class="clear-date-btn" id="clearDateBtn" onclick="clearDateFilter()">×</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -755,6 +854,105 @@
             }
         }
 
+        /* ── Date Filter Logic ── */
+        let currentDateFilter = 'today';
+        let customDate = null;
+
+        function getTodayString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function getWeekRange() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - dayOfWeek);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+            
+            return { start: startOfWeek.toISOString(), end: endOfWeek.toISOString() };
+        }
+
+        function getMonthRange() {
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+            
+            return { start: startOfMonth.toISOString(), end: endOfMonth.toISOString() };
+        }
+
+        function setDateFilter(filterType) {
+            currentDateFilter = filterType;
+            customDate = null;
+            
+            // Update button states
+            document.querySelectorAll('.date-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn${filterType.charAt(0).toUpperCase() + filterType.slice(1)}`).classList.add('active');
+            
+            // Clear custom date input
+            document.getElementById('filterDate').value = '';
+            document.getElementById('clearDateBtn').classList.remove('visible');
+            
+            loadAllHomeworks();
+        }
+
+        function onCustomDateChange() {
+            const dateInput = document.getElementById('filterDate');
+            const selectedDate = dateInput.value;
+            
+            if (selectedDate) {
+                customDate = selectedDate;
+                currentDateFilter = 'custom';
+                
+                // Clear preset button states
+                document.querySelectorAll('.date-filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Show clear button
+                document.getElementById('clearDateBtn').classList.add('visible');
+                
+                loadAllHomeworks();
+            }
+        }
+
+        function clearDateFilter() {
+            customDate = null;
+            document.getElementById('filterDate').value = '';
+            document.getElementById('clearDateBtn').classList.remove('visible');
+            
+            // Default back to today
+            setDateFilter('today');
+        }
+
+        function getDateFilterQuery(query) {
+            if (currentDateFilter === 'today') {
+                const today = getTodayString();
+                // Filter homeworks created today
+                const startOfDay = `${today}T00:00:00`;
+                const endOfDay = `${today}T23:59:59`;
+                return query.gte('created_at', startOfDay).lte('created_at', endOfDay);
+            } else if (currentDateFilter === 'week') {
+                const { start, end } = getWeekRange();
+                return query.gte('created_at', start).lte('created_at', end);
+            } else if (currentDateFilter === 'month') {
+                const { start, end } = getMonthRange();
+                return query.gte('created_at', start).lte('created_at', end);
+            } else if (currentDateFilter === 'custom' && customDate) {
+                const startOfDay = `${customDate}T00:00:00`;
+                const endOfDay = `${customDate}T23:59:59`;
+                return query.gte('created_at', startOfDay).lte('created_at', endOfDay);
+            }
+            // 'all' - no date filtering
+            return query;
+        }
+
         /* ── Homework Logic ── */
         function updateFileName() {
             const file = document.getElementById('hwFile').files[0];
@@ -864,17 +1062,26 @@
                     if (subjectId) query = query.eq('subject_id', subjectId);
                 }
 
+                // Apply date filter
+                query = getDateFilterQuery(query);
+
                 const { data: homeworks, error } = await query;
 
                 if (error) throw error;
 
                 if (!homeworks || homeworks.length === 0) {
+                    let filterText = '';
+                    if (currentDateFilter === 'today') filterText = ' for today';
+                    else if (currentDateFilter === 'week') filterText = ' for this week';
+                    else if (currentDateFilter === 'month') filterText = ' for this month';
+                    else if (currentDateFilter === 'custom' && customDate) filterText = ` for ${new Date(customDate).toLocaleDateString('en-IN')}`;
+                    
                     container.innerHTML = `
                         <div class="empty-state-homework">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <p>No homeworks found</p>
+                            <p>No homeworks found${filterText}</p>
                         </div>
                     `;
                     return;
@@ -888,6 +1095,13 @@
                         year: 'numeric'
                     }) : 'No deadline';
                     const isOverdue = hw.due_date && new Date(hw.due_date) < new Date() && new Date(hw.due_date).toDateString() !== new Date().toDateString();
+                    
+                    // Format created date
+                    const createdDate = new Date(hw.created_at).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
 
                     return `
                         <div class="homework-item" id="hw-item-${hw.id}">
@@ -898,6 +1112,9 @@
                                     <span class="badge badge-green">${subjectName}</span>
                                     <span class="badge ${isOverdue ? 'badge-amber' : 'badge-blue'}">
                                         Due: ${dueDate}
+                                    </span>
+                                    <span class="badge badge-purple">
+                                        Posted: ${createdDate}
                                     </span>
                                 </div>
                             </div>
@@ -981,6 +1198,10 @@
         loadSubjectIds().then(() => {
             // Initialize filter subject dropdown with all subjects
             onFilterClassChange();
+            
+            // Set default date filter to today and set the date input
+            const today = getTodayString();
+            document.getElementById('filterDate').value = today;
         });
     </script>
 </body>
