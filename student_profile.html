@@ -144,6 +144,33 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10000;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 4px solid #4f46e5;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success { border-left-color: #10b981; }
+.toast.error { border-left-color: #ef4444; }
+.toast.warning { border-left-color: #f59e0b; }
     </style>
 </head>
 
@@ -354,26 +381,50 @@
             const newPass = document.getElementById('newPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
 
-            if (newPass !== confirm) return alert("Passwords don't match");
+            if (newPass !== confirm) return showToast("Passwords don't match");
             
             try {
                 // Verify current password from 'students' table
                 const { data, error } = await db.from('students')
                     .select('id').eq('id', student.id).eq('password', current).single();
 
-                if (error || !data) return alert("Current password incorrect");
+                if (error || !data) return showToast("Current password incorrect");
 
                 const { error: updErr } = await db.from('students')
                     .update({ password: newPass }).eq('id', student.id);
 
                 if (updErr) throw updErr;
-                alert("Password updated!");
+                showToast("Password updated!");
                 closePasswordModal();
             } catch (e) {
                 console.error(e);
-                alert("Update failed");
+                showToast("Update failed");
             }
         }
+        /* ── Toast Notification System ── */
+function showToast(message, type = 'success') {
+    // Remove existing toast if any
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // Add icon based on type
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+    toast.innerHTML = `<span>${icon}</span> ${message}`;
+
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Auto-remove
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
     </script>
 </body>
 </html>
