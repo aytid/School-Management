@@ -1,77 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - School Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Manage Users - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        .user-tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; margin-bottom: 1.5rem; }
-        .user-tab { padding: 0.75rem 1.5rem; cursor: pointer; font-weight: 600; color: #9ca3af; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .user-tab.active { color: #667eea; border-bottom-color: #667eea; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
-        .password-strength { height: 4px; border-radius: 2px; margin-top: 0.5rem; transition: all 0.3s; }
-        .strength-weak { background: #ef4444; width: 33%; }
-        .strength-medium { background: #f59e0b; width: 66%; }
-        .strength-strong { background: #10b981; width: 100%; }
-        .generated-pw { background: #f0fdf4; border: 1px solid #10b981; padding: 0.75rem; border-radius: 0.5rem; font-family: monospace; color: #065f46; margin-top: 0.5rem; }
+        .user-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+        }
+
+        .user-tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-400);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .user-tab:hover {
+            color: var(--gray-600);
+        }
+
+        .user-tab.active {
+            color: var(--indigo-600);
+            border-bottom-color: var(--indigo-600);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .strength-weak {
+            background: var(--rose-500);
+            width: 33%;
+        }
+
+        .strength-medium {
+            background: var(--amber-500);
+            width: 66%;
+        }
+
+        .strength-strong {
+            background: var(--emerald-500);
+            width: 100%;
+        }
+
+        .generated-pw {
+            background: var(--emerald-50);
+            border: 1px solid var(--emerald-500);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-family: monospace;
+            color: var(--emerald-700);
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .info-banner {
+            background: var(--indigo-50);
+            border: 1px solid var(--indigo-200);
+            color: var(--indigo-700);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--indigo-500);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 300px;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .toast.success {
+            border-left-color: var(--emerald-500);
+        }
+
+        .toast.error {
+            border-left-color: var(--rose-500);
+        }
+
+        .toast.warning {
+            border-left-color: var(--amber-500);
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            color: var(--gray-600);
+        }
+
+        .toast-close {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .toast-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .toast.hiding {
+            animation: slideOut 0.3s ease forwards;
+        }
     </style>
 </head>
+
 <body>
+    <div class="toast-container" id="toastContainer"></div>
     <div class="app-layout">
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <span class="brand-icon">🏫</span>
-                <div><h2>School Manager</h2><small>Management System</small></div>
-            </div>
-            <div class="sidebar-user">
-                <div class="user-avatar" id="sidebarAvatar">T</div>
-                <div class="user-details">
-                    <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role" id="sidebarRole">Teacher</div>
+        <!-- ── SIDEBAR (desktop) ─────────────────── -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
                 </div>
-            </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
             <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="teacher_dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-                <div class="nav-section-title">Academic</div>
-                <a href="enter_marks.html" class="nav-item"><span class="nav-icon">📝</span> Enter Marks</a>
-                <a href="take_attendance.html" class="nav-item"><span class="nav-icon">📋</span> Take Attendance</a>
-                <div class="nav-section-title">Management</div>
-                <a href="view_students.html" class="nav-item"><span class="nav-icon">👨‍🎓</span> View Students</a>
-                <a href="manage_users.html" class="nav-item active"><span class="nav-icon">👥</span> Manage Users</a>
-                <div class="nav-section-title">Records</div>
-                <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <a href="teacher_dashboard.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Academic</div>
+                    <a href="enter_marks.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
+                    </a>
+                    <a href="take_attendance.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Management</div>
+                    <a href="view_students.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
+                    </a>
+                    <a href="manage_users.html" class="nav-item active" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">T</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
+                    </div>
+                </a>
             </nav>
-            <div class="sidebar-footer"><button class="btn-logout" onclick="logout()">↪ Logout</button></div>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
         </aside>
 
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- ── MAIN CONTENT ───────────────────────── -->
         <div class="main-content">
-            <div class="topbar">
-                <div>
-                    <div class="topbar-title">User Management</div>
-                    <div class="topbar-breadcrumb">Add teachers and students to the system</div>
+            <!-- Mobile top header -->
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand">
+                    <div class="brand-logo-sm">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+                            <path d="M5 13v6l7 4 7-4v-6" />
+                        </svg>
+                    </div>
+                    <span>ZPHS Nagulapet</span>
+                </div>
+                <div style="width: 36px; height: 36px;"></div>
+            </header>
+
+            <!-- Desktop top bar -->
+            <div class="desktop-topbar">
+                <div class="page-title">
+                    <h1>Manage Users</h1>
                 </div>
             </div>
 
-            <div class="page-body">
+            <!-- Page body -->
+            <div class="page-content">
                 <!-- Permission Check Alert -->
-                <div id="permissionAlert" class="alert alert-error" style="display:none">
-                    ⚠️ You don't have permission to manage users. Please contact an administrator.
+                <div id="permissionAlert" class="alert alert-error" style="display:none; margin-bottom: 1.5rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width: 20px; height: 20px; vertical-align: middle; margin-right: 0.5rem;">
+                        <path
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    You don't have permission to manage users. Please contact an administrator.
                 </div>
 
                 <div class="user-tabs" id="userTabs" style="display:none">
-                    <div class="user-tab active" onclick="switchTab('teacher')">👩‍🏫 Add Teacher</div>
-                    <div class="user-tab" onclick="switchTab('student')">👨‍🎓 Add Student</div>
-                    <div class="user-tab" onclick="switchTab('reset')">🔑 Password Reset</div>
+                    <div class="user-tab active" onclick="switchTab('teacher')">Add Teacher</div>
+                    <div class="user-tab" onclick="switchTab('student')">Add Student</div>
+                    <div class="user-tab" onclick="switchTab('reset')">Password Reset</div>
                 </div>
 
                 <!-- Add Teacher Form -->
                 <div class="form-section active" id="teacherSection">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Add New Teacher</span></div>
+                        <div class="card-head">
+                            <h2 class="card-title">Add New Teacher</h2>
+                        </div>
                         <div class="card-body">
                             <div class="form-grid">
                                 <div class="form-group">
@@ -81,13 +375,16 @@
                                 <div class="form-group">
                                     <label class="form-label">Username *</label>
                                     <input type="text" id="tUsername" placeholder="Unique username" required>
-                                    <small style="color:#9ca3af;font-size:0.75rem">Used for login. Must be unique.</small>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Employee ID</small>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Password *</label>
-                                    <input type="password" id="tPassword" placeholder="Min 6 characters" oninput="checkStrength(this.value, 'tStrength')" required>
+                                    <input type="password" id="tPassword" placeholder="Min 6 characters"
+                                        oninput="checkStrength(this.value, 'tStrength')" required>
                                     <div class="password-strength" id="tStrength"></div>
-                                    <small style="color:#9ca3af;font-size:0.75rem">Or <a href="#" onclick="generatePassword('tPassword', 'tGenerated')" style="color:#667eea">generate secure password</a></small>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Or <a href="#"
+                                            onclick="generatePassword('tPassword', 'tGenerated')"
+                                            style="color:var(--indigo-600)">generate secure password</a></small>
                                     <div class="generated-pw" id="tGenerated" style="display:none"></div>
                                 </div>
                                 <div class="form-group" id="roleGroup" style="display:none">
@@ -99,22 +396,24 @@
                                 </div>
                             </div>
                             <div style="margin-top:1.5rem">
-                                <button class="btn btn-primary btn-lg" onclick="addTeacher()">➕ Add Teacher</button>
+                                <button class="btn btn-primary" onclick="addTeacher()">Add Teacher</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Teachers List -->
                     <div class="card" style="margin-top:1.5rem">
-                        <div class="card-header"><span class="card-title">Existing Teachers</span></div>
+                        <div class="card-head">
+                            <h2 class="card-title">Existing Teachers</h2>
+                        </div>
                         <div class="card-body">
                             <div class="table-wrapper">
-                                <table>
+                                <table class="data-table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
                                             <th>Username</th>
-                                            <th>Role</th>
+                                            <th>Designation</th>
                                             <th>Added By</th>
                                             <th>Actions</th>
                                         </tr>
@@ -129,7 +428,9 @@
                 <!-- Add Student Form -->
                 <div class="form-section" id="studentSection">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Add New Student</span></div>
+                        <div class="card-head">
+                            <h2 class="card-title">Add New Student</h2>
+                        </div>
                         <div class="card-body">
                             <div class="form-grid">
                                 <div class="form-group">
@@ -137,53 +438,46 @@
                                     <input type="text" id="sName" placeholder="Enter student's full name" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Roll Number *</label>
-                                    <input type="text" id="sRoll" placeholder="Unique roll number" required>
-                                    <small style="color:#9ca3af;font-size:0.75rem">Used for login. Format: CLASS-SECTION-NUMBER (e.g., 10-A-01)</small>
-                                </div>
-                                <div class="form-group">
                                     <label class="form-label">Class *</label>
-                                    <select id="sClass" required>
+                                    <select id="sClass" required onchange="updateRollPrefix()">
                                         <option value="">Select Class</option>
-                                        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Section *</label>
-                                    <select id="sSection" required>
+                                    <select id="sSection" required onchange="updateRollPrefix()">
                                         <option value="">Select Section</option>
-                                        <option>A</option><option>B</option><option>C</option>
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Password *</label>
-                                    <input type="password" id="sPassword" placeholder="Min 6 characters" oninput="checkStrength(this.value, 'sStrength')" required>
-                                    <div class="password-strength" id="sStrength"></div>
-                                    <small style="color:#9ca3af;font-size:0.75rem">Or <a href="#" onclick="generatePassword('sPassword', 'sGenerated')" style="color:#667eea">generate secure password</a></small>
-                                    <div class="generated-pw" id="sGenerated" style="display:none"></div>
+                                    <label class="form-label">Roll Number *</label>
+                                    <input type="text" id="sRoll" placeholder="Auto-prefixed with class-section"
+                                        required>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Auto-prefixed with
+                                        class-section. Just add the number.</small>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Parent Email (optional)</label>
-                                    <input type="email" id="sEmail" placeholder="For password reset notifications">
+                                    <label class="form-label">Password *</label>
+                                    <input type="password" id="sPassword" placeholder="Min 6 characters"
+                                        oninput="checkStrength(this.value, 'sStrength')" required>
+                                    <div class="password-strength" id="sStrength"></div>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Or <a href="#"
+                                            onclick="generatePassword('sPassword', 'sGenerated')"
+                                            style="color:var(--indigo-600)">generate secure password</a></small>
+                                    <div class="generated-pw" id="sGenerated" style="display:none"></div>
                                 </div>
                             </div>
                             <div style="margin-top:1.5rem">
-                                <button class="btn btn-primary btn-lg" onclick="addStudent()">➕ Add Student</button>
+                                <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Bulk Import -->
-                    <div class="card" style="margin-top:1.5rem">
-                        <div class="card-header"><span class="card-title">Bulk Import Students</span></div>
-                        <div class="card-body">
-                            <div class="info-banner" style="margin-bottom:1rem">
-                                Upload CSV with columns: name, roll_number, class, section, password, email (optional)
-                            </div>
-                            <input type="file" id="csvFile" accept=".csv" style="margin-bottom:1rem">
-                            <button class="btn btn-secondary" onclick="downloadTemplate()">📄 Download CSV Template</button>
-                            <button class="btn btn-success" onclick="importCSV()" style="margin-left:0.5rem">📤 Import</button>
-                            <div id="importResult" style="margin-top:1rem"></div>
                         </div>
                     </div>
                 </div>
@@ -191,7 +485,9 @@
                 <!-- Password Reset Section -->
                 <div class="form-section" id="resetSection">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Reset User Password</span></div>
+                        <div class="card-head">
+                            <h2 class="card-title">Reset User Password</h2>
+                        </div>
                         <div class="card-body">
                             <div class="form-grid">
                                 <div class="form-group">
@@ -209,13 +505,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">New Password</label>
-                                    <input type="password" id="resetPassword" placeholder="Enter new password" oninput="checkStrength(this.value, 'rStrength')">
+                                    <input type="password" id="resetPassword" placeholder="Enter new password"
+                                        oninput="checkStrength(this.value, 'rStrength')">
                                     <div class="password-strength" id="rStrength"></div>
-                                    <small style="color:#9ca3af;font-size:0.75rem">Leave blank to auto-generate</small>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Leave blank to
+                                        auto-generate</small>
                                 </div>
                             </div>
                             <div style="margin-top:1.5rem">
-                                <button class="btn btn-warning" onclick="resetPassword()" style="background:#f59e0b;color:white">🔄 Reset Password</button>
+                                <button class="btn btn-primary" onclick="resetPassword()">Reset Password</button>
                             </div>
                             <div id="resetResult" style="margin-top:1rem"></div>
                         </div>
@@ -225,23 +523,140 @@
         </div>
     </div>
 
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon bnav-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="view_students.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+            </span>
+            <span class="bnav-label">Students</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
+                </svg>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
+    </nav>
+
     <script src="config.js"></script>
     <script>
+        /* ── Sidebar toggle ── */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+        function updateRollPrefix() {
+            const cls = document.getElementById('sClass').value;
+            const sec = document.getElementById('sSection').value;
+            const rollInput = document.getElementById('sRoll');
+
+            if (cls && sec) {
+                rollInput.value = cls + sec;
+                rollInput.focus();
+                const len = rollInput.value.length;
+                rollInput.setSelectionRange(len, len);
+            }
+        }
+
+        /* ── Session guard ── */
         const teacher = getSession('teacher');
-        if (!teacher) throw 'auth';
-        
+        if (!teacher) window.location.href = 'index.html';
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarDesignation').textContent = teacher.designation || "Teacher";
+        document.getElementById('sidebarProfileName').textContent = teacher.name.split(' ')[0];
+
         // Check permissions
         const isAdmin = teacher.role === 'admin';
-        const canManageUsers = isAdmin || true; // Set to `isAdmin only` to restrict to admins
-        
-        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0);
-        document.getElementById('sidebarName').textContent = teacher.name;
-        document.getElementById('sidebarRole').textContent = teacher.role || 'Teacher';
+        const isGHM = teacher.designation === 'GHM';
+        const canManageUsers = isAdmin || true;
 
+        const canResetPassword = isGHM;
         if (!canManageUsers) {
             document.getElementById('permissionAlert').style.display = 'block';
         } else {
-            document.getElementById('userTabs').style.display = 'flex';
+            const tabsContainer = document.getElementById('userTabs');
+            let tabsHTML = '';
+            tabsHTML += '<div class="user-tab active" onclick="switchTab(\'teacher\')">Add Teacher</div>';
+            tabsHTML += '<div class="user-tab" onclick="switchTab(\'student\')">Add Student</div>';
+            if (canResetPassword) {
+                tabsHTML += '<div class="user-tab" onclick="switchTab(\'reset\')">Password Reset</div>';
+            }
+
+            tabsContainer.innerHTML = tabsHTML;
+            tabsContainer.style.display = 'flex';
+
             if (isAdmin) {
                 document.getElementById('roleGroup').style.display = 'block';
             }
@@ -249,17 +664,24 @@
         }
 
         function switchTab(tab) {
-            document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+            // Get all tabs
+            const tabs = document.querySelectorAll('.user-tab');
+            const sections = ['teacher', 'student', 'reset'];
+
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            
+
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const tabIndex = sections.indexOf(tab);
+            if (tabIndex >= 0 && tabIndex < tabs.length) {
+                tabs[tabIndex].classList.add('active');
+            }
+
             if (tab === 'teacher') {
-                document.querySelectorAll('.user-tab')[0].classList.add('active');
                 document.getElementById('teacherSection').classList.add('active');
             } else if (tab === 'student') {
-                document.querySelectorAll('.user-tab')[1].classList.add('active');
                 document.getElementById('studentSection').classList.add('active');
-            } else {
-                document.querySelectorAll('.user-tab')[2].classList.add('active');
+            } else if (tab === 'reset' && canResetPassword) {
                 document.getElementById('resetSection').classList.add('active');
                 loadUsersForReset();
             }
@@ -269,8 +691,8 @@
             const el = document.getElementById(elementId);
             if (!pw) { el.className = 'password-strength'; return; }
             if (pw.length < 6) { el.className = 'password-strength strength-weak'; }
-            else if (pw.length < 10 || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw)) { 
-                el.className = 'password-strength strength-medium'; 
+            else if (pw.length < 10 || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw)) {
+                el.className = 'password-strength strength-medium';
             }
             else { el.className = 'password-strength strength-strong'; }
         }
@@ -283,12 +705,11 @@
             }
             document.getElementById(inputId).value = pw;
             checkStrength(pw, inputId === 'tPassword' ? 'tStrength' : 'sStrength');
-            
+
             const display = document.getElementById(displayId);
             display.textContent = `Generated: ${pw} (Copy this!)`;
             display.style.display = 'block';
-            
-            // Auto-copy to clipboard
+
             navigator.clipboard.writeText(pw);
         }
 
@@ -305,7 +726,6 @@
                 alert('Password must be at least 6 characters'); return;
             }
 
-            // Check if username exists
             const { data: existing } = await db.from('teachers').select('id').eq('username', username).single();
             if (existing) { alert('Username already exists!'); return; }
 
@@ -325,56 +745,103 @@
                 loadTeachers();
             }
         }
-
         async function addStudent() {
-            const name = document.getElementById('sName').value.trim();
-            const roll = document.getElementById('sRoll').value.trim();
-            const cls = document.getElementById('sClass').value;
-            const sec = document.getElementById('sSection').value;
-            const password = document.getElementById('sPassword').value;
-            const email = document.getElementById('sEmail').value.trim();
+            const nameEl = document.getElementById('sName');
+            const rollEl = document.getElementById('sRoll');
+            const clsEl = document.getElementById('sClass');
+            const secEl = document.getElementById('sSection');
+            const pwEl = document.getElementById('sPassword');
+            const emailEl = document.getElementById('sEmail');
+
+            // Check if elements exist
+            if (!nameEl || !rollEl || !clsEl || !secEl || !pwEl) {
+                showToast('error', 'Form Error', 'Form not loaded properly. Please try switching to the Add Student tab again.');
+                return;
+            }
+
+            const name = nameEl.value.trim();
+            const roll = rollEl.value.trim();
+            const cls = clsEl.value;
+            const sec = secEl.value;
+            const password = pwEl.value;
+            const email = emailEl ? emailEl.value.trim() : '';
 
             if (!name || !roll || !cls || !sec || !password) {
-                alert('Please fill all required fields'); return;
+                showToast('warning', 'Missing Fields', 'Please fill all required fields');
+                return;
             }
+
             if (password.length < 6) {
-                alert('Password must be at least 6 characters'); return;
+                showToast('warning', 'Weak Password', 'Password must be at least 6 characters');
+                return;
             }
 
-            // Check if roll exists
-            const { data: existing } = await db.from('students').select('id').eq('roll_number', roll).single();
-            if (existing) { alert('Roll number already exists!'); return; }
+            // Check if roll exists - using maybeSingle to avoid 406 error
+            const { data: existing, error: checkError } = await db
+                .from('students')
+                .select('id')
+                .eq('roll_number', roll)
+                .maybeSingle();
 
+            if (checkError) {
+                console.error('Check error:', checkError);
+            }
+
+            if (existing) {
+                showToast('error', 'Duplicate Entry', 'Roll number already exists!');
+                return;
+            }
+
+            // Try insert
             const { error } = await db.from('students').insert({
-                name, roll_number: roll, class_name: cls, section: sec, password, email,
+                name,
+                roll_number: roll,
+                class_name: cls,
+                section: sec,
+                password,
+                email,
                 created_at: new Date().toISOString()
             });
 
-            if (error) { alert('Error: ' + error.message); }
-            else {
-                alert('Student added successfully!');
-                document.getElementById('sName').value = '';
-                document.getElementById('sRoll').value = '';
-                document.getElementById('sPassword').value = '';
-                document.getElementById('sGenerated').style.display = 'none';
+            if (error) {
+                // 23505 is PostgreSQL unique violation error code
+                if (error.code === '23505' || error.message.includes('duplicate') || error.message.includes('unique')) {
+                    showToast('error', 'Duplicate Entry', 'Roll number already exists!');
+                } else {
+                    console.error('Insert error:', error);
+                    showToast('error', 'Error', error.message);
+                }
+                return;
             }
+
+            // Success - clear form and show toast
+            showToast('success', 'Success', 'Student added successfully!');
+
+            nameEl.value = '';
+            rollEl.value = '';
+            pwEl.value = '';
+            if (emailEl) emailEl.value = '';
+
+            const generatedDiv = document.getElementById('sGenerated');
+            if (generatedDiv) generatedDiv.style.display = 'none';
         }
 
         async function loadTeachers() {
             const { data } = await db.from('teachers').select('*, creator:created_by(name)').order('created_at', { ascending: false });
             document.getElementById('teachersList').innerHTML = (data || []).map(t => `
-                <tr>
-                    <td><strong>${t.name}</strong></td>
-                    <td>${t.username}</td>
-                    <td><span class="badge ${t.role === 'admin' ? 'badge-purple' : 'badge-blue'}">${t.role || 'teacher'}</span></td>
-                    <td>${t.creator?.name || 'System'}</td>
-                    <td>
-                        ${t.id !== teacher.id ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacher('${t.id}')">Delete</button>` : '<span style="color:#9ca3af;font-size:0.8rem">You</span>'}
-                    </td>
-                </tr>
-            `).join('');
+        <tr>
+            <td><strong>${t.name}</strong></td>
+            <td>${t.username}</td>
+            <td><span class="badge ${t.role === 'admin' ? 'badge-purple' : 'badge-blue'}">${t.designation || 'teacher'}</span></td>
+            <td>${t.creator?.name || 'System'}</td>
+            <td>
+                ${t.id === teacher.id ? '<span style="color:var(--gray-400);font-size:0.8rem">You</span>' :
+                    isGHM ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacher('${t.id}')">Delete</button>` :
+                        '<span style="color:var(--gray-400);font-size:0.8rem">—</span>'}
+            </td>
+        </tr>
+    `).join('');
         }
-
         async function deleteTeacher(id) {
             if (!confirm('Are you sure? This cannot be undone.')) return;
             const { error } = await db.from('teachers').delete().eq('id', id);
@@ -396,8 +863,7 @@
             let newPass = document.getElementById('resetPassword').value;
 
             if (!userId) { alert('Please select a user'); return; }
-            
-            // Generate if empty
+
             if (!newPass) {
                 const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
                 newPass = '';
@@ -405,7 +871,7 @@
             }
 
             const { error } = await db.from(type + 's').update({ password: newPass }).eq('id', userId);
-            
+
             const resultDiv = document.getElementById('resetResult');
             if (error) {
                 resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
@@ -429,42 +895,45 @@
             a.download = 'students_template.csv';
             a.click();
         }
+        // Toast Notification System
+        function showToast(type, title, message, duration = 4000) {
+            const container = document.getElementById('toastContainer');
 
-        async function importCSV() {
-            const file = document.getElementById('csvFile').files[0];
-            if (!file) { alert('Please select a CSV file'); return; }
-            
-            const text = await file.text();
-            const lines = text.split('\n').filter(l => l.trim());
-            const headers = lines[0].split(',').map(h => h.trim());
-            
-            let success = 0, failed = 0;
-            const errors = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',').map(c => c.trim());
-                const row = {};
-                headers.forEach((h, idx) => row[h] = cols[idx]);
-                
-                const { error } = await db.from('students').insert({
-                    name: row.name,
-                    roll_number: row.roll_number,
-                    class_name: row.class,
-                    section: row.section,
-                    password: row.password,
-                    email: row.email
-                });
-                
-                if (error) { failed++; errors.push(`Row ${i}: ${error.message}`); }
-                else { success++; }
-            }
-            
-            document.getElementById('importResult').innerHTML = `
-                <div class="alert ${failed === 0 ? 'alert-success' : 'alert-error'}">
-                    ✅ ${success} imported successfully<br>
-                    ${failed > 0 ? `❌ ${failed} failed<br><small>${errors.slice(0, 3).join('<br>')}</small>` : ''}
-                </div>`;
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            // Icon based on type
+            const icons = {
+                success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--emerald-500);"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+                error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--rose-500);"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>`,
+                warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--amber-500);"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+                info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--indigo-500);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>`
+            };
+
+            toast.innerHTML = `
+        <div class="toast-icon">${icons[type] || icons.info}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+    `;
+
+            container.appendChild(toast);
+
+            // Auto remove after duration
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
         }
     </script>
 </body>
+
 </html>

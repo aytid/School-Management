@@ -1,32 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Attendance - School Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Take Attendance - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Page-specific styles matching teacher_dashboard */
-        .page-header {
-            margin-bottom: 1.5rem;
-        }
-        
-        .page-header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 0.25rem;
-        }
-        
-        .page-header p {
-            color: var(--gray-500);
-            font-size: 0.9375rem;
-        }
-
+        /* Page-specific styles */
         .filter-card {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: var(--r-lg);
             border: 1px solid var(--gray-200);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -65,8 +53,8 @@
         }
 
         .tab-item.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: var(--indigo-600);
+            border-bottom-color: var(--indigo-600);
         }
 
         .tab-panel {
@@ -78,48 +66,50 @@
         }
 
         /* Stats */
-        .att-stats { 
-            display: flex; 
-            gap: 1rem; 
-            flex-wrap: wrap; 
-            margin-bottom: 1.5rem; 
+        .att-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
         }
-        
+
         .att-stat-box {
-            background: var(--white); 
-            border-radius: var(--radius-lg);
+            background: var(--white);
+            border-radius: var(--r-lg);
             border: 1px solid var(--gray-200);
-            padding: 1rem 1.5rem; 
+            padding: 1rem 1.5rem;
             text-align: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-xs);
             min-width: 100px;
         }
-        
-        .att-stat-box .asb-val { 
-            font-size: 1.6rem; 
-            font-weight: 800; 
+
+        .att-stat-box .asb-val {
+            font-size: 1.6rem;
+            font-weight: 800;
         }
-        
-        .att-stat-box .asb-label { 
-            font-size: 0.75rem; 
-            color: var(--gray-500); 
+
+        .att-stat-box .asb-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
         }
-        
+
         .asb-total .asb-val { color: var(--gray-900); }
-        .asb-present .asb-val { color: var(--success); }
-        .asb-absent .asb-val { color: var(--danger); }
+        .asb-present .asb-val { color: var(--emerald-500); }
+        .asb-absent .asb-val { color: var(--rose-500); }
 
         /* Attendance Table */
         .attendance-card {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: var(--r-lg);
             border: 1px solid var(--gray-200);
             overflow: hidden;
         }
 
         .attendance-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-100);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -128,50 +118,50 @@
         }
 
         .attendance-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.9375rem;
+            font-weight: 700;
             color: var(--gray-900);
         }
 
-        .bulk-actions { 
-            display: flex; 
-            gap: 0.5rem; 
+        .bulk-actions {
+            display: flex;
+            gap: 0.5rem;
         }
 
         /* Custom Toggle */
-        .att-toggle { 
-            display: flex; 
-            gap: 0; 
-            border-radius: var(--radius); 
-            overflow: hidden; 
-            border: 1.5px solid var(--gray-200); 
+        .att-toggle {
+            display: flex;
+            gap: 0;
+            border-radius: var(--r);
+            overflow: hidden;
+            border: 1.5px solid var(--gray-200);
         }
-        
+
         .att-toggle-btn {
             padding: 0.5rem 1rem;
-            font-size: 0.8rem; 
+            font-size: 0.8rem;
             font-weight: 600;
-            cursor: pointer; 
+            cursor: pointer;
             transition: all 0.15s;
-            border: none; 
-            background: var(--white); 
+            border: none;
+            background: var(--white);
             color: var(--gray-500);
         }
-        
-        .att-toggle-btn.p-btn.selected { 
-            background: #d1fae5; 
-            color: #065f46; 
+
+        .att-toggle-btn.p-btn.selected {
+            background: var(--emerald-100);
+            color: #065f46;
         }
-        
-        .att-toggle-btn.a-btn.selected { 
-            background: #fee2e2; 
-            color: #991b1b; 
+
+        .att-toggle-btn.a-btn.selected {
+            background: var(--rose-100);
+            color: #991b1b;
         }
 
         /* Report Styles */
         .report-card {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: var(--r-lg);
             border: 1px solid var(--gray-200);
             overflow: hidden;
             margin-bottom: 1rem;
@@ -179,57 +169,26 @@
 
         .report-header {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-100);
             background: var(--gray-50);
         }
 
         .report-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.9375rem;
+            font-weight: 700;
             color: var(--gray-900);
         }
 
-        .report-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0.875rem 1.25rem; 
-            border-bottom: 1px solid var(--gray-100); 
-        }
-        
-        .report-row:last-child { 
-            border-bottom: none; 
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
         }
 
-        /* Toast */
-        .notify-toast {
-            position: fixed; 
-            bottom: 2rem; 
-            right: 2rem;
-            background: var(--gray-900); 
-            color: white;
-            padding: 1rem 1.5rem; 
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            font-weight: 500; 
-            font-size: 0.9rem;
-            transform: translateY(100px); 
-            opacity: 0;
-            transition: all 0.3s; 
-            z-index: 999;
-        }
-        
-        .notify-toast.show { 
-            transform: translateY(0); 
-            opacity: 1; 
-        }
-        
-        .notify-toast.success { 
-            background: var(--success); 
-        }
-        
-        .notify-toast.error { 
-            background: var(--danger); 
+        .report-row:last-child {
+            border-bottom: none;
         }
 
         .empty-state {
@@ -238,162 +197,230 @@
             color: var(--gray-400);
         }
 
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.35;
+        }
+
         @media (max-width: 768px) {
             .filter-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .attendance-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .bulk-actions {
                 width: 100%;
             }
-            
+
             .bulk-actions .btn {
                 flex: 1;
             }
         }
+
+        /* Sidebar open state for mobile */
+        .sidebar.open {
+            transform: translateX(0);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Mobile profile section */
+        .sidebar-profile-mobile {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-profile-mobile {
+                display: flex;
+            }
+
+            .sidebar-user {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .sidebar-profile-mobile {
+                display: none !important;
+            }
+
+            .sidebar-user {
+                display: flex !important;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="app-layout">
-        <!-- Sidebar matching teacher_dashboard -->
+
+        <!-- ── SIDEBAR (desktop) ─────────────────── -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                        <path d="M5 13v6l7 4 7-4v-6"/>
-                    </svg>
+            <!-- Mobile Profile Section -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
                 </div>
-                <div class="brand-text">
-                    <h1>School Manager</h1>
-                    <span>Management System</span>
-                </div>
-            </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
 
             <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-section-title">Main</div>
+                    <div class="nav-label">Main</div>
                     <a href="teacher_dashboard.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Academic</div>
+                    <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11l3 3L22 4"/>
-                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                        </svg>
-                        Enter Marks
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
                     </a>
                     <a href="take_attendance.html" class="nav-item active">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M9 14l2 2 4-4"/>
-                        </svg>
-                        Take Attendance
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Records</div>
+                    <div class="nav-label">Management</div>
                     <a href="view_students.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 010 7.75"/>
-                        </svg>
-                        View Students
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
                     </a>
-                    <a href="reports.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9"/>
-                            <path d="M13 17V5"/>
-                            <path d="M8 17v-3"/>
-                        </svg>
-                        Reports
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:none;">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
                     </a>
                 </div>
-                
-                <div class="sidebar-user">
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
-                    <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role">Teacher</div>
-                </div>
-            </div>
+                        <div class="user-name" id="sidebarName">Teacher</div>
+                        <div class="user-role" id="sidebarRole">Teacher</div>
+                    </div>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                        <path d="M16 17l5-5-5-5"/>
-                        <path d="M21 12H9"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
                     </svg>
-                    Logout
+                    Sign Out
                 </button>
             </div>
         </aside>
 
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-            </button>
-            <div class="brand-text">
-                <h1>School Manager</h1>
-            </div>
-            <div style="width: 40px;"></div>
-        </div>
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Main Content -->
+        <!-- ── MAIN CONTENT ───────────────────────── -->
         <div class="main-content">
-            <!-- Top Header -->
-            <div class="top-header">
+
+            <!-- Mobile top header -->
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand">
+                    <span>Take Attendance</span>
+                </div>
+                <div style="width: 36px; height: 36px;"></div>
+            </header>
+
+            <!-- Desktop top bar -->
+            <div class="desktop-topbar">
                 <div class="page-title">
-                    <h1>Attendance Management</h1>
-                    <p>Mark and view student attendance</p>
+                    <h1>Take Attendance</h1>
                 </div>
             </div>
 
-            <!-- Page Content -->
+            <!-- Page body -->
             <div class="page-content">
                 <!-- Tabs -->
                 <div class="tab-bar">
                     <div class="tab-item active" onclick="switchTab('take')">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M9 14l2 2 4-4"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            <path d="M9 14l2 2 4-4" />
                         </svg>
                         Take Attendance
                     </div>
                     <div class="tab-item" onclick="switchTab('report')">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9"/>
-                            <path d="M13 17V5"/>
-                            <path d="M8 17v-3"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+                            <path d="M3 3v18h18" />
+                            <path d="M18 17V9" />
+                            <path d="M13 17V5" />
+                            <path d="M8 17v-3" />
                         </svg>
                         View Reports
                     </div>
@@ -402,19 +429,18 @@
                 <!-- TAKE ATTENDANCE TAB -->
                 <div class="tab-panel active" id="panelTake">
                     <div class="filter-card">
-                        <div class="page-header" style="margin-bottom: 1.25rem;">
-                            <h1 style="font-size: 1.1rem;">Select Class & Date</h1>
-                            <p style="font-size: 0.875rem;">Choose the date, class and section to mark attendance</p>
+                        <div class="section-header" style="margin-bottom: 1.25rem;">
+                            <span class="section-title">Select Class & Date</span>
                         </div>
 
                         <div class="filter-grid">
                             <div class="form-group">
                                 <label class="form-label">Date</label>
-                                <input type="date" id="dateSelect">
+                                <input type="date" id="dateSelect" class="form-input">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Class</label>
-                                <select id="classSelect">
+                                <select id="classSelect" class="form-select">
                                     <option value="">Select Class</option>
                                     <option>6</option>
                                     <option>7</option>
@@ -425,7 +451,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Section</label>
-                                <select id="sectionSelect">
+                                <select id="sectionSelect" class="form-select">
                                     <option value="">Select Section</option>
                                     <option>A</option>
                                     <option>B</option>
@@ -435,11 +461,11 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="loadAttendance()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                                <path d="M16 3.13a4 4 0 010 7.75"/>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
                             </svg>
                             Load Students
                         </button>
@@ -453,30 +479,18 @@
                                 <h3 id="attTableTitle">Attendance</h3>
                                 <div class="bulk-actions">
                                     <button class="btn btn-secondary btn-sm" onclick="markAll('Present')">
-                                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20 6 9 17 4 12"/>
-                                        </svg>
                                         All Present
                                     </button>
                                     <button class="btn btn-secondary btn-sm" onclick="markAll('Absent')">
-                                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"/>
-                                            <line x1="6" y1="6" x2="18" y2="18"/>
-                                        </svg>
                                         All Absent
                                     </button>
-                                    <button class="btn btn-success" onclick="saveAll()">
-                                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-                                            <polyline points="17 21 17 13 7 13 7 21"/>
-                                            <polyline points="7 3 7 8 15 8"/>
-                                        </svg>
+                                    <button class="btn btn-primary" onclick="saveAll()">
                                         Save All
                                     </button>
                                 </div>
                             </div>
-                            <div class="table-wrapper">
-                                <table class="data-table">
+                            <div class="table-container">
+                                <table>
                                     <thead>
                                         <tr>
                                             <th style="width:50px">#</th>
@@ -496,15 +510,14 @@
                 <!-- REPORT TAB -->
                 <div class="tab-panel" id="panelReport">
                     <div class="filter-card">
-                        <div class="page-header" style="margin-bottom: 1.25rem;">
-                            <h1 style="font-size: 1.1rem;">Attendance Report</h1>
-                            <p style="font-size: 0.875rem;">Generate attendance reports for students</p>
+                        <div class="section-header" style="margin-bottom: 1.25rem;">
+                            <span class="section-title">Attendance Report</span>
                         </div>
 
                         <div class="filter-grid">
                             <div class="form-group">
                                 <label class="form-label">Filter by Class</label>
-                                <select id="rptClass" onchange="filterStudents()">
+                                <select id="rptClass" class="form-select" onchange="filterStudents()">
                                     <option value="">All Classes</option>
                                     <option>6</option>
                                     <option>7</option>
@@ -515,7 +528,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Filter by Section</label>
-                                <select id="rptSection" onchange="filterStudents()">
+                                <select id="rptSection" class="form-select" onchange="filterStudents()">
                                     <option value="">All Sections</option>
                                     <option>A</option>
                                     <option>B</option>
@@ -524,26 +537,26 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Student</label>
-                                <select id="rptStudent">
+                                <select id="rptStudent" class="form-select">
                                     <option value="">Select Student</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">From Date</label>
-                                <input type="date" id="rptFrom">
+                                <input type="date" id="rptFrom" class="form-input">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">To Date</label>
-                                <input type="date" id="rptTo">
+                                <input type="date" id="rptTo" class="form-input">
                             </div>
                         </div>
 
-                        <button class="btn btn-primary" onclick="loadReport()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9"/>
-                                <path d="M13 17V5"/>
-                                <path d="M8 17v-3"/>
+                        <button class="btn btn-primary btn-lg" onclick="loadReport()" style="width: 100%;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
                             </svg>
                             Generate Report
                         </button>
@@ -551,76 +564,125 @@
 
                     <div id="reportOutput"></div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </div><!-- /page-content -->
+        </div><!-- /main-content -->
+    </div><!-- /app-layout -->
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <div class="mobile-nav-items">
-            <a href="teacher_dashboard.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span>Home</span>
-            </a>
-            <a href="enter_marks.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                 </svg>
-                <span>Marks</span>
-            </a>
-            <a href="take_attendance.html" class="mobile-nav-item active">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    <path d="M9 14l2 2 4-4"/>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item active bnav-center">
+            <span class="bnav-icon bnav-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
                 </svg>
-                <span>Attendance</span>
-            </a>
-            <a href="view_students.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 010 7.75"/>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="view_students.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
-                <span>Students</span>
-            </a>
-            <a href="#" class="mobile-nav-item" onclick="toggleMoreMenu(); return false;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="19" cy="12" r="1"/>
-                    <circle cx="5" cy="12" r="1"/>
+            </span>
+            <span class="bnav-label">Students</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
                 </svg>
-                <span>More</span>
-            </a>
-        </div>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
     </nav>
 
-    <div class="notify-toast" id="toast"></div>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
     <script src="config.js"></script>
     <script>
-        // Toggle sidebar for mobile
+        /* ── Sidebar toggle ── */
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
         }
 
-        // Toggle more menu
-        function toggleMoreMenu() {
-            document.getElementById('mobileMoreMenu')?.classList.toggle('active');
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
+        /* ── Session guard ── */
         const teacher = getSession('teacher');
-        if (!teacher) throw 'auth';
-        
-        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
-        document.getElementById('sidebarName').textContent = teacher.name;
+        if (!teacher) window.location.href = 'index.html';
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        const sidebarName = document.getElementById('sidebarName');
+        if (sidebarName) sidebarName.textContent = teacher.name || 'Teacher';
+
+        const sidebarRole = document.getElementById('sidebarRole');
+        if (sidebarRole) sidebarRole.textContent = teacher.designation || 'Teacher';
+
+        const sidebarProfileName = document.getElementById('sidebarProfileName');
+        if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
+
+        /* ── Role-based visibility ── */
+        if (teacher.designation === 'GHM') {
+            document.getElementById('manageUsersNav').style.display = 'flex';
+        }
 
         // Set today
         document.getElementById('dateSelect').value = new Date().toISOString().split('T')[0];
@@ -666,7 +728,6 @@
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
             studentsList = students || [];
 
-            // Get existing attendance for this date
             const { data: existing } = await db.from('attendance')
                 .select('*').eq('attendance_date', date)
                 .in('student_id', studentsList.map(s => s.id));
@@ -679,9 +740,14 @@
             document.getElementById('attSection').style.display = 'block';
         }
 
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
         function renderAttTable(attMap) {
             if (studentsList.length === 0) {
-                document.getElementById('attTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></td></tr>';
+                document.getElementById('attTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><p>No students found</p></td></tr>';
                 updateAttStats();
                 return;
             }
@@ -691,14 +757,7 @@
                 return `<tr id="attRow_${s.id}">
                     <td style="color:var(--gray-400);font-weight:600">${i + 1}</td>
                     <td><span class="badge badge-gray">${s.roll_number}</span></td>
-                    <td>
-                        <div class="student-info">
-                            <div class="student-avatar" style="width: 32px; height: 32px; font-size: 0.875rem;">${s.name.charAt(0)}</div>
-                            <div class="student-details">
-                                <strong>${s.name}</strong>
-                            </div>
-                        </div>
-                    </td>
+                    <td><strong>${s.name}</strong></td>
                     <td>
                         <div class="att-toggle">
                             <button class="att-toggle-btn p-btn ${status === 'Present' ? 'selected' : ''}"
@@ -709,7 +768,7 @@
                     </td>
                     <td>
                         <button class="btn btn-success btn-sm" onclick="saveSingle(${s.id})">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
                         </button>
@@ -751,8 +810,10 @@
             const date = document.getElementById('dateSelect').value;
             const status = getStatus(studentId);
 
-            const { data: existing } = await db.from('attendance').select('id')
-                .eq('student_id', studentId).eq('attendance_date', date).single();
+const { data: existing } = await db.from('attendance').select('id')
+  .eq('student_id', studentId)
+  .eq('attendance_date', date)
+  .maybeSingle();
 
             let result;
             if (existing) {
@@ -774,13 +835,12 @@
                 status: getStatus(s.id), recorded_by: teacher.id
             }));
 
-            // Delete existing then insert
             await db.from('attendance').delete().eq('attendance_date', date)
                 .in('student_id', studentsList.map(s => s.id));
 
             const { error } = await db.from('attendance').insert(records);
             if (error) showToast('Error: ' + error.message, 'error');
-            else showToast(`✓ ${records.length} attendance records saved!`, 'success');
+            else showToast(`${records.length} attendance records saved!`, 'success');
         }
 
         async function loadReport() {
@@ -802,7 +862,7 @@
             const present = records ? records.filter(r => r.status === 'Present').length : 0;
             const absent = total - present;
             const pct = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-            const pctColor = pct >= 75 ? 'var(--success)' : pct >= 60 ? 'var(--warning)' : 'var(--danger)';
+            const pctColor = pct >= 75 ? 'var(--emerald-500)' : pct >= 60 ? 'var(--amber-500)' : 'var(--rose-500)';
 
             document.getElementById('reportOutput').innerHTML = `
                 <div class="report-card">
@@ -810,20 +870,20 @@
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <h3>${student?.name} — Attendance Report</h3>
-                                <p style="font-size:0.875rem; color:var(--gray-500); margin-top:0.25rem;">Class ${student?.class_name}-${student?.section} | Roll: ${student?.roll_number}</p>
+                                <p style="font-size:0.8125rem; color:var(--gray-500); margin-top:0.25rem;">Class ${student?.class_name}-${student?.section} | Roll: ${student?.roll_number}</p>
                             </div>
                             <span class="badge badge-gray">${total} Days</span>
                         </div>
                     </div>
                     <div style="padding: 1.5rem;">
-                        <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+                        <div class="att-stats" style="margin-bottom:1.5rem;">
                             <div class="att-stat-box asb-total"><div class="asb-val">${total}</div><div class="asb-label">Total Days</div></div>
                             <div class="att-stat-box asb-present"><div class="asb-val">${present}</div><div class="asb-label">Present</div></div>
                             <div class="att-stat-box asb-absent"><div class="asb-val">${absent}</div><div class="asb-label">Absent</div></div>
                             <div class="att-stat-box"><div class="asb-val" style="color:${pctColor}">${pct}%</div><div class="asb-label">Attendance %</div></div>
                         </div>
-                        <div class="table-wrapper">
-                            <table class="data-table">
+                        <div class="table-container">
+                            <table>
                                 <thead><tr><th>Date</th><th>Day</th><th>Status</th></tr></thead>
                                 <tbody>
                                     ${records && records.length > 0 ? records.map(r => {
@@ -841,14 +901,22 @@
                 </div>`;
         }
 
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'notify-toast ' + type + ' show';
-            setTimeout(() => { t.className = 'notify-toast'; }, 3500);
+        /* ── Toast ── */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        /* ── Logout ── */
+        function logout() {
+            clearSession();
+            window.location.href = 'index.html';
         }
 
         loadAllStudentsForReport();
     </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +12,14 @@
         .page-header {
             margin-bottom: 1.5rem;
         }
-        
+
         .page-header h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--gray-900);
             margin-bottom: 0.25rem;
         }
-        
+
         .page-header p {
             color: var(--gray-500);
             font-size: 0.9375rem;
@@ -344,119 +345,147 @@
         }
     </style>
 </head>
+
 <body>
     <div class="app-layout">
-        <!-- Sidebar matching teacher_dashboard -->
+        <!-- ── SIDEBAR (desktop) ─────────────────── -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                        <path d="M5 13v6l7 4 7-4v-6"/>
-                    </svg>
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
                 </div>
-                <div class="brand-text">
-                    <h1>School Manager</h1>
-                    <span>Management System</span>
-                </div>
-            </div>
-
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
             <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-section-title">Main</div>
+                    <div class="nav-label">Main</div>
                     <a href="teacher_dashboard.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Academic</div>
+                    <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11l3 3L22 4"/>
-                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                        </svg>
-                        Enter Marks
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
                     </a>
                     <a href="take_attendance.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M9 14l2 2 4-4"/>
-                        </svg>
-                        Take Attendance
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Records</div>
+                    <div class="nav-label">Management</div>
                     <a href="view_students.html" class="nav-item active">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 010 7.75"/>
-                        </svg>
-                        View Students
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
                     </a>
-                    <a href="reports.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9"/>
-                            <path d="M13 17V5"/>
-                            <path d="M8 17v-3"/>
-                        </svg>
-                        Reports
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
                     </a>
                 </div>
-                
-                <div class="sidebar-user">
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
-                    <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role">Teacher</div>
-                </div>
-            </div>
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
+                    </div>
+                </a>
 
             </nav>
 
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                        <path d="M16 17l5-5-5-5"/>
-                        <path d="M21 12H9"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
                     </svg>
-                    Logout
+                    Sign Out
                 </button>
             </div>
         </aside>
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-            </button>
-            <div class="brand-text">
-                <h1>School Manager</h1>
-            </div>
-            <div style="width: 40px;"></div>
-        </div>
-
-        <!-- Main Content -->
+        <!-- ── MAIN CONTENT ───────────────────────── -->
         <div class="main-content">
+            <!-- Mobile top header -->
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand">
+                    <div class="brand-logo-sm">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+                            <path d="M5 13v6l7 4 7-4v-6" />
+                        </svg>
+                    </div>
+                    <span>ZPHS Nagulapet</span>
+                </div>
+                <div style="width: 36px; height: 36px;"></div>
+            </header>
+
             <!-- Top Header -->
-            <div class="top-header">
+            <div class="desktop-topbar">
                 <div class="page-title">
                     <h1>Students</h1>
                     <p>Browse and search all enrolled students</p>
@@ -494,12 +523,14 @@
                         <div class="form-group search-bar">
                             <label class="form-label">Search</label>
                             <span class="search-icon">
-                                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"/>
-                                    <path d="M21 21l-4.35-4.35"/>
+                                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="M21 21l-4.35-4.35" />
                                 </svg>
                             </span>
-                            <input type="text" id="searchInput" placeholder="Search by name or roll number..." oninput="applyFilters()">
+                            <input type="text" id="searchInput" placeholder="Search by name or roll number..."
+                                oninput="applyFilters()">
                         </div>
                         <div class="filter-count" id="filterCount"></div>
                     </div>
@@ -508,8 +539,10 @@
                 <!-- Student Grid -->
                 <div class="student-grid" id="studentGrid">
                     <div class="empty-state">
-                        <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem; opacity: 0.5;">
-                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="margin-bottom: 1rem; opacity: 0.5;">
+                            <path
+                                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                         </svg>
                         <p>Loading students...</p>
                     </div>
@@ -518,51 +551,60 @@
         </div>
     </div>
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <div class="mobile-nav-items">
-            <a href="teacher_dashboard.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span>Home</span>
-            </a>
-            <a href="enter_marks.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                 </svg>
-                <span>Marks</span>
-            </a>
-            <a href="take_attendance.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    <path d="M9 14l2 2 4-4"/>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon bnav-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
                 </svg>
-                <span>Attendance</span>
-            </a>
-            <a href="view_students.html" class="mobile-nav-item active">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 010 7.75"/>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="view_students.html" class="bnav-item active">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
-                <span>Students</span>
-            </a>
-            <a href="#" class="mobile-nav-item" onclick="toggleMoreMenu(); return false;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="19" cy="12" r="1"/>
-                    <circle cx="5" cy="12" r="1"/>
+            </span>
+            <span class="bnav-label">Students</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
                 </svg>
-                <span>More</span>
-            </a>
-        </div>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
     </nav>
 
     <!-- Student Detail Modal -->
@@ -570,13 +612,14 @@
         <div class="modal">
             <div class="modal-header">
                 <div>
-                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900);" id="modalName">Student</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900);" id="modalName">Student
+                    </div>
                     <div style="font-size: 0.875rem; color: var(--gray-500);" id="modalSubtitle">Details</div>
                 </div>
                 <div class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 </div>
             </div>
@@ -588,19 +631,46 @@
     <script>
         // Toggle sidebar for mobile
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
         }
-
-        // Toggle more menu
-        function toggleMoreMenu() {
-            document.getElementById('mobileMoreMenu')?.classList.toggle('active');
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
         }
-
+        /* ── Session guard ── */
         const teacher = getSession('teacher');
-        if (!teacher) throw 'auth';
-        
-        document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
+        if (!teacher) window.location.href = 'index.html';
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
         document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarDesignation').textContent = teacher.designation || "Teacher";
+        document.getElementById('sidebarProfileName').textContent = teacher.name.split(' ')[0];
 
         let allStudents = [];
 
@@ -612,9 +682,9 @@
             const classCounts = {};
             CLASSES.forEach(c => classCounts[c] = 0);
             allStudents.forEach(s => { if (classCounts[s.class_name] !== undefined) classCounts[s.class_name]++; });
-            
+
             const colors = ['blue', 'green', 'orange', 'purple', 'teal'];
-            
+
             document.getElementById('classStatCards').innerHTML = CLASSES.map((c, i) => `
                 <div class="stat-card" onclick="filterByClass('${c}')">
                     <div class="stat-info">
@@ -706,7 +776,7 @@
                 </div>
                 <div class="loading" style="text-align: center; padding: 2rem;">Loading details...</div>
             `;
-            
+
             document.getElementById('modal').classList.add('open');
 
             // Load marks & attendance
@@ -780,14 +850,14 @@
                             </thead>
                             <tbody>
                                 ${marks.map(m => {
-                                    const g = calculateGrade(m.marks_obtained, m.max_marks);
-                                    return `<tr>
+                const g = calculateGrade(m.marks_obtained, m.max_marks);
+                return `<tr>
                                         <td>${m.subjects?.subject_name || '–'}</td>
                                         <td><span class="badge badge-blue">${m.exam_type}</span></td>
                                         <td>${m.marks_obtained}/${m.max_marks}</td>
                                         <td><span class="grade-badge ${g.cls}">${g.grade}</span></td>
                                     </tr>`;
-                                }).join('')}
+            }).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -804,4 +874,5 @@
         loadStudents();
     </script>
 </body>
+
 </html>

@@ -1,24 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - School Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reports - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Page-specific styles matching teacher_dashboard */
+        /* Keep all your existing page-specific styles here */
         .page-header {
             margin-bottom: 1.5rem;
         }
-        
+
         .page-header h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--gray-900);
             margin-bottom: 0.25rem;
         }
-        
+
+        .page-header p {
+            color: var(--gray-500);
+            font-size: 0.9375rem;
+        }
+
+        /* Page-specific styles matching teacher_dashboard */
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
         .page-header p {
             color: var(--gray-500);
             font-size: 0.9375rem;
@@ -112,7 +133,7 @@
         }
 
         .rsp {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             padding: 0.5rem 1rem;
             border-radius: 9999px;
             font-size: 0.85rem;
@@ -220,10 +241,25 @@
             font-size: 0.875rem;
         }
 
-        .rank-1 { background: #fef3c7; color: #92400e; }
-        .rank-2 { background: #e5e7eb; color: #374151; }
-        .rank-3 { background: #fed7aa; color: #9a3412; }
-        .rank-other { background: var(--gray-100); color: var(--gray-500); }
+        .rank-1 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rank-2 {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .rank-3 {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .rank-other {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
 
         .rank-info {
             flex: 1;
@@ -331,15 +367,25 @@
         }
 
         @media print {
-            .sidebar, .top-header, .btn, select, input, .tab-bar, .filter-card {
+
+            .sidebar,
+            .top-header,
+            .btn,
+            select,
+            input,
+            .tab-bar,
+            .filter-card {
                 display: none !important;
             }
+
             .main-content {
                 margin-left: 0 !important;
             }
+
             .page-content {
                 padding: 0 !important;
             }
+
             .tab-panel {
                 display: block !important;
             }
@@ -373,208 +419,365 @@
             border-bottom: 1px solid var(--gray-100);
         }
 
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--danger); }
-        .trend-same { color: var(--gray-400); }
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .trend-same {
+            color: var(--gray-400);
+        }
 
         @media (max-width: 768px) {
             .filter-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .result-header-bar {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .class-report-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .icon-sm {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* -----------------------------
+   REPORT TABS
+-----------------------------*/
+
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Each tab */
+        .tab-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            flex: 1 1 calc(33.33% - 10px);
+            /* 3 per row on desktop */
+
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            border-radius: 10px;
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+        }
+
+        /* Hover effect */
+        .tab-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        /* Active tab */
+        .tab-item.active {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        /* Icon sizing */
+        .tab-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* -----------------------------
+   TAB CONTENT
+-----------------------------*/
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* -----------------------------
+   RESPONSIVE
+-----------------------------*/
+
+        /* Tablet / mobile → 2 per row */
+        @media (max-width:900px) {
+
+            .tab-item {
+                flex: 1 1 calc(50% - 10px);
+            }
+
+        }
+
+        /* Small mobile → full width */
+        @media (max-width:480px) {
+
+            .tab-item {
+                flex: 1 1 100%;
+            }
+
+        }
+
+        /* MOBILE TAB DROPDOWN */
+
+        .mobile-tab-select {
+            display: none;
+            margin-bottom: 16px;
+        }
+
+        .mobile-tab-select select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        /* Hide tabs on small screens */
+        @media (max-width:768px) {
+
+            .tab-bar {
+                display: none;
+            }
+
+            .mobile-tab-select {
+                display: block;
+            }
+
+        }
     </style>
 </head>
+
 <body>
     <div class="app-layout">
-        <!-- Sidebar matching teacher_dashboard -->
+        <!-- ── SIDEBAR (desktop) ─────────────────── -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                        <path d="M5 13v6l7 4 7-4v-6"/>
-                    </svg>
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
                 </div>
-                <div class="brand-text">
-                    <h1>School Manager</h1>
-                    <span>Management System</span>
-                </div>
-            </div>
-
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
             <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-section-title">Main</div>
+                    <div class="nav-label">Main</div>
                     <a href="teacher_dashboard.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Academic</div>
+                    <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11l3 3L22 4"/>
-                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-                        </svg>
-                        Enter Marks
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
                     </a>
                     <a href="take_attendance.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M9 14l2 2 4-4"/>
-                        </svg>
-                        Take Attendance
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Records</div>
+                    <div class="nav-label">Management</div>
                     <a href="view_students.html" class="nav-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 010 7.75"/>
-                        </svg>
-                        View Students
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
                     </a>
-                    <a href="reports.html" class="nav-item active">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9"/>
-                            <path d="M13 17V5"/>
-                            <path d="M8 17v-3"/>
-                        </svg>
-                        Reports
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
                     </a>
                 </div>
-                <div class="sidebar-user">
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item active">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
-                    <div class="user-name" id="sidebarName">Teacher</div>
-                    <div class="user-role">Teacher</div>
-                </div>
-            </div>
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
+                    </div>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                        <path d="M16 17l5-5-5-5"/>
-                        <path d="M21 12H9"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
                     </svg>
-                    Logout
+                    Sign Out
                 </button>
             </div>
         </aside>
 
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
         <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
+        <header class="mobile-header">
+            <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                <span></span><span></span><span></span>
             </button>
-            <div class="brand-text">
-                <h1>School Manager</h1>
+            <div class="mobile-brand">
+                <div class="brand-logo-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+                        <path d="M5 13v6l7 4 7-4v-6" />
+                    </svg>
+                </div>
+                <span>ZPHS Nagulapet</span>
             </div>
-            <div style="width: 40px;"></div>
-        </div>
+            <div style="width: 36px; height: 36px;"></div>
+        </header>
 
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
-            <div class="top-header">
+            <!-- Desktop top bar -->
+            <div class="desktop-topbar">
                 <div class="page-title">
                     <h1>Reports</h1>
-                    <p>Generate comprehensive student and class performance reports</p>
-                </div>
-                <div class="header-actions">
-                    <button class="btn btn-secondary print-btn" onclick="window.print()">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 6 2 18 2 18 9"/>
-                            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-                            <rect x="6" y="14" width="12" height="8"/>
-                        </svg>
-                        Print Report
-                    </button>
                 </div>
             </div>
 
             <!-- Page Content -->
             <div class="page-content">
+                <div class="mobile-tab-select">
+                    <select id="reportTabSelect" onchange="switchTab(this.value)">
+                        <option value="student">Student Report</option>
+                        <option value="class">Class Report</option>
+                        <option value="exam">Exam Analysis</option>
+                        <option value="ranking">Rankings</option>
+                        <option value="attendance">Attendance Report</option>
+                        <option value="comparison">Exam Comparison</option>
+                    </select>
+                </div>
                 <!-- Tabs -->
                 <div class="tab-bar">
                     <div class="tab-item active" onclick="switchTab('student')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
                         </svg>
                         Student Report
                     </div>
                     <div class="tab-item" onclick="switchTab('class')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 010 7.75"/>
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                            <path d="M16 3.13a4 4 0 010 7.75" />
                         </svg>
                         Class Report
                     </div>
                     <div class="tab-item" onclick="switchTab('exam')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
                         </svg>
                         Exam Analysis
                     </div>
                     <div class="tab-item" onclick="switchTab('ranking')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 9H4.5a2.5 2.5 0 010-5H6"/>
-                            <path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
-                            <path d="M4 22h16"/>
-                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                            <path d="M18 2H6v7a6 6 0 006 6 6 6 0 006-6V2z"/>
+                            <path d="M6 9H4.5a2.5 2.5 0 010-5H6" />
+                            <path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+                            <path d="M4 22h16" />
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                            <path d="M18 2H6v7a6 6 0 006 6 6 6 0 006-6V2z" />
                         </svg>
                         Rankings
                     </div>
                     <div class="tab-item" onclick="switchTab('attendance')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            <path d="M9 14l2 2 4-4"/>
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                            <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            <path d="M9 14l2 2 4-4" />
                         </svg>
                         Attendance Report
                     </div>
                     <div class="tab-item" onclick="switchTab('comparison')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9"/>
-                            <path d="M13 17V5"/>
-                            <path d="M8 17v-3"/>
+                            <path d="M3 3v18h18" />
+                            <path d="M18 17V9" />
+                            <path d="M13 17V5" />
+                            <path d="M8 17v-3" />
                         </svg>
                         Exam Comparison
                     </div>
@@ -585,7 +788,8 @@
                     <div class="filter-card">
                         <div class="page-header" style="margin-bottom: 1.25rem;">
                             <h1 style="font-size: 1.1rem;">Student Performance Report</h1>
-                            <p style="font-size: 0.875rem;">View detailed academic performance for individual students</p>
+                            <p style="font-size: 0.875rem;">View detailed academic performance for individual students
+                            </p>
                         </div>
 
                         <div class="filter-grid">
@@ -618,11 +822,12 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="generateStudentReport()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9"/>
-                                <path d="M13 17V5"/>
-                                <path d="M8 17v-3"/>
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
                             </svg>
                             Generate Report
                         </button>
@@ -674,11 +879,12 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="generateClassReport()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9"/>
-                                <path d="M13 17V5"/>
-                                <path d="M8 17v-3"/>
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
                             </svg>
                             Generate Report
                         </button>
@@ -691,7 +897,8 @@
                     <div class="filter-card">
                         <div class="page-header" style="margin-bottom: 1.25rem;">
                             <h1 style="font-size: 1.1rem;">Exam-wise Performance Analysis</h1>
-                            <p style="font-size: 0.875rem;">Detailed analysis of performance by exam type and subject</p>
+                            <p style="font-size: 0.875rem;">Detailed analysis of performance by exam type and subject
+                            </p>
                         </div>
 
                         <div class="filter-grid">
@@ -736,11 +943,12 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="generateExamReport()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9"/>
-                                <path d="M13 17V5"/>
-                                <path d="M8 17v-3"/>
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
                             </svg>
                             Generate Report
                         </button>
@@ -798,13 +1006,14 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="generateRankings()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M6 9H4.5a2.5 2.5 0 010-5H6"/>
-                                <path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
-                                <path d="M4 22h16"/>
-                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                                <path d="M18 2H6v7a6 6 0 006 6 6 6 0 006-6V2z"/>
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M6 9H4.5a2.5 2.5 0 010-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 006 6 6 6 0 006-6V2z" />
                             </svg>
                             View Rankings
                         </button>
@@ -851,11 +1060,13 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-primary btn-lg" onclick="generateAttendanceReport()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                <path d="M9 14l2 2 4-4"/>
+                        <button class="btn btn-primary btn-lg" onclick="generateAttendanceReport()"
+                            style="width: 100%;">
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
                             </svg>
                             Generate Report
                         </button>
@@ -901,11 +1112,12 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="generateComparison()" style="width: 100%;">
-                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 17V9"/>
-                                <path d="M13 17V5"/>
-                                <path d="M8 17v-3"/>
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="margin-right: 0.5rem;">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
                             </svg>
                             Compare Performance
                         </button>
@@ -917,140 +1129,184 @@
     </div>
 
     <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <div class="mobile-nav-items">
-            <a href="teacher_dashboard.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span>Home</span>
-            </a>
-            <a href="enter_marks.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                 </svg>
-                <span>Marks</span>
-            </a>
-            <a href="take_attendance.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    <path d="M9 14l2 2 4-4"/>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon bnav-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
                 </svg>
-                <span>Attendance</span>
-            </a>
-            <a href="view_students.html" class="mobile-nav-item">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 010 7.75"/>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="view_students.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
-                <span>Students</span>
-            </a>
-            <a href="#" class="mobile-nav-item active" onclick="toggleMoreMenu(); return false;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="19" cy="12" r="1"/>
-                    <circle cx="5" cy="12" r="1"/>
+            </span>
+            <span class="bnav-label">Students</span>
+        </a>
+        <a href="reports.html" class="bnav-item active">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
                 </svg>
-                <span>More</span>
-            </a>
-        </div>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
     </nav>
 
-<script src="config.js"></script>
-<script>
-    // Toggle sidebar for mobile
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-    }
-
-    // Toggle more menu
-    function toggleMoreMenu() {
-        document.getElementById('mobileMoreMenu')?.classList.toggle('active');
-    }
-
-    const teacher = getSession('teacher');
-    if (!teacher) throw 'auth';
-    
-    document.getElementById('sidebarAvatar').textContent = teacher.name.charAt(0).toUpperCase();
-    document.getElementById('sidebarName').textContent = teacher.name;
-
-    let reportStudents = [];
-    let compStudentsList = [];
-
-    // Set default dates
-    const today = new Date();
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-    
-    document.getElementById('attRptTo').value = today.toISOString().split('T')[0];
-    document.getElementById('attRptFrom').value = lastMonth.toISOString().split('T')[0];
-
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-item').forEach((t, i) => {
-            const tabs = ['student', 'class', 'exam', 'ranking', 'attendance', 'comparison'];
-            t.classList.toggle('active', tabs[i] === tab);
-        });
-        
-        document.getElementById('panelStudent').classList.toggle('active', tab === 'student');
-        document.getElementById('panelClass').classList.toggle('active', tab === 'class');
-        document.getElementById('panelExam').classList.toggle('active', tab === 'exam');
-        document.getElementById('panelRanking').classList.toggle('active', tab === 'ranking');
-        document.getElementById('panelAttendance').classList.toggle('active', tab === 'attendance');
-        document.getElementById('panelComparison').classList.toggle('active', tab === 'comparison');
-    }
-
-    // ========== STUDENT REPORT ==========
-    async function loadStudentsForReport() {
-        const cls = document.getElementById('srClass').value;
-        const sec = document.getElementById('srSection').value;
-        if (!cls) return;
-
-        let query = db.from('students').select('*').eq('class_name', cls);
-        if (sec) query = query.eq('section', sec);
-        const { data } = await query.order('roll_number');
-        reportStudents = data || [];
-
-        const sel = document.getElementById('srStudent');
-        sel.innerHTML = '<option value="">Select Student</option>' +
-            reportStudents.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
-    }
-
-    async function generateStudentReport() {
-        const studentId = document.getElementById('srStudent').value;
-        if (!studentId) { alert('Please select a student'); return; }
-        const student = reportStudents.find(s => s.id == studentId);
-
-        const [marksRes, attRes] = await Promise.all([
-            db.from('marks').select('*, subjects(subject_name)').eq('student_id', studentId).order('exam_type'),
-            db.from('attendance').select('status').eq('student_id', studentId)
-        ]);
-
-        const marks = marksRes.data || [];
-        const att = attRes.data || [];
-        const attPct = att.length > 0 ? ((att.filter(a => a.status === 'Present').length / att.length) * 100).toFixed(1) : 0;
-
-        const subjectGroups = {};
-        marks.forEach(m => {
-            const n = m.subjects?.subject_name || 'Unknown';
-            if (!subjectGroups[n]) subjectGroups[n] = [];
-            subjectGroups[n].push(m);
-        });
-
-        let avgPct = 0;
-        if (marks.length > 0) {
-            avgPct = (marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / marks.length).toFixed(1);
+    <script src="config.js"></script>
+    <script>
+        // Toggle sidebar for mobile
+        /* ── Sidebar toggle ── */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
-        const og = calculateGrade(parseFloat(avgPct), 100);
+        const teacher = getSession('teacher');
+        if (!teacher) window.location.href = 'index.html';
 
-        document.getElementById('studentReportOutput').innerHTML = `
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarDesignation').textContent = teacher.designation || "Teacher";
+        document.getElementById('sidebarProfileName').textContent = teacher.name.split(' ')[0];
+
+        let reportStudents = [];
+        let compStudentsList = [];
+
+        // Set default dates
+        const today = new Date();
+        const lastMonth = new Date();
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+        document.getElementById('attRptTo').value = today.toISOString().split('T')[0];
+        document.getElementById('attRptFrom').value = lastMonth.toISOString().split('T')[0];
+        function switchTab(tab) {
+
+            const tabs = ['student', 'class', 'exam', 'ranking', 'attendance', 'comparison'];
+
+            document.querySelectorAll('.tab-item').forEach((t, i) => {
+                t.classList.toggle('active', tabs[i] === tab);
+            });
+
+            document.getElementById('panelStudent').classList.toggle('active', tab === 'student');
+            document.getElementById('panelClass').classList.toggle('active', tab === 'class');
+            document.getElementById('panelExam').classList.toggle('active', tab === 'exam');
+            document.getElementById('panelRanking').classList.toggle('active', tab === 'ranking');
+            document.getElementById('panelAttendance').classList.toggle('active', tab === 'attendance');
+            document.getElementById('panelComparison').classList.toggle('active', tab === 'comparison');
+
+            /* sync dropdown */
+            const select = document.getElementById('reportTabSelect');
+            if (select) select.value = tab;
+
+        }
+
+        // ========== STUDENT REPORT ==========
+        async function loadStudentsForReport() {
+            const cls = document.getElementById('srClass').value;
+            const sec = document.getElementById('srSection').value;
+            if (!cls) return;
+
+            let query = db.from('students').select('*').eq('class_name', cls);
+            if (sec) query = query.eq('section', sec);
+            const { data } = await query.order('roll_number');
+            reportStudents = data || [];
+
+            const sel = document.getElementById('srStudent');
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                reportStudents.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
+        }
+
+        async function generateStudentReport() {
+            const studentId = document.getElementById('srStudent').value;
+            if (!studentId) { alert('Please select a student'); return; }
+            const student = reportStudents.find(s => s.id == studentId);
+
+            const [marksRes, attRes] = await Promise.all([
+                db.from('marks').select('*, subjects(subject_name)').eq('student_id', studentId).order('exam_type'),
+                db.from('attendance').select('status').eq('student_id', studentId)
+            ]);
+
+            const marks = marksRes.data || [];
+            const att = attRes.data || [];
+            const attPct = att.length > 0 ? ((att.filter(a => a.status === 'Present').length / att.length) * 100).toFixed(1) : 0;
+
+            const subjectGroups = {};
+            marks.forEach(m => {
+                const n = m.subjects?.subject_name || 'Unknown';
+                if (!subjectGroups[n]) subjectGroups[n] = [];
+                subjectGroups[n].push(m);
+            });
+
+            let avgPct = 0;
+            if (marks.length > 0) {
+                avgPct = (marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / marks.length).toFixed(1);
+            }
+
+            const og = calculateGrade(parseFloat(avgPct), 100);
+
+            document.getElementById('studentReportOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>${student.name}</h3>
@@ -1092,74 +1348,74 @@
                                 </thead>
                                 <tbody>
                                     ${exams.map(e => {
-                                        const pct = ((e.marks_obtained / e.max_marks) * 100).toFixed(1);
-                                        const g = calculateGrade(e.marks_obtained, e.max_marks);
-                                        return `<tr>
+                    const pct = ((e.marks_obtained / e.max_marks) * 100).toFixed(1);
+                    const g = calculateGrade(e.marks_obtained, e.max_marks);
+                    return `<tr>
                                             <td><span class="badge badge-blue">${e.exam_type}</span></td>
                                             <td><strong>${e.marks_obtained}</strong></td>
                                             <td>${e.max_marks}</td>
                                             <td>${pct}%</td>
                                             <td><span class="grade-badge ${g.cls}">${g.grade}</span></td>
                                         </tr>`;
-                                    }).join('')}
+                }).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>`;
             }).join('') || '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded yet</p></div>'}
         `;
-    }
-
-    // ========== CLASS REPORT ==========
-    async function generateClassReport() {
-        const cls = document.getElementById('crClass').value;
-        const sec = document.getElementById('crSection').value;
-        const exam = document.getElementById('crExam').value;
-
-        if (!cls) { alert('Please select a class'); return; }
-
-        let studQuery = db.from('students').select('*').eq('class_name', cls);
-        if (sec) studQuery = studQuery.eq('section', sec);
-        const { data: students } = await studQuery.order('roll_number');
-        if (!students || students.length === 0) { 
-            document.getElementById('classReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>'; 
-            return; 
         }
 
-        let marksQuery = db.from('marks').select('*, subjects(subject_name)')
-            .in('student_id', students.map(s => s.id));
-        if (exam) marksQuery = marksQuery.eq('exam_type', exam);
-        const { data: marks } = await marksQuery;
+        // ========== CLASS REPORT ==========
+        async function generateClassReport() {
+            const cls = document.getElementById('crClass').value;
+            const sec = document.getElementById('crSection').value;
+            const exam = document.getElementById('crExam').value;
 
-        const { data: att } = await db.from('attendance').select('student_id, status')
-            .in('student_id', students.map(s => s.id));
+            if (!cls) { alert('Please select a class'); return; }
 
-        const studentStats = students.map(s => {
-            const sm = marks ? marks.filter(m => m.student_id === s.id) : [];
-            const sa = att ? att.filter(a => a.student_id === s.id) : [];
-            const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
-            const attPct = sa.length > 0 ? ((sa.filter(a => a.status === 'Present').length / sa.length) * 100).toFixed(1) : '–';
-            const g = avg !== '–' ? calculateGrade(parseFloat(avg), 100) : null;
-            return { ...s, avg, attPct, exams: sm.length, grade: g };
-        });
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery.order('roll_number');
+            if (!students || students.length === 0) {
+                document.getElementById('classReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>';
+                return;
+            }
 
-        const withAvg = studentStats.filter(s => s.avg !== '–');
-        const classAvg = withAvg.length > 0 ? (withAvg.reduce((a, s) => a + parseFloat(s.avg), 0) / withAvg.length).toFixed(1) : '–';
+            let marksQuery = db.from('marks').select('*, subjects(subject_name)')
+                .in('student_id', students.map(s => s.id));
+            if (exam) marksQuery = marksQuery.eq('exam_type', exam);
+            const { data: marks } = await marksQuery;
 
-        // Subject-wise stats
-        const subjectStats = {};
-        if (marks) {
-            marks.forEach(m => {
-                const subj = m.subjects?.subject_name;
-                if (!subj) return;
-                if (!subjectStats[subj]) subjectStats[subj] = { total: 0, count: 0, max: 0 };
-                subjectStats[subj].total += m.marks_obtained;
-                subjectStats[subj].max += m.max_marks;
-                subjectStats[subj].count++;
+            const { data: att } = await db.from('attendance').select('student_id, status')
+                .in('student_id', students.map(s => s.id));
+
+            const studentStats = students.map(s => {
+                const sm = marks ? marks.filter(m => m.student_id === s.id) : [];
+                const sa = att ? att.filter(a => a.student_id === s.id) : [];
+                const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
+                const attPct = sa.length > 0 ? ((sa.filter(a => a.status === 'Present').length / sa.length) * 100).toFixed(1) : '–';
+                const g = avg !== '–' ? calculateGrade(parseFloat(avg), 100) : null;
+                return { ...s, avg, attPct, exams: sm.length, grade: g };
             });
-        }
 
-        document.getElementById('classReportOutput').innerHTML = `
+            const withAvg = studentStats.filter(s => s.avg !== '–');
+            const classAvg = withAvg.length > 0 ? (withAvg.reduce((a, s) => a + parseFloat(s.avg), 0) / withAvg.length).toFixed(1) : '–';
+
+            // Subject-wise stats
+            const subjectStats = {};
+            if (marks) {
+                marks.forEach(m => {
+                    const subj = m.subjects?.subject_name;
+                    if (!subj) return;
+                    if (!subjectStats[subj]) subjectStats[subj] = { total: 0, count: 0, max: 0 };
+                    subjectStats[subj].total += m.marks_obtained;
+                    subjectStats[subj].max += m.max_marks;
+                    subjectStats[subj].count++;
+                });
+            }
+
+            document.getElementById('classReportOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>Class ${cls}${sec ? '-' + sec : ''} Report${exam ? ' — ' + exam : ''}</h3>
@@ -1178,9 +1434,9 @@
                 <div class="chart-title">Subject-wise Average Performance</div>
                 <div class="bar-chart">
                     ${Object.entries(subjectStats).map(([subj, stat]) => {
-                        const avg = ((stat.total / stat.max) * 100).toFixed(1);
-                        const color = avg >= 80 ? 'var(--success)' : avg >= 60 ? 'var(--warning)' : 'var(--danger)';
-                        return `
+                const avg = ((stat.total / stat.max) * 100).toFixed(1);
+                const color = avg >= 80 ? 'var(--success)' : avg >= 60 ? 'var(--warning)' : 'var(--danger)';
+                return `
                             <div class="bar-item">
                                 <span class="bar-label">${subj}</span>
                                 <div class="bar-track">
@@ -1191,7 +1447,7 @@
                                 <span class="bar-count">${stat.count} exams</span>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             </div>` : ''}
 
@@ -1243,75 +1499,75 @@
                 </div>
             </div>
         `;
-    }
-
-    // ========== EXAM ANALYSIS ==========
-    function updateErSubjects() {
-        const cls = document.getElementById('erClass').value;
-        const subjects = cls ? SUBJECTS_BY_CLASS[cls] : ALL_SUBJECTS;
-        document.getElementById('erSubject').innerHTML = '<option value="">All Subjects</option>' +
-            subjects.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    async function generateExamReport() {
-        const cls = document.getElementById('erClass').value;
-        const sec = document.getElementById('erSection').value;
-        const subj = document.getElementById('erSubject').value;
-        const exam = document.getElementById('erExam').value;
-
-        if (!cls) { alert('Please select a class'); return; }
-
-        let studQuery = db.from('students').select('*').eq('class_name', cls);
-        if (sec) studQuery = studQuery.eq('section', sec);
-        const { data: students } = await studQuery.order('roll_number');
-        if (!students || students.length === 0) { 
-            document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>'; 
-            return; 
         }
 
-        let subjMap = {};
-        const { data: subjData } = await db.from('subjects').select('*');
-        if (subjData) subjData.forEach(s => { subjMap[s.subject_name] = s.id; });
-
-        let marksQuery = db.from('marks').select('*, subjects(subject_name)')
-            .in('student_id', students.map(s => s.id));
-        if (subj && subjMap[subj]) marksQuery = marksQuery.eq('subject_id', subjMap[subj]);
-        if (exam) marksQuery = marksQuery.eq('exam_type', exam);
-        const { data: marks } = await marksQuery;
-
-        if (!marks || marks.length === 0) {
-            document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks found for selected criteria</p></div>';
-            return;
+        // ========== EXAM ANALYSIS ==========
+        function updateErSubjects() {
+            const cls = document.getElementById('erClass').value;
+            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : ALL_SUBJECTS;
+            document.getElementById('erSubject').innerHTML = '<option value="">All Subjects</option>' +
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
-        // Statistics
-        const allPcts = marks.map(m => (m.marks_obtained / m.max_marks) * 100);
-        const avgPct = (allPcts.reduce((a, b) => a + b, 0) / allPcts.length).toFixed(1);
-        const highest = Math.max(...allPcts).toFixed(1);
-        const lowest = Math.min(...allPcts).toFixed(1);
-        
-        // Grade distribution
-        const gradeDist = { 'A+': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0 };
-        allPcts.forEach(pct => {
-            const g = calculateGrade(pct, 100).grade;
-            if (gradeDist[g] !== undefined) gradeDist[g]++;
-        });
+        async function generateExamReport() {
+            const cls = document.getElementById('erClass').value;
+            const sec = document.getElementById('erSection').value;
+            const subj = document.getElementById('erSubject').value;
+            const exam = document.getElementById('erExam').value;
 
-        // Group by student
-        const studentMarkMap = {};
-        marks.forEach(m => {
-            if (!studentMarkMap[m.student_id]) studentMarkMap[m.student_id] = [];
-            studentMarkMap[m.student_id].push(m);
-        });
+            if (!cls) { alert('Please select a class'); return; }
 
-        const rows = students.map(s => {
-            const sm = studentMarkMap[s.id] || [];
-            const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
-            return { ...s, marks: sm, avg };
-        }).filter(s => s.marks.length > 0)
-          .sort((a, b) => (parseFloat(b.avg) || 0) - (parseFloat(a.avg) || 0));
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery.order('roll_number');
+            if (!students || students.length === 0) {
+                document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>';
+                return;
+            }
 
-        document.getElementById('examReportOutput').innerHTML = `
+            let subjMap = {};
+            const { data: subjData } = await db.from('subjects').select('*');
+            if (subjData) subjData.forEach(s => { subjMap[s.subject_name] = s.id; });
+
+            let marksQuery = db.from('marks').select('*, subjects(subject_name)')
+                .in('student_id', students.map(s => s.id));
+            if (subj && subjMap[subj]) marksQuery = marksQuery.eq('subject_id', subjMap[subj]);
+            if (exam) marksQuery = marksQuery.eq('exam_type', exam);
+            const { data: marks } = await marksQuery;
+
+            if (!marks || marks.length === 0) {
+                document.getElementById('examReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks found for selected criteria</p></div>';
+                return;
+            }
+
+            // Statistics
+            const allPcts = marks.map(m => (m.marks_obtained / m.max_marks) * 100);
+            const avgPct = (allPcts.reduce((a, b) => a + b, 0) / allPcts.length).toFixed(1);
+            const highest = Math.max(...allPcts).toFixed(1);
+            const lowest = Math.min(...allPcts).toFixed(1);
+
+            // Grade distribution
+            const gradeDist = { 'A+': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0 };
+            allPcts.forEach(pct => {
+                const g = calculateGrade(pct, 100).grade;
+                if (gradeDist[g] !== undefined) gradeDist[g]++;
+            });
+
+            // Group by student
+            const studentMarkMap = {};
+            marks.forEach(m => {
+                if (!studentMarkMap[m.student_id]) studentMarkMap[m.student_id] = [];
+                studentMarkMap[m.student_id].push(m);
+            });
+
+            const rows = students.map(s => {
+                const sm = studentMarkMap[s.id] || [];
+                const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : '–';
+                return { ...s, marks: sm, avg };
+            }).filter(s => s.marks.length > 0)
+                .sort((a, b) => (parseFloat(b.avg) || 0) - (parseFloat(a.avg) || 0));
+
+            document.getElementById('examReportOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>Class ${cls}${sec ? '-' + sec : ''} | ${subj || 'All Subjects'} | ${exam || 'All Exams'}</h3>
@@ -1352,9 +1608,9 @@
                 <div class="chart-title">Grade Distribution</div>
                 <div class="bar-chart">
                     ${Object.entries(gradeDist).filter(([g, c]) => c > 0).map(([grade, count]) => {
-                        const pct = ((count / allPcts.length) * 100).toFixed(0);
-                        const colors = { 'A+': '#065f46', 'A': '#1e40af', 'B': '#92400e', 'C': '#9a3412', 'D': '#991b1b', 'F': '#7f1d1d' };
-                        return `
+                const pct = ((count / allPcts.length) * 100).toFixed(0);
+                const colors = { 'A+': '#065f46', 'A': '#1e40af', 'B': '#92400e', 'C': '#9a3412', 'D': '#991b1b', 'F': '#7f1d1d' };
+                return `
                             <div class="bar-item">
                                 <span class="bar-label" style="font-weight: 700; color: ${colors[grade]};">Grade ${grade}</span>
                                 <div class="bar-track">
@@ -1365,7 +1621,7 @@
                                 <span class="bar-count">${pct}%</span>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             </div>
 
@@ -1388,18 +1644,18 @@
                         </thead>
                         <tbody>
                             ${rows.map((s, i) => {
-                                const g = s.avg !== '–' ? calculateGrade(parseFloat(s.avg), 100) : null;
-                                let marksCells;
-                                if (!exam) {
-                                    marksCells = EXAMS.map(e => {
-                                        const m = s.marks.find(mk => mk.exam_type === e.value);
-                                        return `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
-                                    }).join('');
-                                } else {
-                                    const m = s.marks[0];
-                                    marksCells = `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
-                                }
-                                return `<tr>
+                const g = s.avg !== '–' ? calculateGrade(parseFloat(s.avg), 100) : null;
+                let marksCells;
+                if (!exam) {
+                    marksCells = EXAMS.map(e => {
+                        const m = s.marks.find(mk => mk.exam_type === e.value);
+                        return `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
+                    }).join('');
+                } else {
+                    const m = s.marks[0];
+                    marksCells = `<td>${m ? `${m.marks_obtained}/${m.max_marks}` : '–'}</td>`;
+                }
+                return `<tr>
                                     <td style="color: var(--gray-400); font-weight: 700;">${i + 1}</td>
                                     <td><span class="badge badge-gray">${s.roll_number}</span></td>
                                     <td>
@@ -1414,55 +1670,55 @@
                                     <td><strong>${s.avg}${s.avg !== '–' ? '%' : ''}</strong></td>
                                     <td>${g ? `<span class="grade-badge ${g.cls}">${g.grade}</span>` : '–'}</td>
                                 </tr>`;
-                            }).join('')}
+            }).join('')}
                         </tbody>
                     </table>
                 </div>
             </div>
         `;
-    }
-
-    // ========== RANKINGS ==========
-    function updateRankSubjects() {
-        const cls = document.getElementById('rankClass').value;
-        const subjects = cls ? SUBJECTS_BY_CLASS[cls] : [];
-        document.getElementById('rankSubject').innerHTML = '<option value="">Overall (All Subjects)</option>' +
-            subjects.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    async function generateRankings() {
-        const cls = document.getElementById('rankClass').value;
-        const sec = document.getElementById('rankSection').value;
-        const subj = document.getElementById('rankSubject').value;
-        const exam = document.getElementById('rankExam').value;
-
-        if (!cls) { alert('Please select a class'); return; }
-
-        let studQuery = db.from('students').select('*').eq('class_name', cls);
-        if (sec) studQuery = studQuery.eq('section', sec);
-        const { data: students } = await studQuery;
-
-        if (!students || students.length === 0) {
-            document.getElementById('rankingOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div><p>No students found</p></div>';
-            return;
         }
 
-        let marksQuery = db.from('marks').select('*, subjects(subject_name)')
-            .in('student_id', students.map(s => s.id));
-        if (subj) {
-            const { data: subjData } = await db.from('subjects').select('*').eq('subject_name', subj).single();
-            if (subjData) marksQuery = marksQuery.eq('subject_id', subjData.id);
+        // ========== RANKINGS ==========
+        function updateRankSubjects() {
+            const cls = document.getElementById('rankClass').value;
+            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : [];
+            document.getElementById('rankSubject').innerHTML = '<option value="">Overall (All Subjects)</option>' +
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
         }
-        if (exam) marksQuery = marksQuery.eq('exam_type', exam);
-        const { data: marks } = await marksQuery;
 
-        const studentScores = students.map(s => {
-            const sm = marks ? marks.filter(m => m.student_id === s.id) : [];
-            const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : 0;
-            return { ...s, avg: parseFloat(avg), exams: sm.length };
-        }).filter(s => s.avg > 0).sort((a, b) => b.avg - a.avg);
+        async function generateRankings() {
+            const cls = document.getElementById('rankClass').value;
+            const sec = document.getElementById('rankSection').value;
+            const subj = document.getElementById('rankSubject').value;
+            const exam = document.getElementById('rankExam').value;
 
-        document.getElementById('rankingOutput').innerHTML = `
+            if (!cls) { alert('Please select a class'); return; }
+
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery;
+
+            if (!students || students.length === 0) {
+                document.getElementById('rankingOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div><p>No students found</p></div>';
+                return;
+            }
+
+            let marksQuery = db.from('marks').select('*, subjects(subject_name)')
+                .in('student_id', students.map(s => s.id));
+            if (subj) {
+                const { data: subjData } = await db.from('subjects').select('*').eq('subject_name', subj).single();
+                if (subjData) marksQuery = marksQuery.eq('subject_id', subjData.id);
+            }
+            if (exam) marksQuery = marksQuery.eq('exam_type', exam);
+            const { data: marks } = await marksQuery;
+
+            const studentScores = students.map(s => {
+                const sm = marks ? marks.filter(m => m.student_id === s.id) : [];
+                const avg = sm.length > 0 ? (sm.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / sm.length).toFixed(1) : 0;
+                return { ...s, avg: parseFloat(avg), exams: sm.length };
+            }).filter(s => s.avg > 0).sort((a, b) => b.avg - a.avg);
+
+            document.getElementById('rankingOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>Student Rankings ${subj ? '- ' + subj : ''} ${exam ? '(' + exam + ')' : ''}</h3>
@@ -1477,11 +1733,11 @@
 
             <div class="ranking-list">
                 ${studentScores.map((s, i) => {
-                    const rank = i + 1;
-                    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                    const g = calculateGrade(s.avg, 100);
-                    return `
+                const rank = i + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                const g = calculateGrade(s.avg, 100);
+                return `
                         <div class="ranking-item">
                             <div class="rank-number ${rankClass}">${rank}</div>
                             <div class="rank-info">
@@ -1494,47 +1750,47 @@
                             </div>
                         </div>
                     `;
-                }).join('') || '<div class="empty-state" style="padding: 3rem;"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded for ranking</p></div>'}
+            }).join('') || '<div class="empty-state" style="padding: 3rem;"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded for ranking</p></div>'}
             </div>
         `;
-    }
-
-    // ========== ATTENDANCE REPORT ==========
-    async function generateAttendanceReport() {
-        const cls = document.getElementById('attRptClass').value;
-        const sec = document.getElementById('attRptSection').value;
-        const fromDate = document.getElementById('attRptFrom').value;
-        const toDate = document.getElementById('attRptTo').value;
-
-        if (!cls) { alert('Please select a class'); return; }
-
-        let studQuery = db.from('students').select('*').eq('class_name', cls);
-        if (sec) studQuery = studQuery.eq('section', sec);
-        const { data: students } = await studQuery.order('roll_number');
-        
-        if (!students || students.length === 0) {
-            document.getElementById('attendanceReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>';
-            return;
         }
 
-        let attQuery = db.from('attendance').select('*')
-            .in('student_id', students.map(s => s.id));
-        if (fromDate) attQuery = attQuery.gte('attendance_date', fromDate);
-        if (toDate) attQuery = attQuery.lte('attendance_date', toDate);
-        
-        const { data: attendance } = await attQuery;
+        // ========== ATTENDANCE REPORT ==========
+        async function generateAttendanceReport() {
+            const cls = document.getElementById('attRptClass').value;
+            const sec = document.getElementById('attRptSection').value;
+            const fromDate = document.getElementById('attRptFrom').value;
+            const toDate = document.getElementById('attRptTo').value;
 
-        const studentAtt = students.map(s => {
-            const sa = attendance ? attendance.filter(a => a.student_id === s.id) : [];
-            const present = sa.filter(a => a.status === 'Present').length;
-            const total = sa.length;
-            const pct = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-            return { ...s, present, total, pct: parseFloat(pct) };
-        }).sort((a, b) => b.pct - a.pct);
+            if (!cls) { alert('Please select a class'); return; }
 
-        const totalDays = [...new Set(attendance?.map(a => a.attendance_date) || [])].length;
+            let studQuery = db.from('students').select('*').eq('class_name', cls);
+            if (sec) studQuery = studQuery.eq('section', sec);
+            const { data: students } = await studQuery.order('roll_number');
 
-        document.getElementById('attendanceReportOutput').innerHTML = `
+            if (!students || students.length === 0) {
+                document.getElementById('attendanceReportOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div><p>No students found</p></div>';
+                return;
+            }
+
+            let attQuery = db.from('attendance').select('*')
+                .in('student_id', students.map(s => s.id));
+            if (fromDate) attQuery = attQuery.gte('attendance_date', fromDate);
+            if (toDate) attQuery = attQuery.lte('attendance_date', toDate);
+
+            const { data: attendance } = await attQuery;
+
+            const studentAtt = students.map(s => {
+                const sa = attendance ? attendance.filter(a => a.student_id === s.id) : [];
+                const present = sa.filter(a => a.status === 'Present').length;
+                const total = sa.length;
+                const pct = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+                return { ...s, present, total, pct: parseFloat(pct) };
+            }).sort((a, b) => b.pct - a.pct);
+
+            const totalDays = [...new Set(attendance?.map(a => a.attendance_date) || [])].length;
+
+            document.getElementById('attendanceReportOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>Attendance Report - Class ${cls}${sec ? '-' + sec : ''}</h3>
@@ -1641,51 +1897,51 @@
                 </div>
             </div>
         `;
-    }
-
-    // ========== EXAM COMPARISON ==========
-    async function loadCompStudents() {
-        const cls = document.getElementById('compClass').value;
-        const sec = document.getElementById('compSection').value;
-        if (!cls) return;
-
-        let query = db.from('students').select('*').eq('class_name', cls);
-        if (sec) query = query.eq('section', sec);
-        const { data } = await query.order('roll_number');
-        compStudentsList = data || [];
-
-        const sel = document.getElementById('compStudent');
-        sel.innerHTML = '<option value="">Select Student</option>' +
-            compStudentsList.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
-    }
-
-    async function generateComparison() {
-        const studentId = document.getElementById('compStudent').value;
-        if (!studentId) { alert('Please select a student'); return; }
-        const student = compStudentsList.find(s => s.id == studentId);
-
-        const { data: marks } = await db.from('marks')
-            .select('*, subjects(subject_name)')
-            .eq('student_id', studentId)
-            .order('exam_type');
-
-        if (!marks || marks.length === 0) {
-            document.getElementById('comparisonOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded for comparison</p></div>';
-            return;
         }
 
-        // Group by subject
-        const subjectData = {};
-        marks.forEach(m => {
-            const subj = m.subjects?.subject_name || 'Unknown';
-            if (!subjectData[subj]) subjectData[subj] = {};
-            subjectData[subj][m.exam_type] = (m.marks_obtained / m.max_marks) * 100;
-        });
+        // ========== EXAM COMPARISON ==========
+        async function loadCompStudents() {
+            const cls = document.getElementById('compClass').value;
+            const sec = document.getElementById('compSection').value;
+            if (!cls) return;
 
-        const subjects = Object.keys(subjectData);
-        const exams = ['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'];
+            let query = db.from('students').select('*').eq('class_name', cls);
+            if (sec) query = query.eq('section', sec);
+            const { data } = await query.order('roll_number');
+            compStudentsList = data || [];
 
-        document.getElementById('comparisonOutput').innerHTML = `
+            const sel = document.getElementById('compStudent');
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                compStudentsList.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
+        }
+
+        async function generateComparison() {
+            const studentId = document.getElementById('compStudent').value;
+            if (!studentId) { alert('Please select a student'); return; }
+            const student = compStudentsList.find(s => s.id == studentId);
+
+            const { data: marks } = await db.from('marks')
+                .select('*, subjects(subject_name)')
+                .eq('student_id', studentId)
+                .order('exam_type');
+
+            if (!marks || marks.length === 0) {
+                document.getElementById('comparisonOutput').innerHTML = '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded for comparison</p></div>';
+                return;
+            }
+
+            // Group by subject
+            const subjectData = {};
+            marks.forEach(m => {
+                const subj = m.subjects?.subject_name || 'Unknown';
+                if (!subjectData[subj]) subjectData[subj] = {};
+                subjectData[subj][m.exam_type] = (m.marks_obtained / m.max_marks) * 100;
+            });
+
+            const subjects = Object.keys(subjectData);
+            const exams = ['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'];
+
+            document.getElementById('comparisonOutput').innerHTML = `
             <div class="result-header-bar">
                 <div>
                     <h3>Exam Performance Comparison</h3>
@@ -1714,32 +1970,32 @@
                         </thead>
                         <tbody>
                             ${subjects.map(subj => {
-                                const scores = exams.map(e => subjectData[subj][e]).filter(s => s !== undefined);
-                                const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
-                                
-                                // Calculate trend
-                                let trend = '→';
-                                let trendClass = 'trend-same';
-                                if (scores.length >= 2) {
-                                    const first = scores[0];
-                                    const last = scores[scores.length - 1];
-                                    if (last > first + 5) { trend = '↑'; trendClass = 'trend-up'; }
-                                    else if (last < first - 5) { trend = '↓'; trendClass = 'trend-down'; }
-                                }
+                const scores = exams.map(e => subjectData[subj][e]).filter(s => s !== undefined);
+                const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
 
-                                return `<tr>
+                // Calculate trend
+                let trend = '→';
+                let trendClass = 'trend-same';
+                if (scores.length >= 2) {
+                    const first = scores[0];
+                    const last = scores[scores.length - 1];
+                    if (last > first + 5) { trend = '↑'; trendClass = 'trend-up'; }
+                    else if (last < first - 5) { trend = '↓'; trendClass = 'trend-down'; }
+                }
+
+                return `<tr>
                                     <td><strong>${subj}</strong></td>
                                     ${exams.map(e => {
-                                        const score = subjectData[subj][e];
-                                        const color = score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)';
-                                        return `<td style="${score ? 'color: ' + color + '; font-weight: 600;' : 'color: var(--gray-300);'}">
+                    const score = subjectData[subj][e];
+                    const color = score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)';
+                    return `<td style="${score ? 'color: ' + color + '; font-weight: 600;' : 'color: var(--gray-300);'}">
                                             ${score ? score.toFixed(1) + '%' : '–'}
                                         </td>`;
-                                    }).join('')}
+                }).join('')}
                                     <td><strong>${avg}%</strong></td>
                                     <td class="${trendClass}" style="font-size: 1.2rem; font-weight: 700;">${trend}</td>
                                 </tr>`;
-                            }).join('')}
+            }).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -1749,10 +2005,10 @@
                 <div class="chart-title">Performance Trend by Subject</div>
                 <div class="bar-chart">
                     ${subjects.map(subj => {
-                        const scores = exams.map(e => subjectData[subj][e]).filter(s => s !== undefined);
-                        const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
-                        const color = avg >= 80 ? 'var(--success)' : avg >= 60 ? 'var(--warning)' : 'var(--danger)';
-                        return `
+                const scores = exams.map(e => subjectData[subj][e]).filter(s => s !== undefined);
+                const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
+                const color = avg >= 80 ? 'var(--success)' : avg >= 60 ? 'var(--warning)' : 'var(--danger)';
+                return `
                             <div class="bar-item">
                                 <span class="bar-label">${subj}</span>
                                 <div class="bar-track">
@@ -1763,11 +2019,12 @@
                                 <span class="bar-count">${scores.length} exams</span>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             </div>
         `;
-    }
-</script>
+        }
+    </script>
 </body>
+
 </html>
