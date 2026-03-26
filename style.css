@@ -1230,7 +1230,7 @@
 
         .bnav-center {
             flex: 0 0 auto;
-            padding: .375rem 1.25rem;
+            /* padding: .375rem 1.25rem; */
         }
 
         .bnav-fab {
