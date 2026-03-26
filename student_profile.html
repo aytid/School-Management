@@ -432,7 +432,7 @@
         document.getElementById('profileDisplayClass').textContent = `Class ${student.class_name || '-'}`;
         document.getElementById('infoName').textContent = student.name;
         document.getElementById('infoUsername').textContent = student.roll_number || student.id.substring(0, 8);
-        document.getElementById('infoClass').textContent = student.class_name || '-';
+        document.getElementById('infoClass').textContent = student.class_name + student.section || '-';
 
         document.getElementById('sidebarName').textContent = student.name;
         document.getElementById('sidebarClass').textContent = `Class ${student.class_name || '-'}`;
