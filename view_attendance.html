@@ -14,37 +14,152 @@
         /* Attendance Banner & Ring */
         .attendance-banner {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            border-radius: 1rem; padding: 2rem; color: white; margin-bottom: 2rem;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 1.5rem; position: relative; overflow: hidden;
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .ring-container { position: relative; width: 120px; height: 120px; flex-shrink: 0; z-index: 1; }
-        .ring-container svg { transform: rotate(-90deg); width: 120px; height: 120px; }
-        .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .ring-pct-lg { font-size: 1.75rem; font-weight: 800; }
-        .ring-label { font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
 
-        .att-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .att-stat-card { background: white; padding: 1.25rem; border-radius: 1rem; text-align: center; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
-        .att-stat-val { font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.25rem; }
-        .att-stat-label { font-size: 0.75rem; color: #9ca3af; font-weight: 600; }
+        .ring-container svg {
+            transform: rotate(-90deg);
+            width: 120px;
+            height: 120px;
+        }
 
-        .month-card { background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); margin-bottom: 1.5rem; }
-        .month-card-header { padding: 1.25rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 1.25rem; }
-        .cal-day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: #9ca3af; padding-bottom: 0.5rem; }
-        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.8rem; font-weight: 600; background: #f9fafb; color: #6b7280; }
-        .cal-date.present { background: #d1fae5; color: #059669; }
-        .cal-date.absent { background: #fee2e2; color: #dc2626; }
+        .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
 
-        .user-avatar img, .profile-avatar-mobile img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;
+        .ring-pct-lg {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .ring-label {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .att-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .att-stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .att-stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .att-stat-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .month-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .month-card-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            padding: 1.25rem;
+        }
+
+        .cal-day-name {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #9ca3af;
+            padding-bottom: 0.5rem;
+        }
+
+        .cal-date {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #f9fafb;
+            color: #6b7280;
+        }
+
+        .cal-date.present {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .cal-date.absent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-avatar img,
+        .profile-avatar-mobile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
         }
 
         @media (max-width: 640px) {
-            .attendance-banner { flex-direction: column-reverse; text-align: center; padding: 1.5rem; }
-            .att-stats-grid { gap: 0.5rem; }
+            .attendance-banner {
+                flex-direction: column-reverse;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .att-stats-grid {
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -65,7 +180,13 @@
                 <div class="nav-section">
                     <div class="nav-label">Main</div>
                     <a href="student_dashboard.html" class="nav-item">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg></span>
                         <span>Dashboard</span>
                     </a>
                 </div>
@@ -73,17 +194,27 @@
                 <div class="nav-section">
                     <div class="nav-label">My Records</div>
                     <a href="view_marks.html" class="nav-item">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg></span>
                         <span>My Marks</span>
                     </a>
                     <a href="view_attendance.html" class="nav-item active">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /><path d="M9 14l2 2 4-4" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg></span>
                         <span>My Attendance</span>
                     </a>
                     <a href="view_homework.html" class="nav-item">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                <path
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </span>
                         <span>My Homework</span>
@@ -100,7 +231,11 @@
             </nav>
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg> Sign Out
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg> Sign Out
                 </button>
             </div>
         </aside>
@@ -109,12 +244,17 @@
 
         <div class="main-content">
             <header class="mobile-header">
-                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+                <button class="hamburger" id="hamburgerBtn"
+                    onclick="toggleSidebar()"><span></span><span></span><span></span></button>
                 <div class="mobile-brand"><span>ZPHS Nagulapet</span></div>
                 <div style="width: 36px;"></div>
             </header>
 
-            <div class="desktop-topbar"><div class="page-title"><h1>Attendance Records</h1></div></div>
+            <div class="desktop-topbar">
+                <div class="page-title">
+                    <h1>Attendance Records</h1>
+                </div>
+            </div>
 
             <div class="page-content">
                 <div class="attendance-banner" id="bannerTheme">
@@ -124,20 +264,30 @@
                     </div>
                     <div class="ring-container">
                         <svg viewBox="0 0 120 120">
-                            <circle fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="10" cx="60" cy="60" r="52"/>
-                            <circle id="attRing" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+                            <circle fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="10" cx="60" cy="60"
+                                r="52" />
+                            <circle id="attRing" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"
+                                cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7" />
                         </svg>
-                        <div class="ring-text"><div class="ring-pct-lg" id="pctDisplay">0%</div><div class="ring-label">Present</div></div>
+                        <div class="ring-text">
+                            <div class="ring-pct-lg" id="pctDisplay">0%</div>
+                            <div class="ring-label">Present</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="att-stats-grid">
-                    <div class="att-stat-card"><span class="att-stat-val" style="color:#059669" id="presentCount">0</span><span class="att-stat-label">Days Present</span></div>
-                    <div class="att-stat-card"><span class="att-stat-val" style="color:#dc2626" id="absentCount">0</span><span class="att-stat-label">Days Absent</span></div>
-                    <div class="att-stat-card"><span class="att-stat-val" style="color:#4f46e5" id="totalCount">0</span><span class="att-stat-label">Working Days</span></div>
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#059669"
+                            id="presentCount">0</span><span class="att-stat-label">Days Present</span></div>
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#dc2626"
+                            id="absentCount">0</span><span class="att-stat-label">Days Absent</span></div>
+                    <div class="att-stat-card"><span class="att-stat-val" style="color:#4f46e5"
+                            id="totalCount">0</span><span class="att-stat-label">Working Days</span></div>
                 </div>
 
-                <div id="monthHistory"><div class="loading-state">Loading calendar...</div></div>
+                <div id="monthHistory">
+                    <div class="loading-state">Loading calendar...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -165,10 +315,10 @@
         </a>
         <a href="view_homework.html" class="bnav-item">
             <span class="bnav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    <path d="M9 14l2 2 4-4" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
             </span>
             <span class="bnav-label">Homework</span>

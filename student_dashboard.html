@@ -24,7 +24,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .profile-banner::before {
             content: '';
             position: absolute;
@@ -32,7 +32,7 @@
             right: -20%;
             width: 300px;
             height: 300px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
         }
 
@@ -40,8 +40,8 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: 3px solid rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -51,7 +51,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .profile-avatar-lg img {
             width: 100%;
             height: 100%;
@@ -63,23 +63,23 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .profile-details h2 {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
         }
-        
+
         .profile-details p {
             opacity: 0.85;
             font-size: 0.9rem;
             margin-bottom: 0.15rem;
         }
-        
+
         .profile-pill {
             display: inline-flex;
             align-items: center;
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             padding: 0.3rem 0.875rem;
             border-radius: 9999px;
             font-size: 0.8rem;
@@ -101,13 +101,13 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon-wrap {
@@ -179,14 +179,14 @@
             gap: 1rem;
             text-decoration: none;
             color: inherit;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
             border: 2px solid transparent;
         }
 
         .action-tile:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border-color: #e5e7eb;
         }
 
@@ -298,7 +298,7 @@
 
         .mark-chip:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .mark-chip .mc-subject {
@@ -384,7 +384,7 @@
         .card {
             background: white;
             border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             margin-bottom: 2rem;
         }
 
@@ -437,7 +437,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .empty-state {
@@ -492,7 +494,7 @@
                 </div>
             </a>
             <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
-            
+
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-label">Main</div>
@@ -533,7 +535,8 @@
                     <a href="view_homework.html" class="nav-item">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                <path
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </span>
                         <span>My Homework</span>
@@ -621,7 +624,8 @@
                     <div class="stat-card">
                         <div class="stat-icon-wrap emerald">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <path
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
                         <div class="stat-body">
@@ -645,7 +649,8 @@
                     <div class="stat-card">
                         <div class="stat-icon-wrap violet">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                <path
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </div>
                         <div class="stat-body">
@@ -755,10 +760,10 @@
         </a>
         <a href="view_homework.html" class="bnav-item">
             <span class="bnav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    <path d="M9 14l2 2 4-4" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
             </span>
             <span class="bnav-label">Homework</span>
@@ -807,7 +812,7 @@
 
         /* ── Populate user info ── */
         const initials = student?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'S';
-        
+
         // Desktop sidebar avatar
         const sidebarAvatar = document.getElementById('sidebarAvatar');
         if (sidebarAvatar) {
@@ -817,7 +822,7 @@
                 sidebarAvatar.textContent = initials;
             }
         }
-        
+
         // Mobile profile avatar
         const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
         if (sidebarProfileAvatar) {
@@ -891,16 +896,16 @@
                     document.getElementById('recentMarksContainer').innerHTML = `
                         <div class="recent-marks-grid">
                             ${marks.slice(0, 12).map(m => {
-                                const g = calculateGrade(m.marks_obtained, m.max_marks);
-                                const pct = ((m.marks_obtained / m.max_marks) * 100).toFixed(0);
-                                return `<div class="mark-chip">
+                        const g = calculateGrade(m.marks_obtained, m.max_marks);
+                        const pct = ((m.marks_obtained / m.max_marks) * 100).toFixed(0);
+                        return `<div class="mark-chip">
                                     <div class="mc-subject">${m.subjects?.subject_name || '–'}</div>
                                     <div class="mc-exam"><span class="badge badge-blue">${m.exam_type}</span></div>
                                     <div class="mc-score">${m.marks_obtained}</div>
                                     <div class="mc-max">/${m.max_marks} (${pct}%)</div>
                                     <div style="margin-top:0.5rem"><span class="grade-tag ${g.cls}">${g.grade}</span></div>
                                 </div>`;
-                            }).join('')}
+                    }).join('')}
                         </div>
                     `;
                 } else {
