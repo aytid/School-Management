@@ -306,6 +306,7 @@
             font-size: .875rem;
             font-weight: 500;
             transition: all .2s;
+            margin-top: 10px;
         }
 
         .btn-logout svg {

@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Assign Homework - ZPHS Nagulapet</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #e5e7eb;
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #4f46e5;
+            background: #f5f3ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area svg {
+            width: 48px;
+            height: 48px;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+
+        .upload-area:hover svg {
+            color: #4f46e5;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #4f46e5;
+            font-weight: 700;
+            background: #eef2ff;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+
+        .upload-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+
+        .upload-sub {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 0rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid #4f46e5;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        /* Sidebar open state for mobile */
+        .sidebar.open {
+            transform: translateX(0);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Mobile profile section */
+        .sidebar-profile-mobile {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-profile-mobile {
+                display: flex;
+            }
+
+            .sidebar-user {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .sidebar-profile-mobile {
+                display: none !important;
+            }
+
+            .sidebar-user {
+                display: flex !important;
+            }
+        }
+
+        /* Tab Styles */
+        .tabs-container {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--gray-700);
+            background: var(--gray-100);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: var(--white);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Homework List Styles */
+        .homework-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .homework-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: var(--gray-50);
+            border-radius: var(--r);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+
+        .homework-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .homework-info {
+            flex: 1;
+        }
+
+        .homework-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .homework-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            flex-wrap: wrap;
+        }
+
+        .homework-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .homework-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r);
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--rose-50);
+            border-color: var(--rose-200);
+            color: var(--rose-500);
+        }
+
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .empty-state-homework {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-400);
+        }
+
+        .empty-state-homework svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.35;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-green {
+            background: var(--emerald-100);
+            color: #065f46;
+        }
+
+        .badge-amber {
+            background: var(--amber-100);
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .tabs-header {
+                flex-direction: row;
+            }
+
+            .tab-btn {
+                padding: 0.875rem 1rem;
+                font-size: 0.8125rem;
+            }
+
+            .homework-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .homework-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
+                </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <a href="teacher_dashboard.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Academic</div>
+                    <a href="enter_marks.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
+                    </a>
+                    <a href="take_attendance.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
+                    </a>
+                    <a href="assign_homework.html" class="nav-item active">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12" />
+                            </svg>
+                        </span>
+                        <span>Assign Homework</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Management</div>
+                    <a href="view_students.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
+                    </a>
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <a href="profile.html" class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">T</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName">Teacher Name</div>
+                        <div class="user-role" id="sidebarDesignation">Teacher</div>
+                    </div>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <div class="main-content">
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand"><span>ZPHS Nagulapet</span></div>
+                <div style="width: 36px;"></div>
+            </header>
+
+            <div class="desktop-topbar">
+                <div class="page-title">
+                    <h1>Assign Homework</h1>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('new')" data-tab="new">
+                            New Homework
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('list')" data-tab="list">
+                            All Homeworks
+                        </button>
+                    </div>
+
+                    <!-- New Homework Tab -->
+                    <div class="tab-content active" id="tab-new">
+                        <div class="card" style="border: none; box-shadow: none;">
+                            <div class="card-head">
+                                <h2 class="card-title">Homework Details</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Homework Title *</label>
+                                        <input type="text" id="hwTitle" placeholder="e.g., Trigonometry Exercise 1.2">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Class *</label>
+                                        <select id="hwClass" onchange="onClassChange()">
+                                            <option value="">Select Class</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Section *</label>
+                                        <select id="hwSection">
+                                            <option value="">Select Section</option>
+                                            <option>A</option>
+                                            <option>B</option>
+                                            <option>C</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Subject *</label>
+                                        <select id="hwSubject">
+                                            <option value="">Select Subject</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Submission Deadline</label>
+                                        <input type="date" id="hwDueDate">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-top:2rem">
+                                    <label class="form-label">Homework Document *</label>
+                                    <div class="upload-area" id="dropZone" onclick="document.getElementById('hwFile').click()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12" />
+                                        </svg>
+                                        <div class="upload-label">Click to select file</div>
+                                        <div class="upload-sub">PDF, Word, or Images up to 10MB</div>
+                                        <input type="file" id="hwFile" hidden onchange="updateFileName()">
+                                        <div id="fileNameDisplay" class="file-info" style="display:none"></div>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary" style="margin-top:2rem; width:100%; height:3.5rem; font-size:1.1rem" onclick="submitHomework()">
+                                    Post Homework
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Homeworks Tab -->
+                    <div class="tab-content" id="tab-list">
+                        <div class="filter-card" style="margin-bottom: 1.5rem;">
+                            <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Class</label>
+                                    <select id="filterClass" onchange="onFilterClassChange(); loadAllHomeworks()">
+                                        <option value="">All Classes</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Section</label>
+                                    <select id="filterSection" onchange="loadAllHomeworks()">
+                                        <option value="">All Sections</option>
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Filter by Subject</label>
+                                    <select id="filterSubject" onchange="loadAllHomeworks()">
+                                        <option value="">All Subjects</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="homeworkListContainer" class="homework-list">
+                            <!-- Homework items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon bnav-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="view_students.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+            </span>
+            <span class="bnav-label">Students</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
+                </svg>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="config.js"></script>
+    <script>
+        /* ── Session guard ── */
+        const teacher = getSession('teacher');
+        if (!teacher) window.location.href = 'index.html';
+
+        /* ── Sidebar toggle ── */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        // Names
+        const sidebarName = document.getElementById('sidebarName');
+        if (sidebarName) sidebarName.textContent = teacher.name || 'Teacher';
+
+        const sidebarDesignation = document.getElementById('sidebarDesignation');
+        if (sidebarDesignation) sidebarDesignation.textContent = teacher.designation || 'Teacher';
+
+        const sidebarProfileName = document.getElementById('sidebarProfileName');
+        if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
+
+        /* ── Tab Switching ── */
+        function switchTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) btn.classList.add('active');
+            });
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Load homeworks when switching to list tab
+            if (tabName === 'list') {
+                loadAllHomeworks();
+            }
+        }
+
+        /* ── Subject filtering based on class (same as enter_marks.html) ── */
+        let subjectIdMap = {};
+        let subjectNameMap = {};
+
+        async function loadSubjectIds() {
+            const { data } = await db.from('subjects').select('*');
+            if (data) {
+                data.forEach(s => {
+                    subjectIdMap[s.subject_name] = s.id;
+                    subjectNameMap[s.id] = s.subject_name;
+                });
+            }
+        }
+
+        function onClassChange() {
+            const cls = document.getElementById('hwClass').value;
+            const subSel = document.getElementById('hwSubject');
+            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : [];
+            subSel.innerHTML = '<option value="">Select Subject</option>' +
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        /* ── Filter Subject Dropdown Logic ── */
+        function onFilterClassChange() {
+            const cls = document.getElementById('filterClass').value;
+            const subSel = document.getElementById('filterSubject');
+            
+            if (!cls) {
+                // If no class selected, show all subjects
+                const allSubjects = [...new Set(Object.values(SUBJECTS_BY_CLASS).flat())].sort();
+                subSel.innerHTML = '<option value="">All Subjects</option>' +
+                    allSubjects.map(s => `<option value="${s}">${s}</option>`).join('');
+            } else {
+                // Show subjects for selected class
+                const subjects = SUBJECTS_BY_CLASS[cls] || [];
+                subSel.innerHTML = '<option value="">All Subjects</option>' +
+                    subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+            }
+        }
+
+        /* ── Homework Logic ── */
+        function updateFileName() {
+            const file = document.getElementById('hwFile').files[0];
+            const display = document.getElementById('fileNameDisplay');
+            if (file) {
+                display.textContent = `Selected: ${file.name}`;
+                display.style.display = 'inline-block';
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        async function submitHomework() {
+            const file = document.getElementById('hwFile').files[0];
+            const title = document.getElementById('hwTitle').value.trim();
+            const cls = document.getElementById('hwClass').value;
+            const sec = document.getElementById('hwSection').value;
+            const subName = document.getElementById('hwSubject').value;
+            const due = document.getElementById('hwDueDate').value;
+
+            // Validation: Ensure all required fields and a file are present
+            if (!file || !title || !cls || !sec || !subName) {
+                showToast("Please fill all required fields and select a file", "error");
+                return;
+            }
+
+            // Get subject ID from name
+            const subjectId = subjectIdMap[subName];
+            if (!subjectId) {
+                showToast('Subject not found in database', 'error');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-primary');
+            btn.disabled = true;
+            btn.textContent = "Uploading...";
+
+            try {
+                // SANITIZATION: Replace any character that is NOT a letter, number, dot, or dash with an underscore
+                const sanitizedName = file.name.replace(/[^a-z0-9.-]/gi, '_');
+                const fileName = `${Date.now()}_${sanitizedName}`;
+
+                // 1. Upload the physical file to Supabase Storage bucket 'homework'
+                const { data: uploadData, error: uploadError } = await db.storage
+                    .from('homework')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                // 2. Retrieve the Public URL for the uploaded file
+                const { data: urlData } = db.storage.from('homework').getPublicUrl(fileName);
+
+                // 3. Insert the homework metadata and file link into the 'homework' database table
+                const { error: dbError } = await db.from('homework').insert({
+                    title: title,
+                    class_name: cls,
+                    section: sec,
+                    subject_id: subjectId,
+                    due_date: due || null,
+                    file_url: urlData.publicUrl,
+                    created_by: teacher.id
+                });
+
+                if (dbError) throw dbError;
+
+                // Success: Notify the user and reset form
+                showToast("Homework assigned successfully!", "success");
+
+                // Reset form
+                document.getElementById('hwTitle').value = '';
+                document.getElementById('hwClass').value = '';
+                document.getElementById('hwSection').value = '';
+                document.getElementById('hwSubject').innerHTML = '<option value="">Select Subject</option>';
+                document.getElementById('hwDueDate').value = '';
+                document.getElementById('hwFile').value = '';
+                document.getElementById('fileNameDisplay').style.display = 'none';
+
+                btn.disabled = false;
+                btn.textContent = "Post Homework";
+
+            } catch (err) {
+                console.error('Detailed Error:', err);
+                showToast(`Failed: ${err.message || "Please try again."}`, "error");
+                btn.disabled = false;
+                btn.textContent = "Post Homework";
+            }
+        }
+
+        /* ── Load All Homeworks ── */
+        async function loadAllHomeworks() {
+            const container = document.getElementById('homeworkListContainer');
+            const filterClass = document.getElementById('filterClass').value;
+            const filterSection = document.getElementById('filterSection').value;
+            const filterSubject = document.getElementById('filterSubject').value;
+
+            container.innerHTML = '<div class="empty-state-homework"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4m-4-8H4m16 0h-4m-2-6h-4v12h4V6z"/></svg><p>Loading...</p></div>';
+
+            try {
+                let query = db.from('homework')
+                    .select('*, subjects(subject_name)')
+                    .order('created_at', { ascending: false });
+
+                if (filterClass) query = query.eq('class_name', filterClass);
+                if (filterSection) query = query.eq('section', filterSection);
+                if (filterSubject) {
+                    const subjectId = subjectIdMap[filterSubject];
+                    if (subjectId) query = query.eq('subject_id', subjectId);
+                }
+
+                const { data: homeworks, error } = await query;
+
+                if (error) throw error;
+
+                if (!homeworks || homeworks.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state-homework">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p>No homeworks found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = homeworks.map(hw => {
+                    const subjectName = hw.subjects?.subject_name || subjectNameMap[hw.subject_id] || 'Unknown';
+                    const dueDate = hw.due_date ? new Date(hw.due_date).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    }) : 'No deadline';
+                    const isOverdue = hw.due_date && new Date(hw.due_date) < new Date() && new Date(hw.due_date).toDateString() !== new Date().toDateString();
+
+                    return `
+                        <div class="homework-item" id="hw-item-${hw.id}">
+                            <div class="homework-info">
+                                <div class="homework-title">${hw.title}</div>
+                                <div class="homework-meta">
+                                    <span class="badge badge-blue">Class ${hw.class_name}-${hw.section}</span>
+                                    <span class="badge badge-green">${subjectName}</span>
+                                    <span class="badge ${isOverdue ? 'badge-amber' : 'badge-blue'}">
+                                        Due: ${dueDate}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="homework-actions">
+                                <a href="${hw.file_url}" target="_blank" class="btn-icon" title="View/Download" style="text-decoration: none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                <button class="btn-icon" onclick="deleteHomework(${hw.id}, '${hw.file_url}')" title="Delete">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('Error loading homeworks:', err);
+                container.innerHTML = `
+                    <div class="empty-state-homework">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p>Error loading homeworks</p>
+                    </div>
+                `;
+            }
+        }
+
+        /* ── Delete Homework ── */
+        async function deleteHomework(id, fileUrl) {
+            if (!confirm('Are you sure you want to delete this homework? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                // Extract filename from URL
+                const fileName = fileUrl.split('/').pop();
+
+                // Delete from storage first
+                if (fileName) {
+                    await db.storage.from('homework').remove([fileName]);
+                }
+
+                // Delete from database
+                const { error } = await db.from('homework').delete().eq('id', id);
+
+                if (error) throw error;
+
+                // Remove from UI
+                const item = document.getElementById(`hw-item-${id}`);
+                if (item) item.remove();
+
+                showToast('Homework deleted successfully', 'success');
+
+                // Reload if no items left
+                const remaining = document.querySelectorAll('.homework-item');
+                if (remaining.length === 0) {
+                    loadAllHomeworks();
+                }
+
+            } catch (err) {
+                console.error('Error deleting homework:', err);
+                showToast('Failed to delete homework', 'error');
+            }
+        }
+
+        /* ── Toast ── */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        // Load subject IDs on page load and initialize filter dropdown
+        loadSubjectIds().then(() => {
+            // Initialize filter subject dropdown with all subjects
+            onFilterClassChange();
+        });
+    </script>
+</body>
+
+</html>

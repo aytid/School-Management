@@ -56,7 +56,7 @@
             font-weight: 800;
             color: #4f46e5;
             border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -144,33 +144,42 @@
                 grid-template-columns: 1fr;
             }
         }
+
         /* Toast Notifications */
-.toast {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    z-index: 10000;
-    transform: translateX(120%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border-left: 4px solid #4f46e5;
-    font-weight: 500;
-    color: #1f2937;
-}
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid #4f46e5;
+            font-weight: 500;
+            color: #1f2937;
+        }
 
-.toast.show {
-    transform: translateX(0);
-}
+        .toast.show {
+            transform: translateX(0);
+        }
 
-.toast.success { border-left-color: #10b981; }
-.toast.error { border-left-color: #ef4444; }
-.toast.warning { border-left-color: #f59e0b; }
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
     </style>
 </head>
 
@@ -190,19 +199,42 @@
                 <div class="nav-section">
                     <div class="nav-label">Main</div>
                     <a href="student_dashboard.html" class="nav-item">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg></span>
                         <span>Dashboard</span>
                     </a>
                 </div>
                 <div class="nav-section">
                     <div class="nav-label">My Records</div>
                     <a href="view_marks.html" class="nav-item">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg></span>
                         <span>My Marks</span>
                     </a>
                     <a href="view_attendance.html" class="nav-item">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /><path d="M9 14l2 2 4-4" /></svg></span>
+                        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg></span>
                         <span>My Attendance</span>
+                    </a>
+                    <a href="view_homework.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </span>
+                        <span>My Homework</span>
                     </a>
                 </div>
 
@@ -216,7 +248,11 @@
             </nav>
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
                     Sign Out
                 </button>
             </div>
@@ -234,7 +270,9 @@
             </header>
 
             <div class="desktop-topbar">
-                <div class="page-title"><h1>My Profile</h1></div>
+                <div class="page-title">
+                    <h1>My Profile</h1>
+                </div>
             </div>
 
             <div class="page-content">
@@ -274,6 +312,14 @@
                                 <button class="btn-change-password" onclick="showChangePassword()">
                                     Update Password
                                 </button>
+                                <button class="btn-logout" onclick="logout()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                        <path d="M16 17l5-5-5-5" />
+                                        <path d="M21 12H9" />
+                                    </svg>
+                                    Sign Out
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -309,21 +355,54 @@
         </div>
     </div>
 
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" id="bottomNav">
         <a href="student_dashboard.html" class="bnav-item">
-            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg></span>
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </span>
             <span class="bnav-label">Home</span>
         </a>
         <a href="view_marks.html" class="bnav-item">
-            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></span>
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+            </span>
             <span class="bnav-label">Marks</span>
         </a>
+        <a href="view_homework.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
+            <span class="bnav-label">Homework</span>
+        </a>
         <a href="view_attendance.html" class="bnav-item">
-            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /><path d="M9 14l2 2 4-4" /></svg></span>
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
             <span class="bnav-label">Attendance</span>
         </a>
         <a href="student_profile.html" class="bnav-item active">
-            <span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span>
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+            </span>
             <span class="bnav-label">Profile</span>
         </a>
     </nav>
@@ -347,11 +426,11 @@
 
         /* ── Populating Data ── */
         const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        
+
         document.getElementById('profileName').textContent = student.name;
         document.getElementById('profileDisplayClass').textContent = `Class ${student.class_name || '-'}`;
         document.getElementById('infoName').textContent = student.name;
-        document.getElementById('infoUsername').textContent = student.roll_number || student.id.substring(0,8);
+        document.getElementById('infoUsername').textContent = student.roll_number || student.id.substring(0, 8);
         document.getElementById('infoClass').textContent = student.class_name || '-';
 
         document.getElementById('sidebarName').textContent = student.name;
@@ -382,7 +461,7 @@
             const confirm = document.getElementById('confirmPassword').value;
 
             if (newPass !== confirm) return showToast("Passwords don't match");
-            
+
             try {
                 // Verify current password from 'students' table
                 const { data, error } = await db.from('students')
@@ -402,29 +481,30 @@
             }
         }
         /* ── Toast Notification System ── */
-function showToast(message, type = 'success') {
-    // Remove existing toast if any
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
+        function showToast(message, type = 'success') {
+            // Remove existing toast if any
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    // Add icon based on type
-    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
-    toast.innerHTML = `<span>${icon}</span> ${message}`;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
 
-    document.body.appendChild(toast);
+            // Add icon based on type
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            toast.innerHTML = `<span>${icon}</span> ${message}`;
 
-    // Trigger animation
-    setTimeout(() => toast.classList.add('show'), 10);
+            document.body.appendChild(toast);
 
-    // Auto-remove
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto-remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     </script>
 </body>
+
 </html>
