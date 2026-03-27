@@ -680,6 +680,8 @@
             document.getElementById('sidebarOverlay').classList.remove('active');
             document.getElementById('hamburgerBtn').classList.remove('active');
         }
+        
+        const teacher = JSON.parse(localStorage.getItem("school_session"));
         if (!teacher) window.location.href = 'index.html';
 
         /* ── Populate user info ── */
