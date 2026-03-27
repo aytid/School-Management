@@ -15,7 +15,6 @@
             display: flex;
             gap: 0;
             border-bottom: 2px solid var(--gray-200);
-            margin-bottom: 1.5rem;
         }
 
         .user-tab {
@@ -194,6 +193,342 @@
         .toast.hiding {
             animation: slideOut 0.3s ease forwards;
         }
+
+        /* Card Grid Styles - Similar to view_students */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .user-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+
+        .user-card-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            background: #4f46e5;
+        }
+
+        .user-card-avatar.teacher {
+            background: linear-gradient(135deg, var(--indigo-500), var(--indigo-700));
+        }
+
+        .user-card-avatar.student {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .user-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-card-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-card-detail {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .user-card-badges {
+            margin-top: 0.4rem;
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .user-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: column;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .btn-icon:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-400);
+            grid-column: 1 / -1;
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .filter-count {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            margin-left: auto;
+            align-self: center;
+        }
+
+        /* ───────── MODAL OVERLAY ───────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        /* ───────── MODAL BOX ───────── */
+        .modal {
+            background: var(--white);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+            animation: modalPop 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ───────── MODAL HEADER ───────── */
+        .modal-header {
+            padding: 1.3rem 1.6rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header div:first-child {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .modal-header div:last-child {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        /* ───────── CLOSE BUTTON ───────── */
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--rose-100);
+            color: var(--rose-600);
+        }
+
+        /* ───────── MODAL BODY ───────── */
+        .modal-body {
+            padding: 1.6rem;
+            overflow-y: auto;
+        }
+
+        /* better spacing for form grid inside modal */
+        .modal-body .form-grid {
+            gap: 1.1rem;
+        }
+
+        /* inputs inside modal */
+        .modal-body input,
+        .modal-body select {
+            width: 100%;
+            padding: 0.6rem 0.7rem;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+        }
+
+        .modal-body input:focus,
+        .modal-body select:focus {
+            border-color: var(--indigo-500);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+            outline: none;
+        }
+
+        /* ───────── MODAL FOOTER ───────── */
+        .modal-footer {
+            padding: 1rem 1.6rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            background: var(--gray-50);
+        }
+
+        /* buttons */
+        .modal-footer .btn {
+            padding: 0.45rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        /* ───────── ANIMATIONS ───────── */
+        @keyframes modalPop {
+            from {
+                transform: translateY(20px) scale(0.97);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ───────── MOBILE ───────── */
+        @media (max-width: 600px) {
+
+            .modal {
+                max-width: 100%;
+                border-radius: 12px;
+            }
+
+            .modal-body {
+                padding: 1.3rem;
+            }
+
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+
+        .filter-inline {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .filter-inline select {
+            height: 38px;
+            padding: 0 0.6rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            min-width: 110px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--indigo-500);
+            color: var(--indigo-600);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--indigo-50);
+        }
     </style>
 </head>
 
@@ -226,37 +561,6 @@
                         <span>Dashboard</span>
                     </a>
                 </div>
-
-                <!-- <div class="nav-section">
-                    <div class="nav-label">Academic</div>
-                    <a href="enter_marks.html" class="nav-item">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 11l3 3L22 4" />
-                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                            </svg>
-                        </span>
-                        <span>Enter Marks</span>
-                    </a>
-                    <a href="take_attendance.html" class="nav-item">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                <path d="M9 14l2 2 4-4" />
-                            </svg>
-                        </span>
-                        <span>Take Attendance</span>
-                    </a>
-                    <a href="assign_homework.html" class="nav-item">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
-                            </svg>
-                        </span>
-                        <span>Assign Homework</span>
-                    </a>
-                </div> -->
 
                 <div class="nav-section">
                     <div class="nav-label">Management</div>
@@ -327,7 +631,6 @@
         <!-- ── MAIN CONTENT ───────────────────────── -->
         <div class="main-content">
             <!-- Mobile top header -->
-            <!-- Mobile top header -->
             <header class="mobile-header">
                 <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
                     <span></span><span></span><span></span>
@@ -385,14 +688,14 @@
                 </div>
 
                 <div class="user-tabs" id="userTabs" style="display:none">
-                    <div class="user-tab active" onclick="switchTab('teacher')">Add Teacher</div>
-                    <div class="user-tab" onclick="switchTab('student')">Add Student</div>
+                    <div class="user-tab active" onclick="switchTab('teacher')">Teachers</div>
+                    <div class="user-tab" onclick="switchTab('student')">Students</div>
                     <div class="user-tab" onclick="switchTab('reset')">Password Reset</div>
                 </div>
 
-                <!-- Add Teacher Form -->
+                <!-- Teachers Section -->
                 <div class="form-section active" id="teacherSection">
-                    <div class="card">
+                    <!-- <div class="card">
                         <div class="card-head">
                             <h2 class="card-title">Add New Teacher</h2>
                         </div>
@@ -429,34 +732,46 @@
                                 <button class="btn btn-primary" onclick="addTeacher()">Add Teacher</button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <!-- Teachers List -->
+                    <!-- Teachers Card Grid -->
                     <div class="card" style="margin-top:1.5rem">
-                        <div class="card-head">
+                        <div class="card-head" style="display:flex;justify-content:space-between;align-items:center;">
                             <h2 class="card-title">Existing Teachers</h2>
+                            <button class="btn btn-primary" onclick="openAddTeacherModal()">+ Add Teacher</button>
                         </div>
                         <div class="card-body">
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Username</th>
-                                            <th>Designation</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="teachersList"></tbody>
-                                </table>
+                            <div class="search-filter-bar">
+                                <div class="search-box">
+                                    <span class="search-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            style="width: 20px; height: 20px;">
+                                            <circle cx="11" cy="11" r="8" />
+                                            <path d="M21 21l-4.35-4.35" />
+                                        </svg>
+                                    </span>
+                                    <input type="text" id="teacherSearch"
+                                        placeholder="Search teachers by name or username..." oninput="loadTeachers()">
+                                </div>
+                                <div class="filter-count" id="teacherCount"></div>
+                            </div>
+                            <div class="users-grid" id="teachersGrid">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 6v6l4 2" />
+                                    </svg>
+                                    <p>Loading teachers...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Add Student Form -->
+                <!-- Students Section -->
                 <div class="form-section" id="studentSection">
-                    <div class="card">
+                    <!-- <div class="card">
                         <div class="card-head">
                             <h2 class="card-title">Add New Student</h2>
                         </div>
@@ -508,34 +823,55 @@
                                 <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+
+                    <!-- Students Card Grid -->
                     <div class="card" style="margin-top:1.5rem">
-                        <div class="card-head">
+                        <div class="card-head" style="display:flex;justify-content:space-between;align-items:center;">
                             <h2 class="card-title">Existing Students</h2>
-                            <div class="search-box">
-                                <input type="text" id="studentSearch" placeholder="Search by name or roll..."
-                                    oninput="loadStudents()"
-                                    style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--gray-200); font-size: 0.8rem;">
-                            </div>
+                            <button class="btn btn-primary" onclick="openAddStudentModal()">+ Add Student</button>
                         </div>
                         <div class="card-body">
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Roll Number</th>
-                                            <th>Class</th>
-                                            <th>Section</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="studentsList">
-                                        <tr>
-                                            <td colspan="5" style="text-align:center">Loading students...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="search-filter-bar">
+                                <div class="filter-inline">
+                                    <select id="studentFilterClass" onchange="loadStudents()">
+                                        <option value="">All Classes</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8</option>
+                                        <option>9</option>
+                                        <option>10</option>
+                                    </select>
+
+                                    <select id="studentFilterSection" onchange="loadStudents()">
+                                        <option value="">All Sections</option>
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+                                <div class="search-box">
+                                    <span class="search-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            style="width: 20px; height: 20px;">
+                                            <circle cx="11" cy="11" r="8" />
+                                            <path d="M21 21l-4.35-4.35" />
+                                        </svg>
+                                    </span>
+                                    <input type="text" id="studentSearch" placeholder="Search by name or roll..."
+                                        oninput="loadStudents()">
+                                </div>
+                                <div class="filter-count" id="studentCount"></div>
+                            </div>
+                            <div class="users-grid" id="studentsGrid">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 6v6l4 2" />
+                                    </svg>
+                                    <p>Loading students...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -638,6 +974,229 @@
         </a>
     </nav>
 
+    <!-- Teacher Edit Modal -->
+    <div class="modal-overlay" id="editTeacherModal" onclick="if(event.target === this) closeEditTeacherModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900);">Edit Teacher</div>
+                    <div style="font-size: 0.875rem; color: var(--gray-500);">Update teacher details</div>
+                </div>
+                <button class="modal-close" onclick="closeEditTeacherModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width: 20px; height: 20px;">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="editTName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Username *</label>
+                        <input type="text" id="editTUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Designation</label>
+                        <input type="text" id="editTDesignation">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" id="editTPassword" placeholder="Min 6 characters">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeEditTeacherModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTeacherEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Edit Modal -->
+    <div class="modal-overlay" id="editStudentModal" onclick="if(event.target === this) closeEditStudentModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900);">Edit Student</div>
+                    <div style="font-size: 0.875rem; color: var(--gray-500);">Update student details</div>
+                </div>
+                <button class="modal-close" onclick="closeEditStudentModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width: 20px; height: 20px;">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="editSName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roll Number *</label>
+                        <input type="text" id="editSRoll" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Class *</label>
+                        <select id="editSClass" required>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Section *</label>
+                        <select id="editSSection" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" id="editSPassword" placeholder="Min 6 characters">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeEditStudentModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStudentEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="addTeacherModal" onclick="if(event.target===this)closeAddTeacherModal()">
+        <div class="modal">
+
+            <div class="modal-header">
+                <div>
+                    <div style="font-weight:700">Add Teacher</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500)">Create new teacher account</div>
+                </div>
+                <button class="modal-close" onclick="closeAddTeacherModal()">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="tName">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="tUsername">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Designation</label>
+                        <input type="text" id="tDesignation">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="tPassword" oninput="checkStrength(this.value,'tStrength')">
+                        <div class="password-strength" id="tStrength"></div>
+
+                        <div style="margin-top:6px">
+                            <button type="button" class="btn btn-outline"
+                                onclick="generatePassword('tPassword','tGenerated')">
+                                Generate Secure Password
+                            </button>
+                        </div>
+
+                        <div class="generated-pw" id="tGenerated" style="display:none"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAddTeacherModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="addTeacher()">Add Teacher</button>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-overlay" id="addStudentModal" onclick="if(event.target===this)closeAddStudentModal()">
+        <div class="modal">
+
+            <div class="modal-header">
+                <div>
+                    <div style="font-weight:700">Add Student</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500)">Create new student account</div>
+                </div>
+                <button class="modal-close" onclick="closeAddStudentModal()">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="sName">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Class</label>
+                        <select id="sClass" onchange="updateRollPrefix()">
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Section</label>
+                        <select id="sSection" onchange="updateRollPrefix()">
+                            <option>A</option>
+                            <option>B</option>
+                            <option>C</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" id="sRoll">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="sPassword" oninput="checkStrength(this.value,'sStrength')">
+                        <div class="password-strength" id="sStrength"></div>
+
+                        <div style="margin-top:6px">
+                            <button type="button" class="btn btn-outline"
+                                onclick="generatePassword('tPassword','tGenerated')">
+                                Generate Secure Password
+                            </button>
+                        </div>
+
+                        <div class="generated-pw" id="sGenerated" style="display:none"></div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAddStudentModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
+            </div>
+
+        </div>
+    </div>
     <script src="config.js"></script>
     <script>
         /* ── Sidebar toggle ── */
@@ -694,20 +1253,19 @@
         document.getElementById('sidebarDesignation').textContent = teacher.designation || "Teacher";
         document.getElementById('sidebarProfileName').textContent = teacher.name.split(' ')[0];
 
-        // Check permissions
+        // Check permissions - All teachers can manage users now
         const isAdmin = teacher.role === 'admin';
-        const isGHM = teacher.designation === 'GHM' || teacher.designation === 'Admin';
-        const canManageUsers = isAdmin || true;
+        const isGHM = teacher.role === 'GHM' || teacher.designation === 'Admin';
+        const canManageUsers = true; // All teachers can manage
 
-        const canResetPassword = isGHM;
         if (!canManageUsers) {
             document.getElementById('permissionAlert').style.display = 'block';
         } else {
             const tabsContainer = document.getElementById('userTabs');
             let tabsHTML = '';
-            tabsHTML += '<div class="user-tab active" onclick="switchTab(\'teacher\')">Add Teacher</div>';
-            tabsHTML += '<div class="user-tab" onclick="switchTab(\'student\')">Add Student</div>';
-            if (canResetPassword) {
+            tabsHTML += '<div class="user-tab active" onclick="switchTab(\'teacher\')">Teachers</div>';
+            tabsHTML += '<div class="user-tab" onclick="switchTab(\'student\')">Students</div>';
+            if (isGHM) {
                 tabsHTML += '<div class="user-tab" onclick="switchTab(\'reset\')">Password Reset</div>';
             }
 
@@ -718,27 +1276,34 @@
                 document.getElementById('roleGroup').style.display = 'block';
             }
             loadTeachers();
+            loadStudents();
         }
 
         function switchTab(tab) {
             // Get all tabs
             const tabs = document.querySelectorAll('.user-tab');
-            const sections = ['teacher', 'student', 'reset'];
-
+            tabs.forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
 
-            tabs.forEach(t => t.classList.remove('active'));
+            // Find and activate the clicked tab
+            const tabElements = Array.from(tabs);
+            const tabMap = {
+                'teacher': 0,
+                'student': 1,
+                'reset': 2
+            };
 
-            const tabIndex = sections.indexOf(tab);
-            if (tabIndex >= 0 && tabIndex < tabs.length) {
-                tabs[tabIndex].classList.add('active');
+            if (tabMap[tab] !== undefined && tabElements[tabMap[tab]]) {
+                tabElements[tabMap[tab]].classList.add('active');
             }
 
             if (tab === 'teacher') {
                 document.getElementById('teacherSection').classList.add('active');
+                loadTeachers();
             } else if (tab === 'student') {
                 document.getElementById('studentSection').classList.add('active');
-            } else if (tab === 'reset' && canResetPassword) {
+                loadStudents();
+            } else if (tab === 'reset' && isGHM) {
                 document.getElementById('resetSection').classList.add('active');
                 loadUsersForReset();
             }
@@ -761,11 +1326,13 @@
                 pw += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             document.getElementById(inputId).value = pw;
-            checkStrength(pw, inputId === 'tPassword' ? 'tStrength' : 'sStrength');
+            checkStrength(pw, inputId === 'tPassword' ? 'tStrength' : inputId === 'sPassword' ? 'sStrength' : 'rStrength');
 
             const display = document.getElementById(displayId);
-            display.textContent = `Generated: ${pw} (Copy this!)`;
-            display.style.display = 'block';
+            if (display) {
+                display.textContent = `Generated: ${pw} (Copy this!)`;
+                display.style.display = 'block';
+            }
 
             navigator.clipboard.writeText(pw);
         }
@@ -774,27 +1341,37 @@
             const name = document.getElementById('tName').value.trim();
             const username = document.getElementById('tUsername').value.trim();
             const password = document.getElementById('tPassword').value;
-            const role = isAdmin ? document.getElementById('tRole').value : 'teacher';
+            const designation = document.getElementById('tDesignation').value;
 
             if (!name || !username || !password) {
-                alert('Please fill all required fields'); return;
+                showToast('warning', 'Missing Fields', 'Please fill all required fields');
+                return;
             }
             if (password.length < 6) {
-                alert('Password must be at least 6 characters'); return;
+                showToast('warning', 'Weak Password', 'Password must be at least 6 characters');
+                return;
             }
 
-            const { data: existing } = await db.from('teachers').select('id').eq('username', username).single();
-            if (existing) { alert('Username already exists!'); return; }
+            const { data: existing } = await db.from('teachers').select('id').eq('username', username).maybeSingle();;
+            if (existing) {
+                showToast('error', 'Duplicate Entry', 'Username already exists!');
+                return;
+            }
 
             const { error } = await db.from('teachers').insert({
-                name, username, password, role,
+                name,
+                username,
+                password,
+                designation,
                 created_by: teacher.id,
                 created_at: new Date().toISOString()
             });
 
-            if (error) { alert('Error: ' + error.message); }
+            if (error) {
+                showToast('error', 'Error', error.message);
+            }
             else {
-                alert('Teacher added successfully!');
+                showToast('success', 'Success', 'Teacher added successfully!');
                 document.getElementById('tName').value = '';
                 document.getElementById('tUsername').value = '';
                 document.getElementById('tPassword').value = '';
@@ -802,15 +1379,14 @@
                 loadTeachers();
             }
         }
+
         async function addStudent() {
             const nameEl = document.getElementById('sName');
             const rollEl = document.getElementById('sRoll');
             const clsEl = document.getElementById('sClass');
             const secEl = document.getElementById('sSection');
             const pwEl = document.getElementById('sPassword');
-            const emailEl = document.getElementById('sEmail');
 
-            // Check if elements exist
             if (!nameEl || !rollEl || !clsEl || !secEl || !pwEl) {
                 showToast('error', 'Form Error', 'Form not loaded properly. Please try switching to the Add Student tab again.');
                 return;
@@ -821,7 +1397,6 @@
             const cls = clsEl.value;
             const sec = secEl.value;
             const password = pwEl.value;
-            const email = emailEl ? emailEl.value.trim() : '';
 
             if (!name || !roll || !cls || !sec || !password) {
                 showToast('warning', 'Missing Fields', 'Please fill all required fields');
@@ -833,7 +1408,6 @@
                 return;
             }
 
-            // Check if roll exists - using maybeSingle to avoid 406 error
             const { data: existing, error: checkError } = await db
                 .from('students')
                 .select('id')
@@ -849,19 +1423,16 @@
                 return;
             }
 
-            // Try insert
             const { error } = await db.from('students').insert({
                 name,
                 roll_number: roll,
                 class_name: cls,
                 section: sec,
                 password,
-                email,
                 created_at: new Date().toISOString()
             });
 
             if (error) {
-                // 23505 is PostgreSQL unique violation error code
                 if (error.code === '23505' || error.message.includes('duplicate') || error.message.includes('unique')) {
                     showToast('error', 'Duplicate Entry', 'Roll number already exists!');
                 } else {
@@ -871,38 +1442,321 @@
                 return;
             }
 
-            // Success - clear form and show toast
             showToast('success', 'Success', 'Student added successfully!');
-
             nameEl.value = '';
             rollEl.value = '';
             pwEl.value = '';
-            if (emailEl) emailEl.value = '';
-
             const generatedDiv = document.getElementById('sGenerated');
             if (generatedDiv) generatedDiv.style.display = 'none';
+            loadStudents();
         }
 
+        let allTeachers = [];
+        let allStudents = [];
+
         async function loadTeachers() {
-            const { data } = await db.from('teachers').select('*, creator:created_by(name)').order('created_at', { ascending: false });
-            document.getElementById('teachersList').innerHTML = (data || []).map(t => `
-        <tr>
-            <td><strong>${t.name}</strong></td>
-            <td>${t.username}</td>
-            <td><span class="badge ${t.role === 'admin' ? 'badge-purple' : 'badge-blue'}">${t.designation || 'teacher'}</span></td>
-            <td>
-                ${t.id === teacher.id ? '<span style="color:var(--gray-400);font-size:0.8rem">You</span>' :
-                    isGHM ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacher('${t.id}')">Delete</button>` :
-                        '<span style="color:var(--gray-400);font-size:0.8rem">—</span>'}
-            </td>
-        </tr>
-    `).join('');
+            const { data, error } = await db
+                .from('teachers')
+                .select('*')
+                .neq('role', 'admin')
+                .order('name');
+
+            if (error) {
+                showToast('error', 'Error', 'Failed to load teachers');
+                return;
+            }
+
+            allTeachers = data || [];
+            renderTeachers();
         }
-        async function deleteTeacher(id) {
-            if (!confirm('Are you sure? This cannot be undone.')) return;
+
+        function renderTeachers() {
+            const searchTerm = document.getElementById('teacherSearch')?.value.toLowerCase() || '';
+            const filtered = allTeachers.filter(t =>
+                t.role !== 'admin' &&
+                (
+                    t.name.toLowerCase().includes(searchTerm) ||
+                    t.username.toLowerCase().includes(searchTerm)
+                )
+            );
+
+            const container = document.getElementById('teachersGrid');
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <p>No teachers found</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(t => {
+                const initials = t.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+
+                return `
+    <div class="user-card">
+        <div class="user-card-avatar teacher">
+            ${t.image_url
+                        ? `<img src="${t.image_url}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                        : initials
+                    }
+        </div>
+
+        <div class="user-card-info">
+            <div class="user-card-name">${t.name}</div>
+            <div class="user-card-detail">@${t.username}</div>
+
+            <div class="user-card-badges">
+                <span class="badge ${t.role === 'admin' || t.designation === 'Admin'
+                        ? 'badge-purple'
+                        : 'badge-blue'
+                    }">
+                    ${t.designation || t.role || 'Teacher'}
+                </span>
+            </div>
+        </div>
+
+<div class="user-card-actions">
+    ${teacher.designation === 'GHM Gr-II'
+                        ? `
+        <button class="btn-icon edit" onclick="editTeacher(${t.id})" title="Edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+        </button>
+
+        <button class="btn-icon delete" onclick="deleteTeacher(${t.id}, '${t.name}')" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
+        </button>
+        `
+                        : ''
+                    }
+</div>
+    </div>
+    `;
+            }).join('');
+
+            const countEl = document.getElementById('teacherCount');
+            if (countEl) countEl.textContent = `Showing ${filtered.length} of ${allTeachers.length} teachers`;
+        }
+
+        async function loadStudents() {
+            const searchTerm = document.getElementById('studentSearch')?.value.toLowerCase() || '';
+            const classFilter = document.getElementById('studentFilterClass')?.value || '';
+            const sectionFilter = document.getElementById('studentFilterSection')?.value || '';
+
+            let query = db.from('students').select('*').order('class_name').order('section').order('roll_number');
+
+            if (classFilter) query = query.eq('class_name', classFilter);
+            if (sectionFilter) query = query.eq('section', sectionFilter);
+
+            const { data, error } = await query;
+            if (error) {
+                showToast('error', 'Error', 'Failed to load students');
+                return;
+            }
+
+            allStudents = data || [];
+
+            const filtered = allStudents.filter(s =>
+                (!searchTerm || s.name.toLowerCase().includes(searchTerm) || s.roll_number.toLowerCase().includes(searchTerm))
+            );
+
+            const container = document.getElementById('studentsGrid');
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <p>No students found</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(s => {
+                const initials = s.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                return `
+            <div class="user-card">
+                <div class="user-card-avatar student">${initials}</div>
+                <div class="user-card-info">
+                    <div class="user-card-name">${s.name}</div>
+                    <div class="user-card-detail">Roll: ${s.roll_number}</div>
+                    <div class="user-card-badges">
+                        <span class="badge badge-purple">Class ${s.class_name}</span>
+                        <span class="badge badge-blue">Sec ${s.section}</span>
+                    </div>
+                </div>
+                <div class="user-card-actions">
+                    <button class="btn-icon edit" onclick="editStudent('${s.id}')" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon delete" onclick="deleteStudent('${s.id}', '${s.name}')" title="Delete">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+
+            const countEl = document.getElementById('studentCount');
+            if (countEl) countEl.textContent = `Showing ${filtered.length} of ${allStudents.length} students`;
+        }
+
+        async function deleteTeacher(id, name) {
+            if (!confirm(`Are you sure you want to delete teacher "${name}"? This cannot be undone.`)) return;
             const { error } = await db.from('teachers').delete().eq('id', id);
-            if (error) alert('Error: ' + error.message);
-            else loadTeachers();
+            if (error) {
+                showToast('error', 'Error', error.message);
+            } else {
+                showToast('success', 'Deleted', `Teacher ${name} removed successfully.`);
+                loadTeachers();
+            }
+        }
+
+        async function deleteStudent(id, name) {
+            if (!confirm(`Are you sure you want to delete student "${name}"? This will also remove their marks and attendance records.`)) return;
+            const { error } = await db.from('students').delete().eq('id', id);
+            if (error) {
+                showToast('error', 'Delete Failed', error.message);
+            } else {
+                showToast('success', 'Deleted', `Student ${name} removed successfully.`);
+                loadStudents();
+            }
+        }
+
+        // Edit functions - using separate modals
+        let editingTeacherId = null;
+        let editingStudentId = null;
+
+        function editTeacher(id) {
+            id = Number(id);
+            const t = allTeachers.find(x => x.id === id);
+            if (!t) return;
+            editingTeacherId = id;
+            editingStudentId = null;
+
+            // Populate the teacher edit modal
+            document.getElementById('editTName').value = t.name;
+            document.getElementById('editTUsername').value = t.username;
+            document.getElementById('editTDesignation').value = t.designation || '';
+            document.getElementById('editTPassword').value = '';
+
+            // Open the teacher edit modal
+            document.getElementById('editTeacherModal').classList.add('open');
+        }
+
+        async function saveTeacherEdit() {
+            if (!editingTeacherId) return;
+
+            const name = document.getElementById('editTName').value.trim();
+            const username = document.getElementById('editTUsername').value.trim();
+            const designation = document.getElementById('editTDesignation').value.trim();
+            const password = document.getElementById('editTPassword').value;
+
+            if (!name || !username) {
+                showToast('warning', 'Missing Fields', 'Name and username are required');
+                return;
+            }
+
+            const updateData = { name, username, designation };
+            if (password) {
+                if (password.length < 6) {
+                    showToast('warning', 'Weak Password', 'Password must be at least 6 characters');
+                    return;
+                }
+                updateData.password = password;
+            }
+
+            const { error } = await db.from('teachers').update(updateData).eq('id', editingTeacherId);
+            if (error) {
+                showToast('error', 'Error', error.message);
+            } else {
+                showToast('success', 'Updated', 'Teacher updated successfully!');
+                closeEditTeacherModal();
+                loadTeachers();
+            }
+        }
+
+        function closeEditTeacherModal() {
+            document.getElementById('editTeacherModal').classList.remove('open');
+            editingTeacherId = null;
+        }
+
+        function editStudent(id) {
+            id = Number(id);
+            const s = allStudents.find(x => x.id === id);
+            if (!s) return;
+            editingStudentId = id;
+            editingTeacherId = null;
+
+            // Populate the student edit modal
+            document.getElementById('editSName').value = s.name;
+            document.getElementById('editSRoll').value = s.roll_number;
+            document.getElementById('editSClass').value = s.class_name;
+            document.getElementById('editSSection').value = s.section;
+            document.getElementById('editSPassword').value = '';
+
+            // Open the student edit modal
+            document.getElementById('editStudentModal').classList.add('open');
+        }
+
+        async function saveStudentEdit() {
+            if (!editingStudentId) return;
+
+            const name = document.getElementById('editSName').value.trim();
+            const roll = document.getElementById('editSRoll').value.trim();
+            const cls = document.getElementById('editSClass').value;
+            const sec = document.getElementById('editSSection').value;
+            const password = document.getElementById('editSPassword').value;
+
+            if (!name || !roll || !cls || !sec) {
+                showToast('warning', 'Missing Fields', 'All fields are required');
+                return;
+            }
+
+            const updateData = { name, roll_number: roll, class_name: cls, section: sec };
+            if (password) {
+                if (password.length < 6) {
+                    showToast('warning', 'Weak Password', 'Password must be at least 6 characters');
+                    return;
+                }
+                updateData.password = password;
+            }
+
+            const { error } = await db.from('students').update(updateData).eq('id', editingStudentId);
+            if (error) {
+                showToast('error', 'Error', error.message);
+            } else {
+                showToast('success', 'Updated', 'Student updated successfully!');
+                closeEditStudentModal();
+                loadStudents();
+            }
+        }
+
+        function closeEditStudentModal() {
+            document.getElementById('editStudentModal').classList.remove('open');
+            editingStudentId = null;
         }
 
         async function loadUsersForReset() {
@@ -918,7 +1772,10 @@
             const userId = document.getElementById('resetUser').value;
             let newPass = document.getElementById('resetPassword').value;
 
-            if (!userId) { alert('Please select a user'); return; }
+            if (!userId) {
+                showToast('warning', 'Select User', 'Please select a user');
+                return;
+            }
 
             if (!newPass) {
                 const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
@@ -928,38 +1785,20 @@
 
             const { error } = await db.from(type + 's').update({ password: newPass }).eq('id', userId);
 
-            const resultDiv = document.getElementById('resetResult');
             if (error) {
-                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+                showToast('error', 'Error', error.message);
             } else {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        ✅ Password reset successfully!<br>
-                        <strong>New Password: ${newPass}</strong><br>
-                        <small>Please share this securely with the user.</small>
-                    </div>`;
+                showToast('success', 'Password Reset', `New password: ${newPass}. Please share securely.`);
                 document.getElementById('resetPassword').value = '';
             }
         }
 
-        function downloadTemplate() {
-            const csv = 'name,roll_number,class,section,password,email\nJohn Doe,10-A-01,10,A,pass123,parent@email.com\nJane Smith,10-A-02,10,A,pass123,parent2@email.com';
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'students_template.csv';
-            a.click();
-        }
         // Toast Notification System
         function showToast(type, title, message, duration = 4000) {
             const container = document.getElementById('toastContainer');
-
-            // Create toast element
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
 
-            // Icon based on type
             const icons = {
                 success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--emerald-500);"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
                 error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--rose-500);"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>`,
@@ -968,90 +1807,55 @@
             };
 
             toast.innerHTML = `
-        <div class="toast-icon">${icons[type] || icons.info}</div>
-        <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            <div class="toast-message">${message}</div>
-        </div>
-        <button class="toast-close" onclick="this.parentElement.remove()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-        </button>
-    `;
+            <div class="toast-icon">${icons[type] || icons.info}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        `;
 
             container.appendChild(toast);
-
-            // Auto remove after duration
             setTimeout(() => {
                 toast.classList.add('hiding');
                 setTimeout(() => toast.remove(), 300);
             }, duration);
         }
-        /* ── Student Management Logic ── */
 
-        // Update switchTab to load students when the tab is clicked
-        const originalSwitchTab = switchTab;
-        switchTab = function (tab) {
-            originalSwitchTab(tab);
-            if (tab === 'student') {
-                loadStudents();
-            }
+        function toggleProfileDropdown() {
+            const menu = document.getElementById('profileDropdownMenu');
+            menu.classList.toggle('show');
         }
 
-        async function loadStudents() {
-            const listEl = document.getElementById('studentsList');
-            const searchTerm = document.getElementById('studentSearch')?.value.toLowerCase() || '';
-
-            let query = db.from('students').select('*').order('class_name', { ascending: true });
-
-            const { data, error } = await query;
-
-            if (error) {
-                listEl.innerHTML = `<tr><td colspan="5" style="color:var(--rose-500)">Error loading data</td></tr>`;
-                return;
-            }
-
-            const filteredData = data.filter(s =>
-                s.name.toLowerCase().includes(searchTerm) ||
-                s.roll_number.toLowerCase().includes(searchTerm)
-            );
-
-            listEl.innerHTML = filteredData.map(s => `
-        <tr>
-            <td><strong>${s.name}</strong></td>
-            <td><code>${s.roll_number}</code></td>
-            <td>Class ${s.class_name}</td>
-            <td>${s.section}</td>
-            <td>
-                ${isGHM || isAdmin ?
-                    `<button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}', '${s.name}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; vertical-align:middle">
-                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg> Delete
-                    </button>` :
-                    '<span style="color:var(--gray-400);font-size:0.8rem">No Access</span>'
-                }
-            </td>
-        </tr>
-    `).join('');
+        function logout() {
+            localStorage.removeItem('teacher');
+            window.location.href = 'index.html';
+        }
+        function openAddTeacherModal() {
+            document.getElementById("addTeacherModal").classList.add("open")
         }
 
-        async function deleteStudent(id, name) {
-            if (!confirm(`Are you sure you want to delete student "${name}"? This will also remove their marks and attendance records.`)) return;
-
-            // Optional: If your DB doesn't have CASCADE delete, you'd need to delete marks/attendance first.
-            // Assuming Standard RLS/Constraints:
-            const { error } = await db.from('students').delete().eq('id', id);
-
-            if (error) {
-                showToast('error', 'Delete Failed', error.message);
-            } else {
-                showToast('success', 'Deleted', `Student ${name} removed successfully.`);
-                loadStudents();
-            }
+        function closeAddTeacherModal() {
+            document.getElementById("addTeacherModal").classList.remove("open")
         }
+
+        function openAddStudentModal() {
+            document.getElementById("addStudentModal").classList.add("open")
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById("addStudentModal").classList.remove("open")
+        }
+
+        // Initial load
+        loadTeachers();
+        loadStudents();
+
     </script>
 </body>
 

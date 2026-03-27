@@ -348,7 +348,7 @@
 
         @media (max-width: 480px) {
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .detail-grid {
@@ -535,8 +535,6 @@
 
             <!-- Page Content -->
             <div class="page-content">
-                <!-- Stats -->
-                <div class="stats-grid" id="classStatCards"></div>
 
                 <!-- Filters -->
                 <div class="filter-card">
@@ -721,21 +719,6 @@
             allStudents.forEach(s => { if (classCounts[s.class_name] !== undefined) classCounts[s.class_name]++; });
 
             const colors = ['blue', 'green', 'orange', 'purple', 'teal'];
-
-            document.getElementById('classStatCards').innerHTML = CLASSES.map((c, i) => `
-                <div class="stat-card" onclick="filterByClass('${c}')">
-                    <div class="stat-info">
-                        <h3>${classCounts[c]}</h3>
-                        <p>Class ${c} Students</p>
-                    </div>
-                </div>
-            `).join('') + `
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <h3>${allStudents.length}</h3>
-                        <p>Total Students</p>
-                    </div>
-                </div>`;
 
             applyFilters();
         }
