@@ -23,12 +23,30 @@ const EXAMS = [
     { value: 'FA4', label: 'FA4 - Formative 4', maxMarks: 20 },
     { value: 'SA2', label: 'SA2 - Summative 2', maxMarks: 80 }
 ];
-const teacher = getSession('teacher');
-updateMobileHeaderAvatar();
+
+// Get current session without role restriction (returns null if no session)
+function getCurrentSession() {
+    const s = JSON.parse(localStorage.getItem('school_session'));
+    if (!s) {
+        return null;
+    }
+    return s;
+}
+
+// Get session with specific role check (for role-specific pages)
 function getSession(role) {
     const s = JSON.parse(localStorage.getItem('school_session'));
     if (!s || (role && s.role !== role)) {
         window.location.href = 'index.html';
+        return null;
+    }
+    return s;
+}
+
+// Get user by role - doesn't redirect, just returns the user or null
+function getUserByRole(role) {
+    const s = JSON.parse(localStorage.getItem('school_session'));
+    if (!s || s.role !== role) {
         return null;
     }
     return s;
@@ -59,17 +77,19 @@ function formatDate(dateStr) {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-
 // Function to update the Mobile Header Avatar
 function updateMobileHeaderAvatar() {
     const headerAvatar = document.getElementById('headerProfileAvatar');
     if (!headerAvatar) return;
 
-    // Use initials as default (defined in your existing script)
-    const userInitials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+    const session = getCurrentSession();
+    if (!session) return;
 
-    if (teacher?.image_url) {
-        headerAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}">`;
+    const userInitials = session.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 
+                         (session.role === 'teacher' ? 'T' : 'S');
+
+    if (session.image_url) {
+        headerAvatar.innerHTML = `<img src="${session.image_url}" alt="${session.name}">`;
     } else {
         headerAvatar.textContent = userInitials;
         headerAvatar.style.color = "var(--indigo-600)";
@@ -83,3 +103,6 @@ function toggleProfileDropdown() {
     const menu = document.getElementById('profileDropdownMenu');
     if (menu) menu.classList.toggle('show');
 }
+
+// Initialize avatar on page load
+updateMobileHeaderAvatar();
