@@ -167,7 +167,7 @@
                         <span>Dashboard</span>
                     </a>
                 </div>
-                <div class="nav-section">
+                <!-- <div class="nav-section">
                     <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
                         <span class="nav-icon">
@@ -196,7 +196,7 @@
                         </span>
                         <span>Assign Homework</span>
                     </a>
-                </div>
+                </div> -->
                 <div class="nav-section">
                     <div class="nav-label">Management</div>
                     <a href="view_students.html" class="nav-item">
@@ -210,7 +210,7 @@
                         </span>
                         <span>View Students</span>
                     </a>
-                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:none;">
+                    <a href="manage_users.html" class="nav-item">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -373,7 +373,6 @@ function closeSidebar() {
 }
 
 /* ── Session guard ── */
-const teacher = getSession('teacher');
 if (!teacher) window.location.href = 'index.html';
 
 /* ── Initials ── */
@@ -416,14 +415,6 @@ function setAvatar(elementId) {
 setAvatar("profileAvatar");
 setAvatar("sidebarAvatar");
 setAvatar("sidebarProfileAvatar");
-
-/* ── Role-based visibility ── */
-const role = teacher?.designation?.toLowerCase();
-
-if (role === 'admin' || role === 'ghm') {
-    const manageNav = document.getElementById('manageUsersNav');
-    if (manageNav) manageNav.style.display = 'flex';
-}
 
 /* ── Password Change ── */
 function showChangePassword() {

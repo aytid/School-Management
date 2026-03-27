@@ -227,7 +227,7 @@
                     </a>
                 </div>
 
-                <div class="nav-section">
+                <!-- <div class="nav-section">
                     <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
                         <span class="nav-icon">
@@ -256,7 +256,7 @@
                         </span>
                         <span>Assign Homework</span>
                     </a>
-                </div>
+                </div> -->
 
                 <div class="nav-section">
                     <div class="nav-label">Management</div>
@@ -327,20 +327,42 @@
         <!-- ── MAIN CONTENT ───────────────────────── -->
         <div class="main-content">
             <!-- Mobile top header -->
+            <!-- Mobile top header -->
             <header class="mobile-header">
                 <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
                 <div class="mobile-brand">
-                    <div class="brand-logo-sm">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
-                            <path d="M5 13v6l7 4 7-4v-6" />
-                        </svg>
-                    </div>
                     <span>ZPHS Nagulapet</span>
                 </div>
-                <div style="width: 36px; height: 36px;"></div>
+
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profileBtn" onclick="toggleProfileDropdown()" aria-label="Profile">
+                        <div class="profile-avatar-img" id="headerProfileAvatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                        <a href="profile.html" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            View Profile
+                        </a>
+                        <button class="dropdown-item" onclick="logout()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                <path d="M16 17l5-5-5-5" />
+                                <path d="M21 12H9" />
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <!-- Desktop top bar -->
@@ -422,7 +444,6 @@
                                             <th>Name</th>
                                             <th>Username</th>
                                             <th>Designation</th>
-                                            <th>Added By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -521,44 +542,44 @@
                 </div>
 
                 <!-- Password Reset Section -->
-<div class="form-section" id="resetSection">
-    <div class="card">
-        <div class="card-head">
-            <h2 class="card-title">Reset User Password</h2>
-        </div>
-        <div class="card-body">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">User Type</label>
-                    <select id="resetType" onchange="loadUsersForReset()">
-                        <option value="student">Student</option>
-                        <option value="teacher">Teacher</option>
-                    </select>
+                <div class="form-section" id="resetSection">
+                    <div class="card">
+                        <div class="card-head">
+                            <h2 class="card-title">Reset User Password</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">User Type</label>
+                                    <select id="resetType" onchange="loadUsersForReset()">
+                                        <option value="student">Student</option>
+                                        <option value="teacher">Teacher</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Select User</label>
+                                    <select id="resetUser">
+                                        <option value="">Select user to reset</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" id="resetPassword" placeholder="Enter new password"
+                                        oninput="checkStrength(this.value, 'rStrength')">
+                                    <div class="password-strength" id="rStrength"></div>
+                                    <small style="color:var(--gray-500);font-size:0.75rem">Or <a href="#"
+                                            onclick="generatePassword('resetPassword', 'rGenerated')"
+                                            style="color:var(--indigo-600)">generate secure password</a></small>
+                                    <div class="generated-pw" id="rGenerated" style="display:none"></div>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.5rem">
+                                <button class="btn btn-primary" onclick="resetPassword()">Reset Password</button>
+                            </div>
+                            <div id="resetResult" style="margin-top:1rem"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Select User</label>
-                    <select id="resetUser">
-                        <option value="">Select user to reset</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">New Password</label>
-                    <input type="password" id="resetPassword" placeholder="Enter new password"
-                        oninput="checkStrength(this.value, 'rStrength')">
-                    <div class="password-strength" id="rStrength"></div>
-                    <small style="color:var(--gray-500);font-size:0.75rem">Or <a href="#"
-                            onclick="generatePassword('resetPassword', 'rGenerated')"
-                            style="color:var(--indigo-600)">generate secure password</a></small>
-                    <div class="generated-pw" id="rGenerated" style="display:none"></div>
-                </div>
-            </div>
-            <div style="margin-top:1.5rem">
-                <button class="btn btn-primary" onclick="resetPassword()">Reset Password</button>
-            </div>
-            <div id="resetResult" style="margin-top:1rem"></div>
-        </div>
-    </div>
-</div>
             </div>
         </div>
     </div>
@@ -646,8 +667,6 @@
             }
         }
 
-        /* ── Session guard ── */
-        const teacher = getSession('teacher');
         if (!teacher) window.location.href = 'index.html';
 
         /* ── Populate user info ── */
@@ -871,7 +890,6 @@
             <td><strong>${t.name}</strong></td>
             <td>${t.username}</td>
             <td><span class="badge ${t.role === 'admin' ? 'badge-purple' : 'badge-blue'}">${t.designation || 'teacher'}</span></td>
-            <td>${t.creator?.name || 'System'}</td>
             <td>
                 ${t.id === teacher.id ? '<span style="color:var(--gray-400);font-size:0.8rem">You</span>' :
                     isGHM ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacher('${t.id}')">Delete</button>` :

@@ -23,7 +23,8 @@ const EXAMS = [
     { value: 'FA4', label: 'FA4 - Formative 4', maxMarks: 20 },
     { value: 'SA2', label: 'SA2 - Summative 2', maxMarks: 80 }
 ];
-
+const teacher = getSession('teacher');
+updateMobileHeaderAvatar();
 function getSession(role) {
     const s = JSON.parse(localStorage.getItem('school_session'));
     if (!s || (role && s.role !== role)) {
@@ -56,4 +57,29 @@ function getExamMaxMarks(examType) {
 function formatDate(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+
+// Function to update the Mobile Header Avatar
+function updateMobileHeaderAvatar() {
+    const headerAvatar = document.getElementById('headerProfileAvatar');
+    if (!headerAvatar) return;
+
+    // Use initials as default (defined in your existing script)
+    const userInitials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+
+    if (teacher?.image_url) {
+        headerAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}">`;
+    } else {
+        headerAvatar.textContent = userInitials;
+        headerAvatar.style.color = "var(--indigo-600)";
+        headerAvatar.style.fontSize = "13px";
+        headerAvatar.style.fontWeight = "700";
+    }
+}
+
+// Function to toggle the dropdown
+function toggleProfileDropdown() {
+    const menu = document.getElementById('profileDropdownMenu');
+    if (menu) menu.classList.toggle('show');
 }

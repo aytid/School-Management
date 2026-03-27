@@ -95,9 +95,17 @@
             color: var(--gray-500);
         }
 
-        .asb-total .asb-val { color: var(--gray-900); }
-        .asb-present .asb-val { color: var(--emerald-500); }
-        .asb-absent .asb-val { color: var(--rose-500); }
+        .asb-total .asb-val {
+            color: var(--gray-900);
+        }
+
+        .asb-present .asb-val {
+            color: var(--emerald-500);
+        }
+
+        .asb-absent .asb-val {
+            color: var(--rose-500);
+        }
 
         /* Attendance Table */
         .attendance-card {
@@ -259,33 +267,34 @@
                 display: flex !important;
             }
         }
+
         .toast {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    background: #111827;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
-    z-index: 9999;
-}
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #111827;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
 
-.toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-.toast.success {
-    background: #16a34a;
-}
+        .toast.success {
+            background: #16a34a;
+        }
 
-.toast.error {
-    background: #dc2626;
-}
+        .toast.error {
+            background: #dc2626;
+        }
     </style>
 </head>
 
@@ -320,7 +329,7 @@
                     </a>
                 </div>
 
-                <div class="nav-section">
+                <!-- <div class="nav-section">
                     <div class="nav-label">Academic</div>
                     <a href="enter_marks.html" class="nav-item">
                         <span class="nav-icon">
@@ -349,7 +358,7 @@
                         </span>
                         <span>Assign Homework</span>
                     </a>
-                </div>
+                </div> -->
 
                 <div class="nav-section">
                     <div class="nav-label">Management</div>
@@ -364,7 +373,7 @@
                         </span>
                         <span>View Students</span>
                     </a>
-                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:none;">
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -426,9 +435,36 @@
                     <span></span><span></span><span></span>
                 </button>
                 <div class="mobile-brand">
-                    <span>Take Attendance</span>
+                    <span>ZPHS Nagulapet</span>
                 </div>
-                <div style="width: 36px; height: 36px;"></div>
+
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profileBtn" onclick="toggleProfileDropdown()" aria-label="Profile">
+                        <div class="profile-avatar-img" id="headerProfileAvatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                        <a href="profile.html" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            View Profile
+                        </a>
+                        <button class="dropdown-item" onclick="logout()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                <path d="M16 17l5-5-5-5" />
+                                <path d="M21 12H9" />
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <!-- Desktop top bar -->
@@ -443,7 +479,8 @@
                 <!-- Tabs -->
                 <div class="tab-bar">
                     <div class="tab-item active" onclick="switchTab('take')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width:18px;height:18px">
                             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
                             <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             <path d="M9 14l2 2 4-4" />
@@ -451,7 +488,8 @@
                         Take Attendance
                     </div>
                     <div class="tab-item" onclick="switchTab('report')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width:18px;height:18px">
                             <path d="M3 3v18h18" />
                             <path d="M18 17V9" />
                             <path d="M13 17V5" />
@@ -496,7 +534,8 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="loadAttendance()" style="width: 100%;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 18px; height: 18px; margin-right: 0.5rem;">
                                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                                 <circle cx="9" cy="7" r="4" />
                                 <path d="M23 21v-2a4 4 0 00-3-3.87" />
@@ -587,7 +626,8 @@
                         </div>
 
                         <button class="btn btn-primary btn-lg" onclick="loadReport()" style="width: 100%;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width: 18px; height: 18px; margin-right: 0.5rem;">
                                 <path d="M3 3v18h18" />
                                 <path d="M18 17V9" />
                                 <path d="M13 17V5" />
@@ -678,8 +718,6 @@
             document.getElementById('hamburgerBtn').classList.remove('active');
         }
 
-        /* ── Session guard ── */
-        const teacher = getSession('teacher');
         if (!teacher) window.location.href = 'index.html';
 
         /* ── Populate user info ── */
@@ -713,9 +751,9 @@
         if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
 
         /* ── Role-based visibility ── */
-        if (teacher.designation === 'GHM' || teacher.designation === 'Admin' ) {
-            document.getElementById('manageUsersNav').style.display = 'flex';
-        }
+        // if (teacher.role === 'headmaster' || teacher.role === 'admin' ) {
+        //     document.getElementById('manageUsersNav').style.display = 'flex';
+        // }
 
         // Set today
         document.getElementById('dateSelect').value = new Date().toISOString().split('T')[0];
@@ -843,10 +881,10 @@
             const date = document.getElementById('dateSelect').value;
             const status = getStatus(studentId);
 
-const { data: existing } = await db.from('attendance').select('id')
-  .eq('student_id', studentId)
-  .eq('attendance_date', date)
-  .maybeSingle();
+            const { data: existing } = await db.from('attendance').select('id')
+                .eq('student_id', studentId)
+                .eq('attendance_date', date)
+                .maybeSingle();
 
             let result;
             if (existing) {
@@ -920,13 +958,13 @@ const { data: existing } = await db.from('attendance').select('id')
                                 <thead><tr><th>Date</th><th>Day</th><th>Status</th></tr></thead>
                                 <tbody>
                                     ${records && records.length > 0 ? records.map(r => {
-                                        const d = new Date(r.attendance_date);
-                                        return `<tr>
+                const d = new Date(r.attendance_date);
+                return `<tr>
                                             <td>${d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                                             <td>${d.toLocaleDateString('en-IN', { weekday: 'long' })}</td>
                                             <td><span class="badge ${r.status === 'Present' ? 'badge-success' : 'badge-danger'}">${r.status}</span></td>
                                         </tr>`;
-                                    }).join('') : '<tr><td colspan="3" class="empty-state">No records in selected range</td></tr>'}
+            }).join('') : '<tr><td colspan="3" class="empty-state">No records in selected range</td></tr>'}
                                 </tbody>
                             </table>
                         </div>
