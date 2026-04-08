@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Enter Marks - ZPHS Nagulapet</title>
+    <title>Bulk Enter Marks - ZPHS Nagulapet</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,14 +58,14 @@
             margin-top: 0.1rem;
         }
 
-        .marks-table-card {
+        .bulk-table-card {
             background: var(--white);
             border-radius: var(--r-lg);
             border: 1px solid var(--gray-200);
             overflow: hidden;
         }
 
-        .marks-table-header {
+        .bulk-table-header {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--gray-100);
             display: flex;
@@ -75,7 +75,7 @@
             gap: 1rem;
         }
 
-        .marks-table-header h3 {
+        .bulk-table-header h3 {
             font-size: 0.9375rem;
             font-weight: 700;
             color: var(--gray-900);
@@ -86,8 +86,8 @@
             gap: 0.5rem;
         }
 
-        .marks-input {
-            width: 80px;
+        .bulk-marks-input {
+            width: 70px;
             padding: 0.5rem;
             border: 1.5px solid var(--gray-300);
             border-radius: var(--r);
@@ -97,59 +97,96 @@
             transition: all 0.2s;
         }
 
-        .marks-input:focus {
+        .bulk-marks-input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
         }
 
-        .marks-input.valid {
+        .bulk-marks-input.valid {
             border-color: var(--emerald-500);
             background: var(--emerald-50);
         }
 
-        .marks-input.invalid {
+        .bulk-marks-input.invalid {
             border-color: var(--rose-500);
             background: var(--rose-50);
         }
 
-        .grade-tag {
-            display: inline-flex;
+        .bulk-marks-input.empty {
+            background: var(--gray-50);
+        }
+
+        /* Fixed first column for horizontal scroll */
+        .table-container.bulk-table {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .bulk-table table {
+            min-width: max-content;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .bulk-table th:first-child,
+        .bulk-table td:first-child {
+            position: sticky;
+            left: 0;
+            background: var(--white);
+            z-index: 10;
+            border-right: 2px solid var(--gray-200);
+        }
+
+        .bulk-table th:first-child {
+            background: var(--gray-50);
+            z-index: 11;
+        }
+
+        .bulk-table th {
+            background: var(--gray-50);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            min-width: 90px;
+        }
+
+        .bulk-table th.student-col {
+            min-width: 200px;
+        }
+
+        .bulk-table th.subject-col {
+            background: var(--indigo-50);
+            color: var(--indigo-700);
+        }
+
+        .bulk-table th .max-marks {
+            font-size: 0.65rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .student-info {
+            display: flex;
             align-items: center;
-            padding: 0.25rem 0.625rem;
-            border-radius: var(--r-full);
+            gap: 0.75rem;
+        }
+
+        .student-roll {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--r);
             font-size: 0.75rem;
             font-weight: 700;
+            min-width: 40px;
+            text-align: center;
         }
 
-        .grade-ap {
-            background: var(--emerald-100);
-            color: #065f46;
-        }
-
-        .grade-a {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .grade-b {
-            background: var(--amber-100);
-            color: #92400e;
-        }
-
-        .grade-c {
-            background: #fed7aa;
-            color: #9a3412;
-        }
-
-        .grade-d {
-            background: var(--rose-100);
-            color: #991b1b;
-        }
-
-        .grade-f {
-            background: #fecaca;
-            color: #7f1d1d;
+        .student-name {
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .empty-state {
@@ -165,14 +202,72 @@
             opacity: 0.35;
         }
 
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: var(--r-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: var(--r-full);
+            transition: width 0.3s ease;
+        }
+
+        .subject-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .subject-code {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
         @media (max-width: 768px) {
             .filter-grid {
                 grid-template-columns: 1fr;
             }
 
-            .marks-table-header {
+            .bulk-table-header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .bulk-marks-input {
+                width: 60px;
+                padding: 0.375rem;
+                font-size: 0.8125rem;
+            }
+
+            .bulk-table th:first-child,
+            .bulk-table td:first-child {
+                min-width: 140px;
+            }
+
+            .student-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            .student-name {
+                font-size: 0.8125rem;
             }
         }
 
@@ -220,7 +315,7 @@
 
         <!-- ── SIDEBAR (desktop) ─────────────────── -->
         <aside class="sidebar" id="sidebar">
-            <!-- Mobile Profile Section -->
+            <!-- Mobile Profile Section (shown only on mobile) -->
             <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
                 <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
                 <div class="profile-info-mobile">
@@ -229,7 +324,6 @@
                 </div>
             </a>
             <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
-
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-label">Main</div>
@@ -248,7 +342,7 @@
 
                 <!-- <div class="nav-section">
                     <div class="nav-label">Academic</div>
-                    <a href="enter_marks.html" class="nav-item active">
+                    <a href="enter_marks.html" class="nav-item">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 11l3 3L22 4" />
@@ -290,9 +384,7 @@
                         </span>
                         <span>View Students</span>
                     </a>
-                </div>
-                <div class="nav-section">
-                    <a href="manage_users.html" class="nav-item" id="manageUsersNav" style="display:flex;">
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -304,6 +396,7 @@
                         <span>Manage Users</span>
                     </a>
                 </div>
+
                 <div class="nav-section">
                     <div class="nav-label">Records</div>
                     <a href="reports.html" class="nav-item">
@@ -323,8 +416,8 @@
                 <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
-                        <div class="user-name" id="sidebarName">Teacher</div>
-                        <div class="user-role" id="sidebarRole">Teacher</div>
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
                     </div>
                 </a>
             </nav>
@@ -388,7 +481,7 @@
             <!-- Desktop top bar -->
             <div class="desktop-topbar">
                 <div class="page-title">
-                    <h1>Enter Marks</h1>
+                    <h1>Bulk Enter Marks</h1>
                 </div>
             </div>
 
@@ -397,7 +490,7 @@
                 <!-- Filter Card -->
                 <div class="filter-card">
                     <div class="section-header" style="margin-bottom: 1.25rem;">
-                        <span class="section-title">Select Class & Exam</span>
+                        <span class="section-title">Select Class, Section & Exam</span>
                     </div>
 
                     <div class="filter-grid">
@@ -422,12 +515,6 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Subject</label>
-                            <select id="subjectSelect" class="form-select">
-                                <option value="">Select Subject</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label class="form-label">Exam Type</label>
                             <select id="examSelect" class="form-select">
                                 <option value="">Select Exam</option>
@@ -441,47 +528,72 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-primary btn-lg" onclick="loadStudents()" style="width: 100%;">
+                    <button class="btn btn-primary btn-lg" onclick="loadStudentsForBulk()" style="width: 100%;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             style="width: 18px; height: 18px; margin-right: 0.5rem;">
                             <path
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        Load Students
+                        Load Students & Subjects
                     </button>
                 </div>
 
                 <!-- Stats Row -->
-                <div class="stats-row" id="statsRow" style="display: none;"></div>
+                <div class="stats-row" id="statsRow" style="display: none;">
+                    <div class="stat-pill">
+                        <div class="sp-val" id="statTotalStudents">0</div>
+                        <div class="sp-label">Students</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="sp-val" id="statTotalSubjects">0</div>
+                        <div class="sp-label">Subjects</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="sp-val" id="statProgress">0%</div>
+                        <div class="sp-label">Completed</div>
+                    </div>
+                    <div class="stat-pill">
+                        <div class="sp-val" id="statMaxMarks">20</div>
+                        <div class="sp-label">Max Marks</div>
+                    </div>
+                </div>
 
-                <!-- Marks Table -->
+                <!-- Bulk Marks Table -->
                 <div id="marksSection" style="display:none">
-                    <div class="marks-table-card">
-                        <div class="marks-table-header">
-                            <h3 id="tableTitle">Marks Entry</h3>
+                    <div class="bulk-table-card">
+                        <div class="bulk-table-header">
+                            <div>
+                                <h3 id="tableTitle">Bulk Marks Entry</h3>
+                                <div class="progress-indicator" style="margin-top: 0.5rem;">
+                                    <span id="completionText">0 of 0 entries completed</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="table-actions">
-                                <button class="btn btn-secondary btn-sm" onclick="markAllZero()">
-                                    Set All 0
+                                <button class="btn btn-secondary btn-sm" onclick="clearAllMarks()">
+                                    Clear All
                                 </button>
-                                <button class="btn btn-primary" onclick="saveAllMarks()">
-                                    Save All
+                                <button class="btn btn-primary" onclick="saveAllBulkMarks()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width: 16px; height: 16px; margin-right: 0.5rem;">
+                                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                                        <polyline points="17 21 17 13 7 13 7 21" />
+                                        <polyline points="7 3 7 8 15 8" />
+                                    </svg>
+                                    Save All Marks
                                 </button>
                             </div>
                         </div>
-                        <div class="table-container">
+                        <div class="table-container bulk-table">
                             <table>
-                                <thead>
-                                    <tr>
-                                        <th style="width:60px">#</th>
-                                        <th>Roll No</th>
-                                        <th>Student Name</th>
-                                        <th>Marks <span style="font-weight:400">(Max: <span
-                                                    id="maxMarksDisplay">20</span>)</span></th>
-                                        <th>Grade</th>
-                                        <th style="width:80px">Action</th>
-                                    </tr>
+                                <thead id="bulkTableHead">
+                                    <!-- Dynamic headers -->
                                 </thead>
-                                <tbody id="marksTableBody"></tbody>
+                                <tbody id="bulkTableBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -549,22 +661,6 @@
 
     <script src="config.js"></script>
     <script>
-        /* ── Sidebar toggle ── */
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('sidebarOverlay');
-            const btn = document.getElementById('hamburgerBtn');
-            sb.classList.toggle('open');
-            ov.classList.toggle('active');
-            btn.classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-            document.getElementById('hamburgerBtn').classList.remove('active');
-        }
-
         /* ── Session guard ── */
         const teacher = JSON.parse(localStorage.getItem("school_session"));
         if (!teacher) window.location.href = 'index.html';
@@ -602,10 +698,49 @@
         const sidebarProfileName = document.getElementById('sidebarProfileName');
         if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
 
-        /* ── Marks functionality ── */
+        /* ── Sidebar toggle ── */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        /* ── Profile dropdown ── */
+        function toggleProfileDropdown() {
+            const menu = document.getElementById('profileDropdownMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (e) {
+            const dropdown = document.querySelector('.profile-dropdown');
+            const menu = document.getElementById('profileDropdownMenu');
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu?.classList.remove('active');
+            }
+        });
+
+        /* ── Logout ── */
+        function logout() {
+            localStorage.removeItem('school_session');
+            window.location.href = 'index.html';
+        }
+
+        /* ── Bulk Marks functionality ── */
         let studentsList = [];
+        let subjectsList = [];
         let subjectIdMap = {};
         let currentMaxMarks = 20;
+        let existingMarksMap = {};
 
         function getExamMaxMarks(examType) {
             if (examType?.startsWith('SA')) return 80;
@@ -613,214 +748,310 @@
             return 20;
         }
 
-        document.getElementById('examSelect').addEventListener('change', function () {
-            const examType = this.value;
-            currentMaxMarks = getExamMaxMarks(examType);
-            document.getElementById('maxMarksDisplay').textContent = currentMaxMarks;
-        });
-
         function onClassChange() {
-            const cls = document.getElementById('classSelect').value;
-            const subSel = document.getElementById('subjectSelect');
-            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : [];
-            subSel.innerHTML = '<option value="">Select Subject</option>' +
-                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+            // No subject selection needed for bulk entry - subjects loaded automatically
         }
 
-        async function loadSubjectIds() {
-            const { data } = await db.from('subjects').select('*');
-            if (data) data.forEach(s => { subjectIdMap[s.subject_name] = s.id; });
+        async function loadSubjectsForClass(className) {
+            const subjects = SUBJECTS_BY_CLASS[className] || [];
+            const { data: subjectData } = await db.from('subjects').select('*').in('subject_name', subjects);
+
+            if (subjectData) {
+                subjectsList = subjectData;
+                subjectData.forEach(s => {
+                    subjectIdMap[s.subject_name] = s.id;
+                });
+            }
+            return subjectsList;
         }
 
-        async function loadStudents() {
+        async function loadStudentsForBulk() {
             const cls = document.getElementById('classSelect').value;
             const sec = document.getElementById('sectionSelect').value;
-            const subj = document.getElementById('subjectSelect').value;
             const exam = document.getElementById('examSelect').value;
 
-            if (!cls || !sec || !subj || !exam) {
+            if (!cls || !sec || !exam) {
                 showToast('Please select all fields', 'error');
                 return;
             }
 
-            const subjectId = subjectIdMap[subj];
-            if (!subjectId) {
-                showToast('Subject not found', 'error');
+            currentMaxMarks = getExamMaxMarks(exam);
+            document.getElementById('statMaxMarks').textContent = currentMaxMarks;
+
+            // Load subjects for this class
+            await loadSubjectsForClass(cls);
+
+            if (subjectsList.length === 0) {
+                showToast('No subjects found for this class', 'error');
                 return;
             }
 
+            // Load students
             const { data: students, error } = await db.from('students')
                 .select('*').eq('class_name', cls).eq('section', sec).order('roll_number');
 
-            if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            studentsList = students || [];
-
-            const { data: existingMarks } = await db.from('marks')
-                .select('*').eq('subject_id', subjectId).eq('exam_type', exam)
-                .in('student_id', studentsList.map(s => s.id));
-
-            const marksMap = {};
-            if (existingMarks) existingMarks.forEach(m => { marksMap[m.student_id] = m; });
-
-            renderTable(marksMap, subj, cls, sec, exam);
-        }
-
-        function renderTable(marksMap, subj, cls, sec, exam) {
-            document.getElementById('tableTitle').textContent = `Class ${cls}-${sec} | ${subj} | ${exam}`;
-            document.getElementById('maxMarksDisplay').textContent = currentMaxMarks;
-
-            if (studentsList.length === 0) {
-                document.getElementById('marksTableBody').innerHTML = '<tr><td colspan="6" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><p>No students found</p></td></tr>';
-                document.getElementById('marksSection').style.display = 'block';
-                document.getElementById('statsRow').style.display = 'flex';
-                updateStats();
+            if (error) {
+                showToast('Error loading students: ' + error.message, 'error');
                 return;
             }
 
-            document.getElementById('marksTableBody').innerHTML = studentsList.map((s, i) => {
-                const existing = marksMap[s.id];
-                const marksVal = existing ? existing.marks_obtained : '';
-                const g = existing ? calculateGrade(existing.marks_obtained, currentMaxMarks) : null;
-                return `<tr id="row_${s.id}">
-                    <td style="color:var(--gray-400);font-weight:600">${i + 1}</td>
-                    <td><span class="badge badge-gray">${s.roll_number}</span></td>
-                    <td><strong>${s.name}</strong></td>
+            studentsList = students || [];
+
+            if (studentsList.length === 0) {
+                showToast('No students found in this class/section', 'error');
+                return;
+            }
+
+            // Load existing marks for all students and subjects
+            const studentIds = studentsList.map(s => s.id);
+            const subjectIds = subjectsList.map(s => s.id);
+
+            const { data: existingMarks } = await db.from('marks')
+                .select('*')
+                .eq('exam_type', exam)
+                .in('student_id', studentIds)
+                .in('subject_id', subjectIds);
+
+            existingMarksMap = {};
+            if (existingMarks) {
+                existingMarks.forEach(m => {
+                    const key = `${m.student_id}_${m.subject_id}`;
+                    existingMarksMap[key] = m;
+                });
+            }
+
+            renderBulkTable(cls, sec, exam);
+            updateStats();
+        }
+
+        function renderBulkTable(cls, sec, exam) {
+            document.getElementById('tableTitle').textContent = `Class ${cls}-${sec} | ${exam} | All Subjects`;
+
+            // Render header
+            const thead = document.getElementById('bulkTableHead');
+            let headerHTML = `
+        <tr>
+            <th class="student-col">Student</th>
+    `;
+
+            subjectsList.forEach(subj => {
+                headerHTML += `
+            <th class="subject-col">
+                <div class="subject-header">
+                    <span>${subj.subject_name}</span>
+                    <span class="max-marks">Max: ${currentMaxMarks}</span>
+                </div>
+            </th>
+        `;
+            });
+
+            headerHTML += '</tr>';
+            thead.innerHTML = headerHTML;
+
+            // Render body
+            const tbody = document.getElementById('bulkTableBody');
+
+            if (studentsList.length === 0) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="${subjectsList.length + 1}" class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                    <p>No students found</p>
+                </td>
+            </tr>
+        `;
+            } else {
+                tbody.innerHTML = studentsList.map((s, idx) => {
+                    let rowHTML = `
+                <tr id="row_${s.id}">
                     <td>
-                        <input type="number" class="marks-input ${marksVal !== '' ? 'valid' : ''}"
-                            id="marks_${s.id}" min="0" max="${currentMaxMarks}"
-                            value="${marksVal}" placeholder="0–${currentMaxMarks}"
-                            oninput="onMarksInput(${s.id})">
+                        <div class="student-info">
+                            <span class="student-roll">${s.roll_number}</span>
+                            <span class="student-name">${s.name}</span>
+                        </div>
                     </td>
-                    <td id="grade_${s.id}">
-                        ${g ? `<span class="grade-tag ${g.cls}">${g.grade}</span>` : '–'}
-                    </td>
+            `;
+
+                    subjectsList.forEach(subj => {
+                        const key = `${s.id}_${subj.id}`;
+                        const existing = existingMarksMap[key];
+                        const marksVal = existing ? existing.marks_obtained : '';
+                        const isValid = marksVal !== '' && marksVal >= 0 && marksVal <= currentMaxMarks;
+
+                        rowHTML += `
                     <td>
-                        <button class="btn btn-success btn-sm" onclick="saveSingle(${s.id})">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                        </button>
+                        <input type="number" 
+                            class="bulk-marks-input ${isValid ? 'valid' : marksVal !== '' ? 'invalid' : 'empty'}"
+                            id="marks_${s.id}_${subj.id}" 
+                            min="0" 
+                            max="${currentMaxMarks}"
+                            value="${marksVal}" 
+                            placeholder="-"
+                            oninput="onBulkMarksInput(${s.id}, ${subj.id})"
+                            data-student="${s.id}"
+                            data-subject="${subj.id}">
                     </td>
-                </tr>`;
-            }).join('');
+                `;
+                    });
+
+                    rowHTML += '</tr>';
+                    return rowHTML;
+                }).join('');
+            }
 
             document.getElementById('marksSection').style.display = 'block';
             document.getElementById('statsRow').style.display = 'flex';
-            updateStats();
+
+            // Update stats display
+            document.getElementById('statTotalStudents').textContent = studentsList.length;
+            document.getElementById('statTotalSubjects').textContent = subjectsList.length;
         }
 
-        function onMarksInput(studentId) {
-            const inp = document.getElementById('marks_' + studentId);
-            const val = parseInt(inp.value);
-            const gradeCell = document.getElementById('grade_' + studentId);
+        function onBulkMarksInput(studentId, subjectId) {
+            const input = document.getElementById(`marks_${studentId}_${subjectId}`);
+            const val = input.value;
 
-            if (inp.value === '') {
-                inp.className = 'marks-input';
-                gradeCell.innerHTML = '–';
-            } else if (isNaN(val) || val < 0 || val > currentMaxMarks) {
-                inp.className = 'marks-input invalid';
-                gradeCell.innerHTML = '<span style="color:var(--rose-500);font-size:0.75rem">Invalid</span>';
+            if (val === '') {
+                input.className = 'bulk-marks-input empty';
             } else {
-                inp.className = 'marks-input valid';
-                const g = calculateGrade(val, currentMaxMarks);
-                gradeCell.innerHTML = `<span class="grade-tag ${g.cls}">${g.grade}</span>`;
+                const numVal = parseInt(val);
+                if (isNaN(numVal) || numVal < 0 || numVal > currentMaxMarks) {
+                    input.className = 'bulk-marks-input invalid';
+                } else {
+                    input.className = 'bulk-marks-input valid';
+                }
             }
-            updateStats();
-        }
 
-        function calculateGrade(marks, max) {
-            const pct = (marks / max) * 100;
-            if (pct >= 91) return { grade: 'A+', cls: 'grade-ap' };
-            if (pct >= 81) return { grade: 'A', cls: 'grade-a' };
-            if (pct >= 71) return { grade: 'B', cls: 'grade-b' };
-            if (pct >= 61) return { grade: 'C', cls: 'grade-c' };
-            if (pct >= 51) return { grade: 'D', cls: 'grade-d' };
-            return { grade: 'F', cls: 'grade-f' };
+            updateStats();
         }
 
         function updateStats() {
-            let entered = 0, highest = 0, lowest = currentMaxMarks, totalSum = 0;
+            let totalEntries = studentsList.length * subjectsList.length;
+            let filledEntries = 0;
+
             studentsList.forEach(s => {
-                const val = document.getElementById('marks_' + s.id)?.value;
-                if (val !== '' && val !== undefined) {
-                    const n = parseInt(val);
-                    if (!isNaN(n) && n >= 0 && n <= currentMaxMarks) {
-                        entered++;
-                        totalSum += n;
-                        if (n > highest) highest = n;
-                        if (n < lowest) lowest = n;
+                subjectsList.forEach(subj => {
+                    const input = document.getElementById(`marks_${s.id}_${subj.id}`);
+                    if (input && input.value !== '' && input.classList.contains('valid')) {
+                        filledEntries++;
                     }
-                }
+                });
             });
-            const avg = entered > 0 ? (totalSum / entered).toFixed(1) : '–';
 
-            document.getElementById('statsRow').innerHTML = `
-                <div class="stat-pill"><div class="sp-val">${entered}/${studentsList.length}</div><div class="sp-label">Entered</div></div>
-                <div class="stat-pill"><div class="sp-val">${avg}</div><div class="sp-label">Average</div></div>
-                <div class="stat-pill"><div class="sp-val" style="color:var(--emerald-500)">${entered > 0 ? highest : '–'}</div><div class="sp-label">Highest</div></div>
-                <div class="stat-pill"><div class="sp-val" style="color:var(--rose-500)">${entered > 0 ? lowest : '–'}</div><div class="sp-label">Lowest</div></div>
-            `;
+            const percentage = totalEntries > 0 ? Math.round((filledEntries / totalEntries) * 100) : 0;
+
+            document.getElementById('statProgress').textContent = percentage + '%';
+            document.getElementById('completionText').textContent = `${filledEntries} of ${totalEntries} entries completed`;
+            document.getElementById('progressFill').style.width = percentage + '%';
         }
 
-        function markAllZero() {
+        function clearAllMarks() {
+            if (!confirm('Are you sure you want to clear all entered marks?')) return;
+
             studentsList.forEach(s => {
-                const inp = document.getElementById('marks_' + s.id);
-                if (inp) { inp.value = '0'; onMarksInput(s.id); }
+                subjectsList.forEach(subj => {
+                    const input = document.getElementById(`marks_${s.id}_${subj.id}`);
+                    if (input) {
+                        input.value = '';
+                        input.className = 'bulk-marks-input empty';
+                    }
+                });
             });
+
+            updateStats();
+            showToast('All marks cleared', 'success');
         }
 
-        async function saveSingle(studentId) {
-            const subj = document.getElementById('subjectSelect').value;
+        async function saveAllBulkMarks() {
             const exam = document.getElementById('examSelect').value;
-            const inp = document.getElementById('marks_' + studentId);
-            const val = parseInt(inp.value);
-
-            if (isNaN(val) || val < 0 || val > currentMaxMarks) {
-                showToast('Please enter valid marks (0–' + currentMaxMarks + ')', 'error'); return;
-            }
-
-            const subjectId = subjectIdMap[subj];
-            const { data: existing } = await db.from('marks').select('id')
-                .eq('student_id', studentId).eq('subject_id', subjectId).eq('exam_type', exam).single();
-
-            let result;
-            if (existing) {
-                result = await db.from('marks').update({ marks_obtained: val, max_marks: currentMaxMarks }).eq('id', existing.id);
-            } else {
-                result = await db.from('marks').insert({ student_id: studentId, subject_id: subjectId, exam_type: exam, marks_obtained: val, max_marks: currentMaxMarks });
-            }
-
-            if (result.error) { showToast('Error: ' + result.error.message, 'error'); }
-            else { showToast('Marks saved!', 'success'); }
-        }
-
-        async function saveAllMarks() {
-            const subj = document.getElementById('subjectSelect').value;
-            const exam = document.getElementById('examSelect').value;
-            const subjectId = subjectIdMap[subj];
             const records = [];
-            let hasError = false;
+            const updates = [];
+            let invalidCount = 0;
+            let emptyCount = 0;
 
             studentsList.forEach(s => {
-                const val = document.getElementById('marks_' + s.id)?.value;
-                if (val !== '' && val !== undefined) {
-                    const n = parseInt(val);
-                    if (!isNaN(n) && n >= 0 && n <= currentMaxMarks) {
-                        records.push({ student_id: s.id, subject_id: subjectId, exam_type: exam, marks_obtained: n, max_marks: currentMaxMarks });
-                    } else { hasError = true; }
-                }
+                subjectsList.forEach(subj => {
+                    const input = document.getElementById(`marks_${s.id}_${subj.id}`);
+                    const val = input.value;
+
+                    if (val === '') {
+                        emptyCount++;
+                        return;
+                    }
+
+                    const numVal = parseInt(val);
+                    if (isNaN(numVal) || numVal < 0 || numVal > currentMaxMarks) {
+                        invalidCount++;
+                        return;
+                    }
+
+                    const key = `${s.id}_${subj.id}`;
+                    const existing = existingMarksMap[key];
+
+                    const record = {
+                        student_id: s.id,
+                        subject_id: subj.id,
+                        exam_type: exam,
+                        marks_obtained: numVal,
+                        max_marks: currentMaxMarks
+                    };
+
+                    if (existing) {
+                        updates.push({ ...record, id: existing.id });
+                    } else {
+                        records.push(record);
+                    }
+                });
             });
 
-            if (hasError) { showToast('Some marks are invalid', 'error'); return; }
-            if (records.length === 0) { showToast('No marks to save', 'error'); return; }
+            if (invalidCount > 0) {
+                showToast(`${invalidCount} marks are invalid. Please fix before saving.`, 'error');
+                return;
+            }
 
-            await db.from('marks').delete()
-                .eq('subject_id', subjectId).eq('exam_type', exam)
-                .in('student_id', studentsList.map(s => s.id));
+            if (records.length === 0 && updates.length === 0) {
+                showToast('No marks to save', 'error');
+                return;
+            }
 
-            const { error } = await db.from('marks').insert(records);
-            if (error) { showToast('Error saving: ' + error.message, 'error'); }
-            else { showToast(`${records.length} marks saved!`, 'success'); }
+            // Show loading state
+            const saveBtn = document.querySelector('.btn-primary[onclick="saveAllBulkMarks()"]');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 0.5rem; animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg> Saving...`;
+            saveBtn.disabled = true;
+
+            try {
+                // Insert new records
+                if (records.length > 0) {
+                    const { error: insertError } = await db.from('marks').insert(records);
+                    if (insertError) throw insertError;
+                }
+
+                // Update existing records
+                for (const update of updates) {
+                    const { id, ...data } = update;
+                    const { error: updateError } = await db.from('marks')
+                        .update(data)
+                        .eq('id', id);
+                    if (updateError) throw updateError;
+                }
+
+                showToast(`Saved ${records.length} new and updated ${updates.length} marks!`, 'success');
+
+                // Refresh the data
+                await loadStudentsForBulk();
+
+            } catch (error) {
+                showToast('Error saving marks: ' + error.message, 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
         }
 
         /* ── Toast ── */
@@ -831,7 +1062,163 @@
             setTimeout(() => toast.className = 'toast', 3000);
         }
 
-        loadSubjectIds();
+        // Add spin animation for loading state
+        const style = document.createElement('style');
+        style.textContent = `
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+`;
+        document.head.appendChild(style);
+
+        /* ── Keyboard Navigation for Spreadsheet-like Experience ── */
+        document.addEventListener('keydown', function (e) {
+            const activeElement = document.activeElement;
+            if (!activeElement || !activeElement.classList.contains('bulk-marks-input')) return;
+
+            const studentId = parseInt(activeElement.dataset.student);
+            const subjectId = parseInt(activeElement.dataset.subject);
+
+            const studentIndex = studentsList.findIndex(s => s.id === studentId);
+            const subjectIndex = subjectsList.findIndex(s => s.id === subjectId);
+
+            let nextInput = null;
+
+            switch (e.key) {
+                case 'ArrowRight':
+                    e.preventDefault();
+                    if (subjectIndex < subjectsList.length - 1) {
+                        nextInput = document.getElementById(`marks_${studentId}_${subjectsList[subjectIndex + 1].id}`);
+                    }
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    if (subjectIndex > 0) {
+                        nextInput = document.getElementById(`marks_${studentId}_${subjectsList[subjectIndex - 1].id}`);
+                    }
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (studentIndex < studentsList.length - 1) {
+                        nextInput = document.getElementById(`marks_${studentsList[studentIndex + 1].id}_${subjectId}`);
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (studentIndex > 0) {
+                        nextInput = document.getElementById(`marks_${studentsList[studentIndex - 1].id}_${subjectId}`);
+                    }
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    // Move to next cell (right, or down if at end of row)
+                    if (subjectIndex < subjectsList.length - 1) {
+                        nextInput = document.getElementById(`marks_${studentId}_${subjectsList[subjectIndex + 1].id}`);
+                    } else if (studentIndex < studentsList.length - 1) {
+                        nextInput = document.getElementById(`marks_${studentsList[studentIndex + 1].id}_${subjectsList[0].id}`);
+                    }
+                    break;
+            }
+
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select();
+            }
+        });
+
+        /* ── Export to CSV Function ── */
+        function exportToCSV() {
+            const cls = document.getElementById('classSelect').value;
+            const sec = document.getElementById('sectionSelect').value;
+            const exam = document.getElementById('examSelect').value;
+
+            let csv = 'Roll No,Student Name,' + subjectsList.map(s => s.subject_name).join(',') + '\n';
+
+            studentsList.forEach(s => {
+                let row = `${s.roll_number},"${s.name}"`;
+                subjectsList.forEach(subj => {
+                    const input = document.getElementById(`marks_${s.id}_${subj.id}`);
+                    const val = input?.value || '';
+                    row += ',' + val;
+                });
+                csv += row + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `marks_${cls}_${sec}_${exam}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showToast('CSV exported successfully!', 'success');
+        }
+
+        /* ── Import from CSV (Paste Handler) ── */
+        document.addEventListener('paste', function (e) {
+            const activeElement = document.activeElement;
+            if (!activeElement || !activeElement.classList.contains('bulk-marks-input')) return;
+
+            const pasteData = e.clipboardData.getData('text');
+            const rows = pasteData.trim().split('\n');
+
+            if (rows.length <= 1) return; // Single value paste, let default happen
+
+            e.preventDefault();
+
+            const startStudentId = parseInt(activeElement.dataset.student);
+            const startSubjectId = parseInt(activeElement.dataset.subject);
+
+            const startStudentIndex = studentsList.findIndex(s => s.id === startStudentId);
+            const startSubjectIndex = subjectsList.findIndex(s => s.id === startSubjectId);
+
+            rows.forEach((row, rowIdx) => {
+                const values = row.split('\t');
+                const studentIdx = startStudentIndex + rowIdx;
+
+                if (studentIdx >= studentsList.length) return;
+
+                values.forEach((val, colIdx) => {
+                    const subjectIdx = startSubjectIndex + colIdx;
+                    if (subjectIdx >= subjectsList.length) return;
+
+                    const student = studentsList[studentIdx];
+                    const subject = subjectsList[subjectIdx];
+                    const input = document.getElementById(`marks_${student.id}_${subject.id}`);
+
+                    if (input && val.trim() !== '') {
+                        const numVal = parseInt(val.trim());
+                        if (!isNaN(numVal) && numVal >= 0 && numVal <= currentMaxMarks) {
+                            input.value = numVal;
+                            input.className = 'bulk-marks-input valid';
+                        }
+                    }
+                });
+            });
+
+            updateStats();
+            showToast('Data pasted successfully!', 'success');
+        });
+
+        /* ── Fill Empty Marks with Zero ── */
+        function fillEmptyWithZero() {
+            if (!confirm('Fill all empty cells with 0?')) return;
+
+            studentsList.forEach(s => {
+                subjectsList.forEach(subj => {
+                    const input = document.getElementById(`marks_${s.id}_${subj.id}`);
+                    if (input && input.value === '') {
+                        input.value = '0';
+                        input.className = 'bulk-marks-input valid';
+                    }
+                });
+            });
+
+            updateStats();
+            showToast('Empty cells filled with 0', 'success');
+        }
     </script>
 </body>
 

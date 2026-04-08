@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Enter Marks - ZPHS Nagulapet</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Page-specific styles */
+        .filter-card {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            border: 1px solid var(--gray-200);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .stats-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-pill {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--r-lg);
+            text-align: center;
+            min-width: 110px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .stat-pill .sp-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .stat-pill .sp-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.1rem;
+        }
+
+        .marks-table-card {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .marks-table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .marks-table-header h3 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .marks-input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--r);
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .marks-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .marks-input.valid {
+            border-color: var(--emerald-500);
+            background: var(--emerald-50);
+        }
+
+        .marks-input.invalid {
+            border-color: var(--rose-500);
+            background: var(--rose-50);
+        }
+
+        .grade-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .grade-ap {
+            background: var(--emerald-100);
+            color: #065f46;
+        }
+
+        .grade-a {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .grade-b {
+            background: var(--amber-100);
+            color: #92400e;
+        }
+
+        .grade-c {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .grade-d {
+            background: var(--rose-100);
+            color: #991b1b;
+        }
+
+        .grade-f {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-400);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.35;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .marks-table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Sidebar open state for mobile */
+        .sidebar.open {
+            transform: translateX(0);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Mobile profile section */
+        .sidebar-profile-mobile {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-profile-mobile {
+                display: flex;
+            }
+
+            .sidebar-user {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .sidebar-profile-mobile {
+                display: none !important;
+            }
+
+            .sidebar-user {
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- ── SIDEBAR (desktop) ─────────────────── -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
+                </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <a href="teacher_dashboard.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- <div class="nav-section">
+                    <div class="nav-label">Academic</div>
+                    <a href="enter_marks.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
+                    </a>
+                    <a href="take_attendance.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
+                    </a>
+                    <a href="assign_homework.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
+                            </svg>
+                        </span>
+                        <span>Assign Homework</span>
+                    </a>
+                </div> -->
+
+                <div class="nav-section">
+                    <div class="nav-label">Management</div>
+                    <a href="view_students.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
+                    </a>
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item active">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">T</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
+                    </div>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- ── MAIN CONTENT ───────────────────────── -->
+        <div class="main-content">
+
+            <!-- Mobile top header -->
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand">
+                    <span>ZPHS Nagulapet</span>
+                </div>
+
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profileBtn" onclick="toggleProfileDropdown()" aria-label="Profile">
+                        <div class="profile-avatar-img" id="headerProfileAvatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                        <a href="profile.html" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            View Profile
+                        </a>
+                        <button class="dropdown-item" onclick="logout()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                <path d="M16 17l5-5-5-5" />
+                                <path d="M21 12H9" />
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Desktop top bar -->
+            <div class="desktop-topbar">
+                <div class="page-title">
+                    <h1>Enter Marks</h1>
+                </div>
+            </div>
+
+            <!-- Page body -->
+            <div class="page-content">
+                <!-- Filter Card -->
+                <div class="filter-card">
+                    <div class="section-header" style="margin-bottom: 1.25rem;">
+                        <span class="section-title">Select Class & Exam</span>
+                    </div>
+
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <label class="form-label">Class</label>
+                            <select id="classSelect" class="form-select" onchange="onClassChange()">
+                                <option value="">Select Class</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Section</label>
+                            <select id="sectionSelect" class="form-select">
+                                <option value="">Select Section</option>
+                                <option>A</option>
+                                <option>B</option>
+                                <option>C</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <select id="subjectSelect" class="form-select">
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Exam Type</label>
+                            <select id="examSelect" class="form-select">
+                                <option value="">Select Exam</option>
+                                <option value="FA1">FA1 - Formative 1</option>
+                                <option value="FA2">FA2 - Formative 2</option>
+                                <option value="SA1">SA1 - Summative 1</option>
+                                <option value="FA3">FA3 - Formative 3</option>
+                                <option value="FA4">FA4 - Formative 4</option>
+                                <option value="SA2">SA2 - Summative 2</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg" onclick="loadStudents()" style="width: 100%;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 18px; height: 18px; margin-right: 0.5rem;">
+                            <path
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Load Students
+                    </button>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="stats-row" id="statsRow" style="display: none;"></div>
+
+                <!-- Marks Table -->
+                <div id="marksSection" style="display:none">
+                    <div class="marks-table-card">
+                        <div class="marks-table-header">
+                            <h3 id="tableTitle">Marks Entry</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="markAllZero()">
+                                    Set All 0
+                                </button>
+                                <button class="btn btn-primary" onclick="saveAllMarks()">
+                                    Save All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px">#</th>
+                                        <th>Roll No</th>
+                                        <th>Student Name</th>
+                                        <th>Marks <span style="font-weight:400">(Max: <span
+                                                    id="maxMarksDisplay">20</span>)</span></th>
+                                        <th>Grade</th>
+                                        <th style="width:80px">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marksTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /page-content -->
+        </div><!-- /main-content -->
+    </div><!-- /app-layout -->
+
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item active">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="assign_homework.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+            </span>
+            <span class="bnav-label">Homework</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
+                </svg>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="config.js"></script>
+    <script>
+        /* ── Sidebar toggle ── */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+
+        /* ── Session guard ── */
+        const teacher = JSON.parse(localStorage.getItem("school_session"));
+        if (!teacher) window.location.href = 'index.html';
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        // Names
+        const sidebarName = document.getElementById('sidebarName');
+        if (sidebarName) sidebarName.textContent = teacher.name || 'Teacher';
+
+        const sidebarRole = document.getElementById('sidebarRole');
+        if (sidebarRole) sidebarRole.textContent = teacher.designation || 'Teacher';
+
+        const sidebarProfileName = document.getElementById('sidebarProfileName');
+        if (sidebarProfileName) sidebarProfileName.textContent = teacher?.name?.split(' ')[0] || 'Teacher';
+
+        /* ── Marks functionality ── */
+        let studentsList = [];
+        let subjectIdMap = {};
+        let currentMaxMarks = 20;
+
+        function getExamMaxMarks(examType) {
+            if (examType?.startsWith('SA')) return 80;
+            if (examType?.startsWith('FA')) return 20;
+            return 20;
+        }
+
+        document.getElementById('examSelect').addEventListener('change', function () {
+            const examType = this.value;
+            currentMaxMarks = getExamMaxMarks(examType);
+            document.getElementById('maxMarksDisplay').textContent = currentMaxMarks;
+        });
+
+        function onClassChange() {
+            const cls = document.getElementById('classSelect').value;
+            const subSel = document.getElementById('subjectSelect');
+            const subjects = cls ? SUBJECTS_BY_CLASS[cls] : [];
+            subSel.innerHTML = '<option value="">Select Subject</option>' +
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        async function loadSubjectIds() {
+            const { data } = await db.from('subjects').select('*');
+            if (data) data.forEach(s => { subjectIdMap[s.subject_name] = s.id; });
+        }
+
+        async function loadStudents() {
+            const cls = document.getElementById('classSelect').value;
+            const sec = document.getElementById('sectionSelect').value;
+            const subj = document.getElementById('subjectSelect').value;
+            const exam = document.getElementById('examSelect').value;
+
+            if (!cls || !sec || !subj || !exam) {
+                showToast('Please select all fields', 'error');
+                return;
+            }
+
+            const subjectId = subjectIdMap[subj];
+            if (!subjectId) {
+                showToast('Subject not found', 'error');
+                return;
+            }
+
+            const { data: students, error } = await db.from('students')
+                .select('*').eq('class_name', cls).eq('section', sec).order('roll_number');
+
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            studentsList = students || [];
+
+            const { data: existingMarks } = await db.from('marks')
+                .select('*').eq('subject_id', subjectId).eq('exam_type', exam)
+                .in('student_id', studentsList.map(s => s.id));
+
+            const marksMap = {};
+            if (existingMarks) existingMarks.forEach(m => { marksMap[m.student_id] = m; });
+
+            renderTable(marksMap, subj, cls, sec, exam);
+        }
+
+        function renderTable(marksMap, subj, cls, sec, exam) {
+            document.getElementById('tableTitle').textContent = `Class ${cls}-${sec} | ${subj} | ${exam}`;
+            document.getElementById('maxMarksDisplay').textContent = currentMaxMarks;
+
+            if (studentsList.length === 0) {
+                document.getElementById('marksTableBody').innerHTML = '<tr><td colspan="6" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><p>No students found</p></td></tr>';
+                document.getElementById('marksSection').style.display = 'block';
+                document.getElementById('statsRow').style.display = 'flex';
+                updateStats();
+                return;
+            }
+
+            document.getElementById('marksTableBody').innerHTML = studentsList.map((s, i) => {
+                const existing = marksMap[s.id];
+                const marksVal = existing ? existing.marks_obtained : '';
+                const g = existing ? calculateGrade(existing.marks_obtained, currentMaxMarks) : null;
+                return `<tr id="row_${s.id}">
+                    <td style="color:var(--gray-400);font-weight:600">${i + 1}</td>
+                    <td><span class="badge badge-gray">${s.roll_number}</span></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>
+                        <input type="number" class="marks-input ${marksVal !== '' ? 'valid' : ''}"
+                            id="marks_${s.id}" min="0" max="${currentMaxMarks}"
+                            value="${marksVal}" placeholder="0–${currentMaxMarks}"
+                            oninput="onMarksInput(${s.id})">
+                    </td>
+                    <td id="grade_${s.id}">
+                        ${g ? `<span class="grade-tag ${g.cls}">${g.grade}</span>` : '–'}
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="saveSingle(${s.id})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('marksSection').style.display = 'block';
+            document.getElementById('statsRow').style.display = 'flex';
+            updateStats();
+        }
+
+        function onMarksInput(studentId) {
+            const inp = document.getElementById('marks_' + studentId);
+            const val = parseInt(inp.value);
+            const gradeCell = document.getElementById('grade_' + studentId);
+
+            if (inp.value === '') {
+                inp.className = 'marks-input';
+                gradeCell.innerHTML = '–';
+            } else if (isNaN(val) || val < 0 || val > currentMaxMarks) {
+                inp.className = 'marks-input invalid';
+                gradeCell.innerHTML = '<span style="color:var(--rose-500);font-size:0.75rem">Invalid</span>';
+            } else {
+                inp.className = 'marks-input valid';
+                const g = calculateGrade(val, currentMaxMarks);
+                gradeCell.innerHTML = `<span class="grade-tag ${g.cls}">${g.grade}</span>`;
+            }
+            updateStats();
+        }
+
+        function calculateGrade(marks, max) {
+            const pct = (marks / max) * 100;
+            if (pct >= 91) return { grade: 'A+', cls: 'grade-ap' };
+            if (pct >= 81) return { grade: 'A', cls: 'grade-a' };
+            if (pct >= 71) return { grade: 'B', cls: 'grade-b' };
+            if (pct >= 61) return { grade: 'C', cls: 'grade-c' };
+            if (pct >= 51) return { grade: 'D', cls: 'grade-d' };
+            return { grade: 'F', cls: 'grade-f' };
+        }
+
+        function updateStats() {
+            let entered = 0, highest = 0, lowest = currentMaxMarks, totalSum = 0;
+            studentsList.forEach(s => {
+                const val = document.getElementById('marks_' + s.id)?.value;
+                if (val !== '' && val !== undefined) {
+                    const n = parseInt(val);
+                    if (!isNaN(n) && n >= 0 && n <= currentMaxMarks) {
+                        entered++;
+                        totalSum += n;
+                        if (n > highest) highest = n;
+                        if (n < lowest) lowest = n;
+                    }
+                }
+            });
+            const avg = entered > 0 ? (totalSum / entered).toFixed(1) : '–';
+
+            document.getElementById('statsRow').innerHTML = `
+                <div class="stat-pill"><div class="sp-val">${entered}/${studentsList.length}</div><div class="sp-label">Entered</div></div>
+                <div class="stat-pill"><div class="sp-val">${avg}</div><div class="sp-label">Average</div></div>
+                <div class="stat-pill"><div class="sp-val" style="color:var(--emerald-500)">${entered > 0 ? highest : '–'}</div><div class="sp-label">Highest</div></div>
+                <div class="stat-pill"><div class="sp-val" style="color:var(--rose-500)">${entered > 0 ? lowest : '–'}</div><div class="sp-label">Lowest</div></div>
+            `;
+        }
+
+        function markAllZero() {
+            studentsList.forEach(s => {
+                const inp = document.getElementById('marks_' + s.id);
+                if (inp) { inp.value = '0'; onMarksInput(s.id); }
+            });
+        }
+
+        async function saveSingle(studentId) {
+            const subj = document.getElementById('subjectSelect').value;
+            const exam = document.getElementById('examSelect').value;
+            const inp = document.getElementById('marks_' + studentId);
+            const val = parseInt(inp.value);
+
+            if (isNaN(val) || val < 0 || val > currentMaxMarks) {
+                showToast('Please enter valid marks (0–' + currentMaxMarks + ')', 'error'); return;
+            }
+
+            const subjectId = subjectIdMap[subj];
+            const { data: existing } = await db.from('marks').select('id')
+                .eq('student_id', studentId).eq('subject_id', subjectId).eq('exam_type', exam).single();
+
+            let result;
+            if (existing) {
+                result = await db.from('marks').update({ marks_obtained: val, max_marks: currentMaxMarks }).eq('id', existing.id);
+            } else {
+                result = await db.from('marks').insert({ student_id: studentId, subject_id: subjectId, exam_type: exam, marks_obtained: val, max_marks: currentMaxMarks });
+            }
+
+            if (result.error) { showToast('Error: ' + result.error.message, 'error'); }
+            else { showToast('Marks saved!', 'success'); }
+        }
+
+        async function saveAllMarks() {
+            const subj = document.getElementById('subjectSelect').value;
+            const exam = document.getElementById('examSelect').value;
+            const subjectId = subjectIdMap[subj];
+            const records = [];
+            let hasError = false;
+
+            studentsList.forEach(s => {
+                const val = document.getElementById('marks_' + s.id)?.value;
+                if (val !== '' && val !== undefined) {
+                    const n = parseInt(val);
+                    if (!isNaN(n) && n >= 0 && n <= currentMaxMarks) {
+                        records.push({ student_id: s.id, subject_id: subjectId, exam_type: exam, marks_obtained: n, max_marks: currentMaxMarks });
+                    } else { hasError = true; }
+                }
+            });
+
+            if (hasError) { showToast('Some marks are invalid', 'error'); return; }
+            if (records.length === 0) { showToast('No marks to save', 'error'); return; }
+
+            await db.from('marks').delete()
+                .eq('subject_id', subjectId).eq('exam_type', exam)
+                .in('student_id', studentsList.map(s => s.id));
+
+            const { error } = await db.from('marks').insert(records);
+            if (error) { showToast('Error saving: ' + error.message, 'error'); }
+            else { showToast(`${records.length} marks saved!`, 'success'); }
+        }
+
+        /* ── Toast ── */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        loadSubjectIds();
+    </script>
+</body>
+
+</html>

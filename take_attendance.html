@@ -303,7 +303,7 @@
 
         <!-- ── SIDEBAR (desktop) ─────────────────── -->
         <aside class="sidebar" id="sidebar">
-            <!-- Mobile Profile Section -->
+            <!-- Mobile Profile Section (shown only on mobile) -->
             <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
                 <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
                 <div class="profile-info-mobile">
@@ -312,7 +312,6 @@
                 </div>
             </a>
             <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
-
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-label">Main</div>
@@ -340,7 +339,7 @@
                         </span>
                         <span>Enter Marks</span>
                     </a>
-                    <a href="take_attendance.html" class="nav-item active">
+                    <a href="take_attendance.html" class="nav-item">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
@@ -405,8 +404,8 @@
                 <a href="profile.html" class="sidebar-user">
                     <div class="user-avatar" id="sidebarAvatar">T</div>
                     <div class="user-info">
-                        <div class="user-name" id="sidebarName">Teacher</div>
-                        <div class="user-role" id="sidebarRole">Teacher</div>
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
                     </div>
                 </a>
             </nav>
