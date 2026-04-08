@@ -389,6 +389,63 @@
         font-size: 1rem;
     }
 }
+
+
+
+
+
+
+
+
+/* Mobile scrollable table */
+.table-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: thin;
+    scrollbar-color: #4f46e5 #f3f4f6;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: #4f46e5;
+    border-radius: 3px;
+}
+
+/* Ensure table doesn't shrink on mobile */
+.table-scroll-container table {
+    min-width: 600px; /* Adjust based on your content */
+    width: 100%;
+}
+
+/* For consolidated report specifically */
+.consolidated-report .table-scroll-container {
+    border-radius: 0 0 1rem 1rem;
+}
+
+@media (max-width: 768px) {
+    .table-scroll-container {
+        margin: 0 -1rem; /* Full width on mobile */
+        padding: 0 1rem;
+    }
+    
+    .consolidated-table {
+        font-size: 0.8rem;
+    }
+    
+    .consolidated-table th,
+    .consolidated-table td {
+        padding: 0.75rem 0.5rem;
+        white-space: nowrap;
+    }
+}
     </style>
 </head>
 
@@ -678,7 +735,7 @@
                 </h3>
                 <span class="overall-avg">Overall Average: ${avgPct}% | Grade: ${overallGrade.grade}</span>
             </div>
-            <div style="overflow-x: auto;">
+            <div style="overflow-x: auto";class="table-scroll-container">
                 <table class="consolidated-table">
                     <thead>
                         <tr>
