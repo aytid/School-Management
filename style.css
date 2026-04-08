@@ -1555,7 +1555,7 @@ table {
 
 thead th {
     padding: .75rem 1rem;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
     color: var(--gray-600);
     background: var(--gray-50);
@@ -1568,6 +1568,7 @@ tbody td {
     padding: .875rem 1rem;
     border-bottom: 1px solid var(--gray-100);
     color: var(--gray-700);
+    text-align: center;
 }
 
 tbody tr:last-child td {
