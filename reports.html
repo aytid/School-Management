@@ -566,6 +566,38 @@
             }
 
         }
+        /* Consolidated Report Styling */
+.data-table th {
+    background: var(--gray-100);
+    font-weight: 700;
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+}
+
+.data-table td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.grade-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.grade-ap, .grade-a-plus { background: #d1fae5; color: #065f46; }
+.grade-a { background: #dbeafe; color: #1e40af; }
+.grade-b { background: #fef3c7; color: #92400e; }
+.grade-c { background: #fed7aa; color: #9a3412; }
+.grade-d { background: #fecaca; color: #991b1b; }
+.grade-f { background: #fee2e2; color: #7f1d1d; }
     </style>
 </head>
 
@@ -748,11 +780,11 @@
                 <div class="mobile-tab-select">
                     <select id="reportTabSelect" onchange="switchTab(this.value)">
                         <option value="student">Student Report</option>
+                        <option value="comparison">Student Progress</option>
                         <option value="class">Class Report</option>
                         <option value="exam">Exam Analysis</option>
                         <option value="ranking">Rankings</option>
                         <option value="attendance">Attendance Report</option>
-                        <option value="comparison">Exam Comparison</option>
                     </select>
                 </div>
                 <!-- Tabs -->
@@ -763,6 +795,15 @@
                             <circle cx="12" cy="7" r="4" />
                         </svg>
                         Student Report
+                    </div>
+                    <div class="tab-item" onclick="switchTab('comparison')">
+                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18" />
+                            <path d="M18 17V9" />
+                            <path d="M13 17V5" />
+                            <path d="M8 17v-3" />
+                        </svg>
+                        Student Progress
                     </div>
                     <div class="tab-item" onclick="switchTab('class')">
                         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -802,15 +843,7 @@
                         </svg>
                         Attendance Report
                     </div>
-                    <div class="tab-item" onclick="switchTab('comparison')">
-                        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18" />
-                            <path d="M18 17V9" />
-                            <path d="M13 17V5" />
-                            <path d="M8 17v-3" />
-                        </svg>
-                        Exam Comparison
-                    </div>
+
                 </div>
 
                 <!-- STUDENT REPORT -->
@@ -1214,7 +1247,7 @@
 
     <script src="config.js"></script>
     <script>
-        
+
         /* ── Sidebar toggle ── */
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
@@ -1270,7 +1303,7 @@
         document.getElementById('attRptFrom').value = lastMonth.toISOString().split('T')[0];
         function switchTab(tab) {
 
-            const tabs = ['student', 'class', 'exam', 'ranking', 'attendance', 'comparison'];
+            const tabs = ['student', 'comparison', 'class', 'exam', 'ranking', 'attendance'];
 
             document.querySelectorAll('.tab-item').forEach((t, i) => {
                 t.classList.toggle('active', tabs[i] === tab);
@@ -1305,6 +1338,7 @@
                 reportStudents.map(s => `<option value="${s.id}">${s.name} (${s.roll_number})</option>`).join('');
         }
 
+
         async function generateStudentReport() {
             const studentId = document.getElementById('srStudent').value;
             if (!studentId) { alert('Please select a student'); return; }
@@ -1319,80 +1353,213 @@
             const att = attRes.data || [];
             const attPct = att.length > 0 ? ((att.filter(a => a.status === 'Present').length / att.length) * 100).toFixed(1) : 0;
 
-            const subjectGroups = {};
+            // Group by EXAM (changed from subject)
+            const examGroups = {};
             marks.forEach(m => {
-                const n = m.subjects?.subject_name || 'Unknown';
-                if (!subjectGroups[n]) subjectGroups[n] = [];
-                subjectGroups[n].push(m);
+                const examName = m.exam_type;
+                if (!examGroups[examName]) examGroups[examName] = [];
+                examGroups[examName].push(m);
             });
 
+            // Calculate overall average
             let avgPct = 0;
             if (marks.length > 0) {
                 avgPct = (marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / marks.length).toFixed(1);
             }
-
             const og = calculateGrade(parseFloat(avgPct), 100);
 
+            // Get all unique subjects for consolidated report
+            const allSubjects = [...new Set(marks.map(m => m.subjects?.subject_name).filter(Boolean))].sort();
+
+            // Build consolidated data: subject -> exam -> marks
+            const consolidatedData = {};
+            allSubjects.forEach(subj => {
+                consolidatedData[subj] = {};
+                ['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'].forEach(exam => {
+                    const mark = marks.find(m => m.subjects?.subject_name === subj && m.exam_type === exam);
+                    if (mark) {
+                        consolidatedData[subj][exam] = {
+                            obtained: mark.marks_obtained,
+                            max: mark.max_marks,
+                            pct: ((mark.marks_obtained / mark.max_marks) * 100).toFixed(1)
+                        };
+                    }
+                });
+            });
+
             document.getElementById('studentReportOutput').innerHTML = `
-            <div class="result-header-bar">
-                <div>
-                    <h3>${student.name}</h3>
-                    <p>Class ${student.class_name}-${student.section} | Roll: ${student.roll_number}</p>
-                </div>
-                <div class="result-summary-pills">
-                    <span class="rsp">Avg: ${avgPct}%</span>
-                    <span class="rsp">Grade: ${og.grade}</span>
-                    <span class="rsp">Attendance: ${attPct}%</span>
-                    <span class="rsp">Exams: ${marks.length}</span>
-                </div>
+        <div class="result-header-bar">
+            <div>
+                <h3>${student.name}</h3>
+                <p>Class ${student.class_name}-${student.section} | Roll: ${student.roll_number}</p>
             </div>
-            ${Object.entries(subjectGroups).map(([subj, exams]) => {
-                const tot = exams.reduce((a, e) => a + e.marks_obtained, 0);
-                const max = exams.reduce((a, e) => a + e.max_marks, 0);
-                const avg = ((tot / max) * 100).toFixed(1);
+            <div class="result-summary-pills">
+                <span class="rsp">Avg: ${avgPct}%</span>
+                <span class="rsp">Grade: ${og.grade}</span>
+                <span class="rsp">Attendance: ${attPct}%</span>
+                <span class="rsp">Exams: ${marks.length}</span>
+            </div>
+        </div>
+
+        <!-- EXAM-WISE SECTIONS -->
+        ${Object.entries(examGroups).map(([exam, subjects]) => {
+                const examTotal = subjects.reduce((a, s) => a + s.marks_obtained, 0);
+                const examMax = subjects.reduce((a, s) => a + s.max_marks, 0);
+                const examAvg = ((examTotal / examMax) * 100).toFixed(1);
+                const examGrade = calculateGrade(parseFloat(examAvg), 100);
+
                 return `
-                    <div class="subject-block">
-                        <div class="subject-block-header">
-                            <span class="sb-name">
-                                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-                                </svg>
-                                ${subj}
-                            </span>
-                            <span class="sb-avg">Average: ${avg}%</span>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Exam</th>
-                                        <th>Marks</th>
-                                        <th>Max</th>
-                                        <th>Percentage</th>
-                                        <th>Grade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${exams.map(e => {
-                    const pct = ((e.marks_obtained / e.max_marks) * 100).toFixed(1);
-                    const g = calculateGrade(e.marks_obtained, e.max_marks);
+                <div class="subject-block">
+                    <div class="subject-block-header">
+                        <span class="sb-name">
+                            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            ${exam} - ${getExamFullName(exam)}
+                        </span>
+                        <span class="sb-avg">Average: ${examAvg}% | Grade: ${examGrade.grade}</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Marks</th>
+                                    <th>Max</th>
+                                    <th>Percentage</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subjects.map(s => {
+                    const pct = ((s.marks_obtained / s.max_marks) * 100).toFixed(1);
+                    const g = calculateGrade(s.marks_obtained, s.max_marks);
                     return `<tr>
-                                            <td><span class="badge badge-blue">${e.exam_type}</span></td>
-                                            <td><strong>${e.marks_obtained}</strong></td>
-                                            <td>${e.max_marks}</td>
-                                            <td>${pct}%</td>
-                                            <td><span class="grade-badge ${g.cls}">${g.grade}</span></td>
-                                        </tr>`;
+                                        <td><strong>${s.subjects?.subject_name || 'Unknown'}</strong></td>
+                                        <td><strong>${s.marks_obtained}</strong></td>
+                                        <td>${s.max_marks}</td>
+                                        <td>${pct}%</td>
+                                        <td><span class="grade-badge ${g.cls}">${g.grade}</span></td>
+                                    </tr>`;
                 }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>`;
+                                <tr style="background: var(--gray-50); font-weight: 700;">
+                                    <td>Total / Average</td>
+                                    <td>${examTotal}</td>
+                                    <td>${examMax}</td>
+                                    <td>${examAvg}%</td>
+                                    <td><span class="grade-badge ${examGrade.cls}">${examGrade.grade}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
             }).join('') || '<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 1rem;">📊</div><p>No marks recorded yet</p></div>'}
-        `;
+
+        <!-- CONSOLIDATED PROGRESS REPORT -->
+        ${marks.length > 0 ? `
+        <div class="subject-block" style="margin-top: 2rem; border: 2px solid var(--primary);">
+            <div class="subject-block-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+                <span class="sb-name" style="color: white;">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: white;">
+                        <path d="M3 3v18h18"/>
+                        <path d="M18 17V9"/>
+                        <path d="M13 17V5"/>
+                        <path d="M8 17v-3"/>
+                    </svg>
+                    CONSOLIDATED PROGRESS REPORT
+                </span>
+                <span class="sb-avg" style="background: rgba(255,255,255,0.2); color: white;">Overall Average: ${avgPct}%</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 150px;">Subject / Exam</th>
+                            <th>FA1</th>
+                            <th>FA2</th>
+                            <th>SA1</th>
+                            <th>FA3</th>
+                            <th>FA4</th>
+                            <th>SA2</th>
+                            <th>Average</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allSubjects.map(subj => {
+                const rowData = consolidatedData[subj];
+                const scores = [];
+
+                let rowHTML = `<tr>
+                                <td style="font-weight: 700; background: var(--gray-50);">${subj}</td>`;
+
+                ['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'].forEach(exam => {
+                    const data = rowData[exam];
+                    if (data) {
+                        scores.push(parseFloat(data.pct));
+                        const color = data.pct >= 80 ? 'var(--success)' : data.pct >= 60 ? 'var(--warning)' : 'var(--danger)';
+                        rowHTML += `<td style="text-align: center;">
+                                        <div style="font-weight: 700; color: ${color};">${data.obtained}/${data.max}</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">${data.pct}%</div>
+                                    </td>`;
+                    } else {
+                        rowHTML += `<td style="text-align: center; color: var(--gray-300);">–</td>`;
+                    }
+                });
+
+                const subjAvg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '–';
+                const subjGrade = subjAvg !== '–' ? calculateGrade(parseFloat(subjAvg), 100) : null;
+
+                rowHTML += `
+                                <td style="text-align: center; font-weight: 700;">${subjAvg !== '–' ? subjAvg + '%' : '–'}</td>
+                                <td style="text-align: center;">
+                                    ${subjGrade ? `<span class="grade-badge ${subjGrade.cls}">${subjGrade.grade}</span>` : '–'}
+                                </td>
+                            </tr>`;
+
+                return rowHTML;
+            }).join('')}
+                        
+                        <!-- Overall Row -->
+                        <tr style="background: linear-gradient(135deg, var(--indigo-50) 0%, var(--indigo-100) 100%); font-weight: 800;">
+                            <td style="font-weight: 800; color: var(--primary);">OVERALL</td>
+                            ${['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'].map(exam => {
+                const examMarks = marks.filter(m => m.exam_type === exam);
+                if (examMarks.length > 0) {
+                    const examAvg = (examMarks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0) / examMarks.length).toFixed(1);
+                    return `<td style="text-align: center; color: var(--primary);">${examAvg}%</td>`;
+                }
+                return `<td style="text-align: center; color: var(--gray-300);">–</td>`;
+            }).join('')}
+                            <td style="text-align: center; color: var(--primary); font-size: 1.1rem;">${avgPct}%</td>
+                            <td style="text-align: center;">
+                                <span class="grade-badge ${og.cls}" style="font-size: 0.9rem; padding: 0.375rem 1rem;">${og.grade}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        ` : ''}
+    `;
         }
 
+        // Helper function to get full exam name
+        function getExamFullName(exam) {
+            const names = {
+                'FA1': 'Formative Assessment 1',
+                'FA2': 'Formative Assessment 2',
+                'SA1': 'Summative Assessment 1',
+                'FA3': 'Formative Assessment 3',
+                'FA4': 'Formative Assessment 4',
+                'SA2': 'Summative Assessment 2'
+            };
+            return names[exam] || exam;
+        }
         // ========== CLASS REPORT ==========
         async function generateClassReport() {
             const cls = document.getElementById('crClass').value;
