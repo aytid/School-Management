@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details - School Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Page-specific styles */
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .student-profile-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .student-avatar-large {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .student-info h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .student-info p {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            border: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .detail-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .detail-section-header {
+            padding: 1rem 1.25rem;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .detail-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .icon-sm {
+            height: 10px;
+        }
+
+        .exam-block:last-child {
+            border-bottom: none !important;
+        }
+
+        .exam-content {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .exam-header:hover {
+            background: var(--gray-100) !important;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .exam-header {
+                padding: 0.875rem 1rem !important;
+            }
+
+            .exam-content .data-table {
+                font-size: 0.8125rem;
+            }
+
+            .exam-content .data-table th,
+            .exam-content .data-table td {
+                padding: 0.625rem 0.75rem;
+            }
+        }
+
+        /* Mobile Table Scrolling */
+        @media screen and (max-width: 768px) {
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -1rem;
+                padding: 0 1rem;
+            }
+
+            .table-wrapper table {
+                min-width: 500px;
+                width: 100%;
+            }
+
+            .data-table th,
+            .data-table td {
+                white-space: nowrap;
+                padding: 0.75rem 1rem;
+            }
+
+            /* Exam content tables */
+            .exam-content .table-wrapper {
+                margin: 0;
+                padding: 0;
+            }
+
+            .exam-content table {
+                min-width: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <!-- Mobile Profile Section (shown only on mobile) -->
+            <a href="profile.html" class="sidebar-profile-mobile" onclick="closeSidebar()">
+                <div class="profile-avatar-mobile" id="sidebarProfileAvatar">T</div>
+                <div class="profile-info-mobile">
+                    <div class="profile-name-mobile" id="sidebarProfileName">Teacher</div>
+                    <div class="profile-role-mobile">View Profile →</div>
+                </div>
+            </a>
+            <button class="sidebar-close-mobile" onclick="closeSidebar()">✕</button>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <a href="teacher_dashboard.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- <div class="nav-section">
+                    <div class="nav-label">Academic</div>
+                    <a href="enter_marks.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                            </svg>
+                        </span>
+                        <span>Enter Marks</span>
+                    </a>
+                    <a href="take_attendance.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                                <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                <path d="M9 14l2 2 4-4" />
+                            </svg>
+                        </span>
+                        <span>Take Attendance</span>
+                    </a>
+                    <a href="assign_homework.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
+                            </svg>
+                        </span>
+                        <span>Assign Homework</span>
+                    </a>
+                </div> -->
+
+                <div class="nav-section">
+                    <div class="nav-label">Management</div>
+                    <a href="view_students.html" class="nav-item active">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </span>
+                        <span>View Students</span>
+                    </a>
+                    <a href="manage_users.html" class="nav-item" id="manageUsersNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 8v6" />
+                                <path d="M23 11h-6" />
+                            </svg>
+                        </span>
+                        <span>Manage Users</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Records</div>
+                    <a href="reports.html" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18" />
+                                <path d="M18 17V9" />
+                                <path d="M13 17V5" />
+                                <path d="M8 17v-3" />
+                            </svg>
+                        </span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <!-- User chip in sidebar -->
+                <a href="profile.html" class="sidebar-user">
+                    <div class="user-avatar" id="sidebarAvatar">T</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebarName"></div>
+                        <div class="user-role" id="sidebarDesignation"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <div class="main-content">
+            <!-- Mobile header -->
+            <header class="mobile-header">
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="mobile-brand">
+                    <span>ZPHS Nagulapet</span>
+                </div>
+
+                <div class="profile-dropdown">
+                    <button class="profile-btn" id="profileBtn" onclick="toggleProfileDropdown()" aria-label="Profile">
+                        <div class="profile-avatar-img" id="headerProfileAvatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                        <a href="profile.html" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            View Profile
+                        </a>
+                        <button class="dropdown-item" onclick="logout()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                <path d="M16 17l5-5-5-5" />
+                                <path d="M21 12H9" />
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="desktop-topbar">
+                <div class="page-title">
+                    <h1>Student Details</h1>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <a href="view_students.html" class="back-btn">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Back to Students
+                </a>
+
+                <div id="studentContent">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MOBILE BOTTOM NAV ─────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="teacher_dashboard.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </span>
+            <span class="bnav-label">Home</span>
+        </a>
+        <a href="enter_marks.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+            </span>
+            <span class="bnav-label">Marks</span>
+        </a>
+        <a href="take_attendance.html" class="bnav-item bnav-center">
+            <span class="bnav-icon ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    <path d="M9 14l2 2 4-4" />
+                </svg>
+            </span>
+            <span class="bnav-label">Attendance</span>
+        </a>
+        <a href="assign_homework.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+            </span>
+            <span class="bnav-label">Homework</span>
+        </a>
+        <a href="reports.html" class="bnav-item">
+            <span class="bnav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18" />
+                    <path d="M18 17V9" />
+                    <path d="M13 17V5" />
+                    <path d="M8 17v-3" />
+                </svg>
+            </span>
+            <span class="bnav-label">Reports</span>
+        </a>
+    </nav>
+
+    <script src="config.js"></script>
+    <script>
+        // Same sidebar toggle functions
+        function toggleSidebar() { /* ... */ }
+        function closeSidebar() { /* ... */ }
+
+        const teacher = JSON.parse(localStorage.getItem("school_session"));
+        if (!teacher) window.location.href = 'index.html';
+
+        // Get student ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id');
+
+        if (!studentId) {
+            window.location.href = 'view_students.html';
+        }
+        
+        function groupMarksByExam(marks) {
+    // Group marks by exam type
+    const examGroups = {};
+    const examOrder = ['FA1', 'FA2', 'SA1', 'FA3', 'FA4', 'SA2'];
+    
+    marks.forEach(m => {
+        const exam = m.exam_type;
+        if (!examGroups[exam]) {
+            examGroups[exam] = [];
+        }
+        examGroups[exam].push(m);
+    });
+    
+    // Sort exams by predefined order
+    const sortedExams = Object.keys(examGroups).sort((a, b) => {
+        const indexA = examOrder.indexOf(a);
+        const indexB = examOrder.indexOf(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+    
+    // Generate HTML for each exam group
+    return sortedExams.map(exam => {
+        const examMarks = examGroups[exam];
+        const totalObtained = examMarks.reduce((sum, m) => sum + m.marks_obtained, 0);
+        const totalMax = examMarks.reduce((sum, m) => sum + m.max_marks, 0);
+        const avgPct = ((totalObtained / totalMax) * 100).toFixed(1);
+        const grade = calculateGrade(parseFloat(avgPct), 100);
+        
+        const examNames = {
+            'FA1': 'Formative Assessment 1',
+            'FA2': 'Formative Assessment 2',
+            'SA1': 'Summative Assessment 1',
+            'FA3': 'Formative Assessment 3',
+            'FA4': 'Formative Assessment 4',
+            'SA2': 'Summative Assessment 2'
+        };
+        
+        return `
+        <div class="exam-block" style="border-bottom: 1px solid var(--gray-200);">
+            <div class="exam-header" style="padding: 1rem 1.25rem; background: var(--gray-50); display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleExam('${exam}')">
+                <div>
+                    <div style="font-weight: 700; color: var(--gray-900); font-size: 0.95rem;">
+                        ${exam} - ${examNames[exam] || exam}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">
+                        ${examMarks.length} subjects | Average: ${avgPct}%
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="grade-badge ${grade.cls}">${grade.grade}</span>
+                    <svg class="exam-toggle-icon" id="icon-${exam}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; color: var(--gray-400); transition: transform 0.2s;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="exam-content" id="exam-${exam}" style="display: none;">
+                <div class="table-wrapper">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Max</th>
+                                <th>%</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${examMarks.map(m => {
+                                const pct = ((m.marks_obtained / m.max_marks) * 100).toFixed(1);
+                                const g = calculateGrade(m.marks_obtained, m.max_marks);
+                                return `<tr>
+                                    <td>${m.subjects?.subject_name || '–'}</td>
+                                    <td><strong>${m.marks_obtained}</strong></td>
+                                    <td>${m.max_marks}</td>
+                                    <td>${pct}%</td>
+                                    <td><span class="grade-badge ${g.cls}">${g.grade}</span></td>
+                                </tr>`;
+                            }).join('')}
+                            <tr style="background: var(--gray-50); font-weight: 700;">
+                                <td>Total / Average</td>
+                                <td>${totalObtained}</td>
+                                <td>${totalMax}</td>
+                                <td>${avgPct}%</td>
+                                <td><span class="grade-badge ${grade.cls}">${grade.grade}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+function toggleExam(examId) {
+            const content = document.getElementById(`exam-${examId}`);
+            const icon = document.getElementById(`icon-${examId}`);
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        async function loadStudent() {
+            // Load student data
+            const { data: student } = await db.from('students')
+                .select('*')
+                .eq('id', studentId)
+                .single();
+
+            if (!student) {
+                document.getElementById('studentContent').innerHTML =
+                    '<div class="empty-state">Student not found</div>';
+                return;
+            }
+
+            // Load marks and attendance
+            const [marksRes, attRes] = await Promise.all([
+                db.from('marks').select('*, subjects(subject_name)').eq('student_id', studentId),
+                db.from('attendance').select('status').eq('student_id', studentId)
+            ]);
+
+            const marks = marksRes.data || [];
+            const att = attRes.data || [];
+
+            const attTotal = att.length;
+            const attPresent = att.filter(a => a.status === 'Present').length;
+            const attPct = attTotal > 0 ? ((attPresent / attTotal) * 100).toFixed(1) : 0;
+
+            let avgPct = '–';
+            if (marks.length > 0) {
+                const total = marks.reduce((a, m) => a + (m.marks_obtained / m.max_marks * 100), 0);
+                avgPct = (total / marks.length).toFixed(1) + '%';
+            }
+
+            // Render content
+            document.getElementById('studentContent').innerHTML = `
+                <div class="student-profile-card">
+                    <div class="student-avatar-large">${student.name.charAt(0).toUpperCase()}</div>
+                    <div class="student-info">
+                        <h1>${student.name}</h1>
+                        <p>Class ${student.class_name} - Section ${student.section} | Roll: ${student.roll_number}</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">${avgPct}</div>
+                        <div class="stat-label">Average Marks</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: ${attPct >= 75 ? 'var(--success)' : attPct >= 60 ? 'var(--warning)' : 'var(--danger)'}">${attPct}%</div>
+                        <div class="stat-label">Attendance</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${marks.length}</div>
+                        <div class="stat-label">Total Exams</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${attPresent}/${attTotal}</div>
+                        <div class="stat-label">Days Present</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-header">Student Information</div>
+                    <div class="detail-row">
+                        <span class="detail-label">Full Name</span>
+                        <span class="detail-value">${student.name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Roll Number</span>
+                        <span class="detail-value">${student.roll_number}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Class</span>
+                        <span class="detail-value">${student.class_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Section</span>
+                        <span class="detail-value">${student.section}</span>
+                    </div>
+                </div>
+                ${marks.length > 0 ? `
+<div class="detail-section">
+    <div class="detail-section-header">Exam Results</div>
+    ${groupMarksByExam(marks)}
+</div>` : '<div class="detail-section"><div class="detail-section-header">Exam Results</div><div style="padding: 2rem; text-align: center; color: var(--gray-400);">No marks recorded yet</div></div>'}
+            `;
+
+
+            // After rendering, expand the first exam
+            setTimeout(() => {
+                const firstExam = document.querySelector('.exam-content');
+                const firstIcon = document.querySelector('.exam-toggle-icon');
+                if (firstExam && firstIcon) {
+                    firstExam.style.display = 'block';
+                    firstIcon.style.transform = 'rotate(180deg)';
+                }
+            }, 100);
+        }
+
+        loadStudent();
+
+        /* ── Populate user info ── */
+        const initials = teacher?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'T';
+        // Desktop sidebar avatar
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (sidebarAvatar) {
+            if (teacher?.image_url) {
+                sidebarAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarAvatar.textContent = initials;
+            }
+        }
+        // Mobile profile avatar
+        const sidebarProfileAvatar = document.getElementById('sidebarProfileAvatar');
+        if (sidebarProfileAvatar) {
+            if (teacher?.image_url) {
+                sidebarProfileAvatar.innerHTML = `<img src="${teacher.image_url}" alt="${teacher.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                sidebarProfileAvatar.textContent = initials;
+            }
+        }
+
+        document.getElementById('sidebarName').textContent = teacher.name;
+        document.getElementById('sidebarDesignation').textContent = teacher.designation || "Teacher";
+        document.getElementById('sidebarProfileName').textContent = teacher.name.split(' ')[0];
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebarOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            sb.classList.toggle('open');
+            ov.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.getElementById('hamburgerBtn').classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>

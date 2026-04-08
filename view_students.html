@@ -645,7 +645,7 @@
     </nav>
 
     <!-- Student Detail Modal -->
-    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <!-- <div class="modal-overlay" id="modal" onclick="closeModal(event)">
         <div class="modal">
             <div class="modal-header">
                 <div>
@@ -662,7 +662,7 @@
             </div>
             <div class="modal-body" id="modalBody"></div>
         </div>
-    </div>
+    </div> -->
 
     <script src="config.js"></script>
     <script>
@@ -755,8 +755,10 @@
                 return;
             }
 
-            document.getElementById('studentGrid').innerHTML = filtered.map(s => `
-                <div class="student-card" onclick="openModal(${s.id})">
+            // document.getElementById('studentGrid').innerHTML = filtered.map(s => `
+            //     <div class="student-card" onclick="openModal(${s.id})">
+                document.getElementById('studentGrid').innerHTML = filtered.map(s => `
+    <div class="student-card" onclick="window.location.href='student.html?id=${s.id}'">
                     <div class="student-card-avatar">${s.name.charAt(0).toUpperCase()}</div>
                     <div>
                         <div class="sc-name">${s.name}</div>
