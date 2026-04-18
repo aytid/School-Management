@@ -3,391 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Website Inauguration</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <title>ZPHS Nagulapet - Exclusive Unveiling</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS Reset & Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* --- Base & Reset --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background-color: #050505;
-            font-family: 'Playfair Display', serif;
-            color: #d4af37; /* Royal Gold */
-            overflow: hidden; /* Prevent scrolling during animation */
-        }
-
-        /* Stage and Lighting */
-        .stage {
-            position: relative;
+            background-color: #0a0a0a;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
             width: 100vw;
             height: 100vh;
+            color: #e6dfd5; /* Soft Alabaster */
+        }
+
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, #2a0808 0%, #000000 70%);
+            background: #000;
         }
 
-        /* Velvet Curtains */
+        /* --- Ambient Lighting --- */
+        /* Simulates a high-end gallery spotlight hitting the center */
+        .gallery-spotlight {
+            position: absolute;
+            top: -20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150vw;
+            height: 150vh;
+            background: radial-gradient(ellipse at top, rgba(224, 203, 170, 0.15) 0%, rgba(10, 10, 10, 0) 70%);
+            z-index: 25;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* --- Background Images Sequence --- */
+        .background-sequence {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            background: #0a0a0a;
+        }
+
+        .school-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0;
+            transform: scale(1.02); /* Start slightly zoomed */
+            transition: opacity 2s ease-in-out;
+            filter: brightness(0.8) contrast(1.1) grayscale(10%); /* Cinematic architectural color grading */
+        }
+
+        .school-image.active {
+            opacity: 1;
+            /* Very slow, subtle Ken Burns pan */
+            animation: luxuryPan 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes luxuryPan {
+            from { transform: scale(1.02) translateY(0); }
+            to { transform: scale(1.08) translateY(-1%); }
+        }
+
+        /* --- Realistic Heavy Linen Drapes --- */
         .curtain {
             position: absolute;
             top: 0;
-            width: 50vw;
+            width: 51vw; /* Slight overlap to prevent gaps */
             height: 100vh;
-            /* Velvet texture simulation */
+            /* Simulating physical folds of heavy matte fabric */
             background: 
-                linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 20%, rgba(255,255,255,0.05) 50%, transparent 80%, rgba(0,0,0,0.5) 100%),
-                linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.3) 100%),
-                #4a0000; /* Deep Red */
-            background-size: 10vw 100%, 100% 100%, 100% 100%;
+                linear-gradient(to right, 
+                    rgba(255,255,255,0.01) 0%, 
+                    rgba(0,0,0,0.4) 12%, 
+                    rgba(255,255,255,0.04) 25%, 
+                    rgba(0,0,0,0.5) 45%, 
+                    rgba(255,255,255,0.02) 65%, 
+                    rgba(0,0,0,0.6) 85%,
+                    rgba(255,255,255,0.03) 100%),
+                #141517; /* Deep Slate/Charcoal */
+            background-size: 12vw 100%, 100% 100%;
             z-index: 20;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
-            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            /* Slower, heavier easing to simulate physical weight */
+            transition: transform 3.5s cubic-bezier(0.7, 0, 0.1, 1); 
         }
 
-        .curtain-left {
-            left: 0;
-            transform-origin: left;
-            border-right: 2px solid #2a0000;
+        .curtain-left { 
+            left: 0; 
+            transform-origin: left; 
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .curtain-right { 
+            right: 0; 
+            transform-origin: right; 
+            border-left: 1px solid rgba(255,255,255,0.05);
         }
 
-        .curtain-right {
-            right: 0;
-            transform-origin: right;
-            border-left: 2px solid #2a0000;
-        }
+        .stage.open .curtain-left { transform: translateX(-102%); }
+        .stage.open .curtain-right { transform: translateX(102%); }
 
-        /* Curtain Opening Animation */
-        .stage.open .curtain-left {
-            transform: translateX(-100%);
-        }
-
-        .stage.open .curtain-right {
-            transform: translateX(100%);
-        }
-
-        /* Pre-launch Interface (Button & Crest) */
-        .launch-interface {
+        /* --- The Unveiling Interface --- */
+        .launch-overlay {
             position: absolute;
             z-index: 30;
+            width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            transition: opacity 1s ease-out, transform 1s ease-out;
-        }
-
-        .launch-interface.hidden {
-            opacity: 0;
-            transform: scale(1.1);
             pointer-events: none;
         }
 
-        .crest {
-            font-size: 4rem;
-            color: #d4af37;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-            animation: slowRotate 15s linear infinite;
+        .school-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4.5rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 25vh;
+            color: #fcfbf9;
+            text-shadow: 0 10px 40px rgba(0,0,0,0.9);
+            transition: opacity 1.5s ease, transform 1.5s ease;
         }
 
-        @keyframes slowRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .school-title i { font-style: italic; color: #d1bfae; }
+
+        /* --- Hyper-Realistic Silk Ribbon --- */
+        .ribbon-wrapper {
+            position: absolute;
+            top: 50%; left: 0;
+            width: 100%; height: 40px;
+            transform: translateY(-50%);
+            display: flex;
+            filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6));
         }
 
-        .launch-btn {
-            background: transparent;
-            color: #d4af37;
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            padding: 1rem 3rem;
-            border: 2px solid #d4af37;
-            border-radius: 4px;
-            cursor: pointer;
+        .ribbon-half {
+            width: 50%; height: 100%;
+            /* Complex gradient to simulate silk shine and shadows */
+            background: linear-gradient(to bottom, 
+                #a38d72 0%, 
+                #d1bfae 20%, 
+                #947e62 45%, 
+                #b0997e 75%, 
+                #756148 100%);
+            transition: transform 1.8s cubic-bezier(0.5, 0, 0.1, 1), opacity 1.5s ease;
             position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 0 15px rgba(212, 175, 55, 0.1);
-            transition: all 0.4s ease;
         }
 
-        .launch-btn::before {
+        /* Ribbon Texture Lines */
+        .ribbon-half::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: skewX(-20deg);
-            transition: left 0.7s ease;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.05) 3px);
         }
 
-        .launch-btn:hover {
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.3);
-            text-shadow: 0 0 10px #d4af37;
-            background: rgba(212, 175, 55, 0.05);
-        }
+        .ribbon-left { transform-origin: center left; border-right: 1px solid #fff; }
+        .ribbon-right { transform-origin: center right; border-left: 1px solid #fff; }
 
-        .launch-btn:hover::before {
-            left: 200%;
-        }
+        /* The Cut Fall */
+        .ribbon-wrapper.cut .ribbon-left { transform: rotate(-10deg) translateY(120vh); opacity: 0; }
+        .ribbon-wrapper.cut .ribbon-right { transform: rotate(10deg) translateY(120vh); opacity: 0; }
 
-        /* Post-launch Content (Behind Curtains) */
-        .content {
+        /* Minimalist Unveil Button */
+        .action-wrapper {
             position: absolute;
-            z-index: 10;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 35;
+            pointer-events: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: all 0.5s ease;
+        }
+
+        .action-wrapper.hidden {
             opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 2s ease-in 0.5s, transform 2s ease-out 0.5s;
-        }
-
-        .stage.open .content {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .welcome-title {
-            font-family: 'Cinzel', serif;
-            font-size: 4rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            background: linear-gradient(to bottom, #ffffff, #d4af37);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Live Badge */
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            margin-top: 1rem;
-            padding: 10px 20px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50px;
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            background-color: #ff3333;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ff3333;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 300px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            margin-top: 3rem;
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, transparent, #d4af37, #fff);
-            box-shadow: 0 0 10px #d4af37;
-        }
-
-        /* Confetti Canvas */
-        #confetti {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 15;
+            transform: translate(-50%, -40%) scale(0.9);
             pointer-events: none;
         }
 
-        /* Responsive Design */
+        .cut-btn {
+            background: #141517;
+            color: #d1bfae;
+            border: 1px solid #d1bfae;
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .cut-btn:hover { 
+            background: #d1bfae; 
+            color: #141517;
+            transform: scale(1.05); 
+            box-shadow: 0 15px 40px rgba(209, 191, 174, 0.3);
+        }
+
+        /* --- Premium Live Badge --- */
+        #live-badge {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s ease;
+            width: 100%;
+        }
+
+        #live-badge.active { opacity: 1; }
+
+        .live-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #d1bfae; /* Champagne/Brass */
+        }
+
+        .pulse-dot {
+            width: 8px; height: 8px;
+            background-color: #d1bfae;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(209, 191, 174, 0.8);
+            animation: softPulse 3s infinite ease-in-out;
+        }
+
+        @keyframes softPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* --- Mobile Adjustments --- */
         @media (max-width: 768px) {
-            .welcome-title { font-size: 2.5rem; }
-            .launch-btn { font-size: 1.2rem; padding: 0.8rem 2rem; }
-            .crest { font-size: 3rem; }
+            .school-title { font-size: 2.8rem; padding: 0 20px; line-height: 1.2; margin-bottom: 15vh; }
+            .live-title { font-size: 2rem; }
+            .ribbon-wrapper { height: 30px; }
+            .cut-btn { width: 60px; height: 60px; font-size: 1rem; }
+            .gallery-spotlight { width: 200vw; }
         }
     </style>
 </head>
 <body>
 
     <div class="stage" id="stage">
+        
+        <div class="gallery-spotlight"></div>
+
+        <div class="background-sequence">
+            <img id="img1" class="school-image" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet Entrance">
+            <img id="img2" class="school-image" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet Campus">
+            
+            <div id="live-badge">
+                <h2 class="live-title">The Digital Space is Open</h2>
+                <div class="live-indicator">
+                    <div class="pulse-dot"></div>
+                    Project Live
+                </div>
+            </div>
+        </div>
+
         <div class="curtain curtain-left"></div>
         <div class="curtain curtain-right"></div>
 
-        <div class="launch-interface" id="launchInterface">
-            <div class="crest">&#x269C;</div> <button class="launch-btn" id="launchBtn">Launch Website</button>
-        </div>
-
-        <div class="content">
-            <h1 class="welcome-title">Welcome to<br>The Grand Project</h1>
-            <div class="live-badge">
-                <div class="dot"></div>
-                Project is Live Now
+        <div class="launch-overlay">
+            <h1 class="school-title" id="schoolTitle">ZPHS <i>Nagulapet</i></h1>
+            
+            <div class="ribbon-wrapper" id="ribbonWrapper">
+                <div class="ribbon-half ribbon-left"></div>
+                <div class="ribbon-half ribbon-right"></div>
             </div>
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+
+            <div class="action-wrapper" id="actionWrapper">
+                <button id="cutBtn" class="cut-btn">Unveil</button>
             </div>
         </div>
 
-        <canvas id="confetti"></canvas>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const launchBtn = document.getElementById('launchBtn');
+            const cutBtn = document.getElementById('cutBtn');
+            const actionWrapper = document.getElementById('actionWrapper');
+            const ribbonWrapper = document.getElementById('ribbonWrapper');
             const stage = document.getElementById('stage');
-            const launchInterface = document.getElementById('launchInterface');
-            const progressBar = document.getElementById('progressBar');
+            const schoolTitle = document.getElementById('schoolTitle');
             
-            // Web Audio API setup for the chime
-            let audioCtx;
+            const img1 = document.getElementById('img1');
+            const img2 = document.getElementById('img2');
+            const liveBadge = document.getElementById('live-badge');
 
-            function playChime() {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
+            cutBtn.addEventListener('click', () => {
+                // 1. Hide the Unveil button smoothly
+                actionWrapper.classList.add('hidden');
                 
-                // Create an oscillator for a pure, bell-like tone
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                oscillator.type = 'sine';
+                // 2. Snap the Silk Ribbon
+                ribbonWrapper.classList.add('cut');
                 
-                // Frequency sweep for a premium chime effect (C5 to E5 to G5 chord feel)
-                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-                oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 1.5); 
+                // 3. Fade out the title text
+                schoolTitle.style.opacity = '0';
+                schoolTitle.style.transform = 'translateY(-15px)'; // Subtle drift up
 
-                // Volume envelope (fade in quickly, fade out slowly)
-                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 3);
-            }
-
-            // Confetti Particle System
-            const canvas = document.getElementById('confetti');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            let particles = [];
-            const colors = ['#d4af37', '#f3e5ab', '#aa6c39', '#ffffff', '#ff3333'];
-
-            class Particle {
-                constructor() {
-                    this.x = canvas.width / 2;
-                    this.y = canvas.height / 2 + 100;
-                    this.r = Math.random() * 6 + 2;
-                    this.dx = Math.random() * 20 - 10;
-                    this.dy = Math.random() * -20 - 10;
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
-                    this.tilt = Math.floor(Math.random() * 10) - 10;
-                    this.tiltAngleInc = (Math.random() * 0.07) + 0.05;
-                    this.tiltAngle = 0;
-                    this.gravity = 0.5;
-                }
-                update() {
-                    this.dy += this.gravity;
-                    this.x += this.dx;
-                    this.y += this.dy;
-                    this.tiltAngle += this.tiltAngleInc;
-                    this.tilt = Math.sin(this.tiltAngle) * 15;
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.lineWidth = this.r;
-                    ctx.strokeStyle = this.color;
-                    ctx.moveTo(this.x + this.tilt + this.r, this.y);
-                    ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r);
-                    ctx.stroke();
-                }
-            }
-
-            function fireConfetti() {
-                for (let i = 0; i < 150; i++) {
-                    particles.push(new Particle());
-                }
-                animateConfetti();
-            }
-
-            function animateConfetti() {
-                requestAnimationFrame(animateConfetti);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                    // Remove particles that fall off screen
-                    if (particles[i].y > canvas.height) {
-                        particles.splice(i, 1);
-                        i--;
-                    }
-                }
-            }
-
-            // Handle Resize
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-
-            // Main Launch Sequence
-            launchBtn.addEventListener('click', () => {
-                // 1. Fade out the interface
-                launchInterface.classList.add('hidden');
-
-                // 2 & 3. Open curtains and play audio slightly after click to ensure audio context starts
+                // 4. Open the heavy linen drapes (delay allows the ribbon to fall first)
                 setTimeout(() => {
                     stage.classList.add('open');
-                    playChime();
                     
-                    // 6. Trigger Confetti just as curtains open wide enough
-                    setTimeout(fireConfetti, 500);
-
-                    // 7. Animate Progress Bar
+                    // 5. Start Image 1 cinematic pan/zoom
                     setTimeout(() => {
-                        progressBar.style.transition = 'width 3.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                        progressBar.style.width = '100%';
-                    }, 1000);
+                        img1.classList.add('active');
+                        
+                        // 6. Crossfade to Image 2 (Slow, gallery-style transition)
+                        setTimeout(() => {
+                            img1.style.opacity = '0'; 
+                            img2.classList.add('active'); 
+                            
+                            // 7. Fade out Image 2 into the dark background and show Live text
+                            setTimeout(() => {
+                                img2.style.opacity = '0.2'; // Keep it barely visible like a memory
+                                liveBadge.classList.add('active');
+                                
+                                // 8. Smooth fade to black before redirect
+                                setTimeout(() => {
+                                    document.body.style.transition = "opacity 1.5s ease";
+                                    document.body.style.opacity = "0";
+                                    
+                                    // Final Redirect
+                                    setTimeout(() => {
+                                        window.location.href = 'index.html'; 
+                                    }, 1500);
+                                    
+                                }, 3500); // Time to read "Live" text
+                                
+                            }, 4500); // Image 2 viewing time
+                            
+                        }, 4500); // Image 1 viewing time
 
-                    // 8. Redirect after sequence finishes (approx 5.5 seconds total)
-                    setTimeout(() => {
-                        // Redirect logic (Update 'index.html' to your actual target destination)
-                        window.location.href = 'index.html'; 
-                    }, 5500);
+                    }, 1000); // Wait for heavy drapes to open halfway before showing image
 
-                }, 400); 
+                }, 500); // Delay after ribbon cut
             });
         });
     </script>
