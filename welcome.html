@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Website Inauguration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050505;
+            font-family: 'Playfair Display', serif;
+            color: #d4af37; /* Royal Gold */
+            overflow: hidden; /* Prevent scrolling during animation */
+        }
+
+        /* Stage and Lighting */
+        .stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #2a0808 0%, #000000 70%);
+        }
+
+        /* Velvet Curtains */
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50vw;
+            height: 100vh;
+            /* Velvet texture simulation */
+            background: 
+                linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 20%, rgba(255,255,255,0.05) 50%, transparent 80%, rgba(0,0,0,0.5) 100%),
+                linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.3) 100%),
+                #4a0000; /* Deep Red */
+            background-size: 10vw 100%, 100% 100%, 100% 100%;
+            z-index: 20;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .curtain-left {
+            left: 0;
+            transform-origin: left;
+            border-right: 2px solid #2a0000;
+        }
+
+        .curtain-right {
+            right: 0;
+            transform-origin: right;
+            border-left: 2px solid #2a0000;
+        }
+
+        /* Curtain Opening Animation */
+        .stage.open .curtain-left {
+            transform: translateX(-100%);
+        }
+
+        .stage.open .curtain-right {
+            transform: translateX(100%);
+        }
+
+        /* Pre-launch Interface (Button & Crest) */
+        .launch-interface {
+            position: absolute;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .launch-interface.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .crest {
+            font-size: 4rem;
+            color: #d4af37;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            animation: slowRotate 15s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .launch-btn {
+            background: transparent;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1rem 3rem;
+            border: 2px solid #d4af37;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 0 15px rgba(212, 175, 55, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .launch-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.7s ease;
+        }
+
+        .launch-btn:hover {
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 10px #d4af37;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .launch-btn:hover::before {
+            left: 200%;
+        }
+
+        /* Post-launch Content (Behind Curtains) */
+        .content {
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 2s ease-in 0.5s, transform 2s ease-out 0.5s;
+        }
+
+        .stage.open .content {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .welcome-title {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            background: linear-gradient(to bottom, #ffffff, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Live Badge */
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            padding: 10px 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff3333;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, transparent, #d4af37, #fff);
+            box-shadow: 0 0 10px #d4af37;
+        }
+
+        /* Confetti Canvas */
+        #confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .welcome-title { font-size: 2.5rem; }
+            .launch-btn { font-size: 1.2rem; padding: 0.8rem 2rem; }
+            .crest { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stage" id="stage">
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+
+        <div class="launch-interface" id="launchInterface">
+            <div class="crest">&#x269C;</div> <button class="launch-btn" id="launchBtn">Launch Website</button>
+        </div>
+
+        <div class="content">
+            <h1 class="welcome-title">Welcome to<br>The Grand Project</h1>
+            <div class="live-badge">
+                <div class="dot"></div>
+                Project is Live Now
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <canvas id="confetti"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const launchBtn = document.getElementById('launchBtn');
+            const stage = document.getElementById('stage');
+            const launchInterface = document.getElementById('launchInterface');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Web Audio API setup for the chime
+            let audioCtx;
+
+            function playChime() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Create an oscillator for a pure, bell-like tone
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.type = 'sine';
+                
+                // Frequency sweep for a premium chime effect (C5 to E5 to G5 chord feel)
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 1.5); 
+
+                // Volume envelope (fade in quickly, fade out slowly)
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 3);
+            }
+
+            // Confetti Particle System
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const colors = ['#d4af37', '#f3e5ab', '#aa6c39', '#ffffff', '#ff3333'];
+
+            class Particle {
+                constructor() {
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2 + 100;
+                    this.r = Math.random() * 6 + 2;
+                    this.dx = Math.random() * 20 - 10;
+                    this.dy = Math.random() * -20 - 10;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.tilt = Math.floor(Math.random() * 10) - 10;
+                    this.tiltAngleInc = (Math.random() * 0.07) + 0.05;
+                    this.tiltAngle = 0;
+                    this.gravity = 0.5;
+                }
+                update() {
+                    this.dy += this.gravity;
+                    this.x += this.dx;
+                    this.y += this.dy;
+                    this.tiltAngle += this.tiltAngleInc;
+                    this.tilt = Math.sin(this.tiltAngle) * 15;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.lineWidth = this.r;
+                    ctx.strokeStyle = this.color;
+                    ctx.moveTo(this.x + this.tilt + this.r, this.y);
+                    ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r);
+                    ctx.stroke();
+                }
+            }
+
+            function fireConfetti() {
+                for (let i = 0; i < 150; i++) {
+                    particles.push(new Particle());
+                }
+                animateConfetti();
+            }
+
+            function animateConfetti() {
+                requestAnimationFrame(animateConfetti);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    // Remove particles that fall off screen
+                    if (particles[i].y > canvas.height) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            // Main Launch Sequence
+            launchBtn.addEventListener('click', () => {
+                // 1. Fade out the interface
+                launchInterface.classList.add('hidden');
+
+                // 2 & 3. Open curtains and play audio slightly after click to ensure audio context starts
+                setTimeout(() => {
+                    stage.classList.add('open');
+                    playChime();
+                    
+                    // 6. Trigger Confetti just as curtains open wide enough
+                    setTimeout(fireConfetti, 500);
+
+                    // 7. Animate Progress Bar
+                    setTimeout(() => {
+                        progressBar.style.transition = 'width 3.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                        progressBar.style.width = '100%';
+                    }, 1000);
+
+                    // 8. Redirect after sequence finishes (approx 5.5 seconds total)
+                    setTimeout(() => {
+                        // Redirect logic (Update 'index.html' to your actual target destination)
+                        window.location.href = 'index.html'; 
+                    }, 5500);
+
+                }, 400); 
+            });
+        });
+    </script>
+</body>
+</html>
