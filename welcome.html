@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZPHS Nagulapet - Exclusive Unveiling</title>
+    <title>ZPHS Nagulapet - Grand Unveiling</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
     
@@ -17,7 +17,7 @@
             overflow: hidden;
             width: 100vw;
             height: 100vh;
-            color: #e6dfd5; /* Soft Alabaster */
+            color: #e6dfd5; 
         }
 
         .stage {
@@ -31,7 +31,6 @@
         }
 
         /* --- Ambient Lighting --- */
-        /* Simulates a high-end gallery spotlight hitting the center */
         .gallery-spotlight {
             position: absolute;
             top: -20vh;
@@ -60,14 +59,13 @@
             object-fit: cover;
             object-position: center;
             opacity: 0;
-            transform: scale(1.02); /* Start slightly zoomed */
+            transform: scale(1.02);
             transition: opacity 2s ease-in-out;
-            filter: brightness(0.8) contrast(1.1) grayscale(10%); /* Cinematic architectural color grading */
+            filter: brightness(0.85) contrast(1.1);
         }
 
         .school-image.active {
             opacity: 1;
-            /* Very slow, subtle Ken Burns pan */
             animation: luxuryPan 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
@@ -76,43 +74,53 @@
             to { transform: scale(1.08) translateY(-1%); }
         }
 
-        /* --- Realistic Heavy Linen Drapes --- */
+        /* --- Luxurious Crimson Curtains --- */
         .curtain {
             position: absolute;
             top: 0;
-            width: 51vw; /* Slight overlap to prevent gaps */
+            width: 51vw; 
             height: 100vh;
-            /* Simulating physical folds of heavy matte fabric */
+            /* Rich Red Velvet/Silk simulation */
             background: 
                 linear-gradient(to right, 
-                    rgba(255,255,255,0.01) 0%, 
+                    rgba(255,255,255,0.02) 0%, 
                     rgba(0,0,0,0.4) 12%, 
-                    rgba(255,255,255,0.04) 25%, 
+                    rgba(255,255,255,0.08) 25%, 
                     rgba(0,0,0,0.5) 45%, 
-                    rgba(255,255,255,0.02) 65%, 
+                    rgba(255,255,255,0.05) 65%, 
                     rgba(0,0,0,0.6) 85%,
                     rgba(255,255,255,0.03) 100%),
-                #141517; /* Deep Slate/Charcoal */
+                #7a0000; /* Deep Crimson Base */
             background-size: 12vw 100%, 100% 100%;
             z-index: 20;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9);
-            /* Slower, heavier easing to simulate physical weight */
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.5);
             transition: transform 3.5s cubic-bezier(0.7, 0, 0.1, 1); 
         }
 
         .curtain-left { 
             left: 0; 
             transform-origin: left; 
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 2px solid #3a0000;
         }
         .curtain-right { 
             right: 0; 
             transform-origin: right; 
-            border-left: 1px solid rgba(255,255,255,0.05);
+            border-left: 2px solid #3a0000;
         }
 
         .stage.open .curtain-left { transform: translateX(-102%); }
         .stage.open .curtain-right { transform: translateX(102%); }
+
+        /* --- Confetti Canvas --- */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 40; /* High z-index to fall over curtains and background */
+            pointer-events: none; /* Let clicks pass through */
+        }
 
         /* --- The Unveiling Interface --- */
         .launch-overlay {
@@ -129,7 +137,7 @@
         .school-title {
             font-family: 'Cormorant Garamond', serif;
             font-size: 4.5rem;
-            font-weight: 300;
+            font-weight: 400;
             letter-spacing: 0.05em;
             text-align: center;
             margin-bottom: 25vh;
@@ -140,7 +148,7 @@
 
         .school-title i { font-style: italic; color: #d1bfae; }
 
-        /* --- Hyper-Realistic Silk Ribbon --- */
+        /* --- Silk Ribbon --- */
         .ribbon-wrapper {
             position: absolute;
             top: 50%; left: 0;
@@ -152,18 +160,11 @@
 
         .ribbon-half {
             width: 50%; height: 100%;
-            /* Complex gradient to simulate silk shine and shadows */
-            background: linear-gradient(to bottom, 
-                #a38d72 0%, 
-                #d1bfae 20%, 
-                #947e62 45%, 
-                #b0997e 75%, 
-                #756148 100%);
+            background: linear-gradient(to bottom, #a38d72 0%, #d1bfae 20%, #947e62 45%, #b0997e 75%, #756148 100%);
             transition: transform 1.8s cubic-bezier(0.5, 0, 0.1, 1), opacity 1.5s ease;
             position: relative;
         }
 
-        /* Ribbon Texture Lines */
         .ribbon-half::after {
             content: '';
             position: absolute;
@@ -174,7 +175,6 @@
         .ribbon-left { transform-origin: center left; border-right: 1px solid #fff; }
         .ribbon-right { transform-origin: center right; border-left: 1px solid #fff; }
 
-        /* The Cut Fall */
         .ribbon-wrapper.cut .ribbon-left { transform: rotate(-10deg) translateY(120vh); opacity: 0; }
         .ribbon-wrapper.cut .ribbon-right { transform: rotate(10deg) translateY(120vh); opacity: 0; }
 
@@ -201,14 +201,14 @@
             background: #141517;
             color: #d1bfae;
             border: 1px solid #d1bfae;
-            width: 70px; height: 70px;
+            width: 80px; height: 80px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-style: italic;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -238,7 +238,7 @@
         .live-title {
             font-family: 'Cormorant Garamond', serif;
             font-size: 3.5rem;
-            font-weight: 300;
+            font-weight: 400;
             letter-spacing: 0.1em;
             color: #ffffff;
             margin-bottom: 2rem;
@@ -253,7 +253,7 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.3em;
-            color: #d1bfae; /* Champagne/Brass */
+            color: #d1bfae; 
         }
 
         .pulse-dot {
@@ -274,8 +274,7 @@
             .school-title { font-size: 2.8rem; padding: 0 20px; line-height: 1.2; margin-bottom: 15vh; }
             .live-title { font-size: 2rem; }
             .ribbon-wrapper { height: 30px; }
-            .cut-btn { width: 60px; height: 60px; font-size: 1rem; }
-            .gallery-spotlight { width: 200vw; }
+            .cut-btn { width: 70px; height: 70px; font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -284,10 +283,12 @@
     <div class="stage" id="stage">
         
         <div class="gallery-spotlight"></div>
+        
+        <canvas id="confetti-canvas"></canvas>
 
         <div class="background-sequence">
-            <img id="img1" class="school-image" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet Entrance">
-            <img id="img2" class="school-image" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet Campus">
+            <img id="img1" class="school-image" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet 1">
+            <img id="img2" class="school-image" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80" alt="ZPHS Nagulapet 2">
             
             <div id="live-badge">
                 <h2 class="live-title">The Digital Space is Open</h2>
@@ -323,59 +324,119 @@
             const ribbonWrapper = document.getElementById('ribbonWrapper');
             const stage = document.getElementById('stage');
             const schoolTitle = document.getElementById('schoolTitle');
-            
             const img1 = document.getElementById('img1');
             const img2 = document.getElementById('img2');
             const liveBadge = document.getElementById('live-badge');
 
+            // --- Confetti Logic ---
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            // Premium confetti colors: Gold, Champagne, White, Deep Red
+            const colors = ['#d1bfae', '#fcfbf9', '#d4af37', '#a31c1c']; 
+
+            class ConfettiParticle {
+                constructor() {
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2 + 50; // Burst from center where button was
+                    this.r = Math.random() * 6 + 4; // Size
+                    this.dx = Math.random() * 25 - 12.5; // Horizontal spread
+                    this.dy = Math.random() * -25 - 10; // Vertical burst upward
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.tilt = Math.floor(Math.random() * 10) - 10;
+                    this.tiltAngleInc = (Math.random() * 0.07) + 0.05;
+                    this.tiltAngle = 0;
+                    this.gravity = 0.6; // How fast it falls
+                }
+                update() {
+                    this.dy += this.gravity;
+                    this.x += this.dx;
+                    this.y += this.dy;
+                    this.tiltAngle += this.tiltAngleInc;
+                    this.tilt = Math.sin(this.tiltAngle) * 15;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.lineWidth = this.r;
+                    ctx.strokeStyle = this.color;
+                    ctx.moveTo(this.x + this.tilt + this.r, this.y);
+                    ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r);
+                    ctx.stroke();
+                }
+            }
+
+            function fireConfetti() {
+                for (let i = 0; i < 200; i++) { // Generate 200 pieces
+                    particles.push(new ConfettiParticle());
+                }
+                animateConfetti();
+            }
+
+            function animateConfetti() {
+                requestAnimationFrame(animateConfetti);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    // Remove if off screen
+                    if (particles[i].y > canvas.height) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+
+            // --- Main Sequence Logic ---
             cutBtn.addEventListener('click', () => {
-                // 1. Hide the Unveil button smoothly
                 actionWrapper.classList.add('hidden');
-                
-                // 2. Snap the Silk Ribbon
                 ribbonWrapper.classList.add('cut');
                 
-                // 3. Fade out the title text
                 schoolTitle.style.opacity = '0';
-                schoolTitle.style.transform = 'translateY(-15px)'; // Subtle drift up
+                schoolTitle.style.transform = 'translateY(-15px)';
 
-                // 4. Open the heavy linen drapes (delay allows the ribbon to fall first)
                 setTimeout(() => {
                     stage.classList.add('open');
                     
-                    // 5. Start Image 1 cinematic pan/zoom
+                    // Trigger confetti right as curtains open
+                    fireConfetti();
+                    
                     setTimeout(() => {
                         img1.classList.add('active');
                         
-                        // 6. Crossfade to Image 2 (Slow, gallery-style transition)
                         setTimeout(() => {
                             img1.style.opacity = '0'; 
                             img2.classList.add('active'); 
                             
-                            // 7. Fade out Image 2 into the dark background and show Live text
                             setTimeout(() => {
-                                img2.style.opacity = '0.2'; // Keep it barely visible like a memory
+                                img2.style.opacity = '0.2'; 
                                 liveBadge.classList.add('active');
                                 
-                                // 8. Smooth fade to black before redirect
                                 setTimeout(() => {
                                     document.body.style.transition = "opacity 1.5s ease";
                                     document.body.style.opacity = "0";
                                     
-                                    // Final Redirect
                                     setTimeout(() => {
                                         window.location.href = 'index.html'; 
                                     }, 1500);
                                     
-                                }, 3500); // Time to read "Live" text
+                                }, 3500); 
                                 
-                            }, 4500); // Image 2 viewing time
+                            }, 4500); 
                             
-                        }, 4500); // Image 1 viewing time
+                        }, 4500); 
 
-                    }, 1000); // Wait for heavy drapes to open halfway before showing image
+                    }, 1000); 
 
-                }, 500); // Delay after ribbon cut
+                }, 500); 
             });
         });
     </script>
